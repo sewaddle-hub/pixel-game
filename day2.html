@@ -1,0 +1,3994 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пещера Дракона: Тихая кража</title>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    body {
+        background: #000 url('img/Fon day2 Peshchera.svg') no-repeat center center fixed;
+        background-size: cover;
+        color: #ffcc00;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        font-family: 'Press Start 2P', 'Courier New', Courier, monospace;
+    }
+
+    body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        z-index: -1;
+    }
+
+    /* Остальные стили... */
+    .game-title,
+    .title-subtitle,
+    .cutscene-text,
+    .character-name,
+    .dialogue-choice,
+    .game-btn,
+    .start-button,
+    .cutscene-next-btn,
+    .start-minigame-btn,
+    .continue-btn,
+    .hint-text,
+    .stat-value,
+    .alertness-percent,
+    .event-description,
+    .minigame-description,
+    .stone-result-description,
+    .choice-btn,
+    .choice-details,
+    .choice-outcome,
+    .sound-toggle,
+    #dragonStatus,
+    #stepCounter,
+    #alertnessPercent,
+    #waitButton,
+    #stepButton,
+    #stoneButton,
+    #startMinigameBtn,
+    .minigame-title {
+        font-family: 'Press Start 2P', 'Courier New', Courier, monospace !important;
+        font-weight: normal;
+        letter-spacing: 0.5px;
+    }
+
+    .choice-header,
+    .event-title,
+    .stone-result-title,
+    .music-toggle,
+    .volume-value {
+        font-family: 'Orbitron', sans-serif !important;
+        font-weight: bold;
+    }
+
+    .stat-title,
+    .alertness-label {
+        font-family: 'Press Start 2P', 'Courier New', Courier, monospace !important;
+        font-weight: normal;
+        letter-spacing: 0.5px;
+    }
+
+    .minigame-title {
+        font-family: 'Press Start 2P', 'Courier New', Courier, monospace !important;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+        text-shadow: 0 0 10px #ff6600;
+        padding-bottom: 10px;
+        border-bottom: 2px solid rgba(255, 102, 0, 0.5);
+        color: #ffcc00;
+    }
+
+    .pixel-border-video {
+        border: 4px solid;
+        border-image: 
+            repeating-linear-gradient(
+                45deg,
+                #ffcc00 0px,
+                #ff6600 10px,
+                #cc3300 20px,
+                #ffcc00 30px
+            ) 10;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        border-radius: 0;
+    }
+
+    .pixel-filter {
+        filter: 
+            blur(0.5px) 
+            contrast(1.2) 
+            saturate(1.1);
+    }
+    
+    .start-minigame-btn {
+        background: linear-gradient(135deg, #8B4513, #A0522D);
+        border: 4px solid #FFD700;
+        color: #FFD700;
+        padding: 20px 40px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        margin-top: 30px;
+        border-radius: 10px;
+        transition: all 0.3s;
+        position: relative;
+        overflow: hidden;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-shadow: 2px 2px 0 #000;
+        box-shadow: 0 5px 15px rgba(139, 69, 19, 0.5);
+        animation: pulseGlow 2s infinite alternate;
+    }
+
+    @keyframes pulseGlow {
+        0% {
+            box-shadow: 0 5px 15px rgba(139, 69, 19, 0.5);
+            transform: scale(1);
+        }
+        100% {
+            box-shadow: 0 5px 25px rgba(139, 69, 19, 0.8), 0 0 30px rgba(255, 215, 0, 0.4);
+            transform: scale(1.02);
+        }
+    }
+
+    .start-minigame-btn:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(139, 69, 19, 0.7), 0 0 40px rgba(255, 215, 0, 0.6);
+        background: linear-gradient(135deg, #A0522D, #8B4513);
+    }
+
+    .start-minigame-btn:active {
+        transform: translateY(0) scale(1);
+    }
+
+    .start-minigame-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .start-minigame-btn:hover::before {
+        left: 100%;
+    }
+    
+    .game-title {
+        font-size: 2.5rem;
+        margin-bottom: 30px;
+        color: #ff6600;
+        text-shadow: 0 0 15px #ff3300;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .title-subtitle,
+    .cutscene-text,
+    .event-description,
+    .minigame-description,
+    .hint-text,
+    .stone-result-description {
+        line-height: 1.6;
+        font-size: 1rem;
+    }
+    
+    .stat-title,
+    .alertness-label,
+    .choice-header {
+        font-size: 0.9rem;
+    }
+    
+    .stat-value,
+    .alertness-percent {
+        font-size: 1.2rem;
+    }
+    
+    .game-container {
+        width: 100%;
+        max-width: 1400px;
+        height: 95vh;
+        max-height: 800px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .title-screen {
+        text-align: center;
+        padding: 40px;
+        background: rgba(0, 0, 0, 0.9);
+        border: 4px solid #8B4513;
+        border-radius: 15px;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: radial-gradient(circle at center, #331100 0%, #000000 100%);
+    }
+    
+    .title-subtitle {
+        color: #ff9966;
+        font-size: 1rem;
+        margin-bottom: 30px;
+        line-height: 1.6;
+        max-width: 800px;
+    }
+    
+    .start-button {
+        background: linear-gradient(135deg, #8B4513, #A0522D);
+        border: 3px solid #FFD700;
+        color: #FFD700;
+        padding: 20px 50px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        margin-top: 30px;
+        border-radius: 8px;
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+        letter-spacing: 1px;
+        text-shadow: 1px 1px 0 #000;
+        box-shadow: 0 4px 0 #5D2900;
+    }
+    
+    .start-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 #5D2900;
+        background: linear-gradient(135deg, #A0522D, #8B4513);
+    }
+    
+    .start-button:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 0 #5D2900;
+    }
+    
+    .cutscene-screen {
+        display: none;
+        flex: 1;
+        flex-direction: column;
+        background: #000;
+        border: 4px solid #8B4513;
+        border-radius: 10px;
+        overflow: hidden;
+        height: 100%;
+        background: linear-gradient(to bottom, #1a0a0a, #331100);
+    }
+    
+    .cutscene-video-container {
+        flex: 1;
+        min-height: 400px;
+        background: #000;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .cutscene-video {
+        width: 100%;
+        height: 100%;
+        max-height: 500px;
+        object-fit: contain;
+        display: none;
+    }
+    
+    .cutscene-video.active {
+        display: block;
+    }
+    
+    .cutscene-text-container {
+        flex: 0 0 auto;
+        background: rgba(40, 10, 0, 0.95);
+        border-top: 4px solid #8B4513;
+        padding: 20px;
+        min-height: 150px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    .cutscene-text {
+        color: #ffcc99;
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+    
+    .character-name {
+        color: #ff9966;
+        font-size: 1rem;
+        margin-bottom: 10px;
+        display: block;
+    }
+    
+    .cutscene-next-btn {
+        background: linear-gradient(135deg, #8B4513, #A0522D);
+        border: 3px solid #FFD700;
+        color: #FFD700;
+        padding: 15px 40px;
+        font-size: 1rem;
+        cursor: pointer;
+        border-radius: 8px;
+        align-self: flex-end;
+        transition: all 0.2s;
+        letter-spacing: 1px;
+        text-shadow: 1px 1px 0 #000;
+        box-shadow: 0 4px 0 #5D2900;
+    }
+    
+    .cutscene-next-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 #5D2900;
+        background: linear-gradient(135deg, #A0522D, #8B4513);
+    }
+    
+    .cutscene-next-btn:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 0 #5D2900;
+    }
+    
+    .dialogue-choices {
+        display: none;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .dialogue-choice {
+        background: rgba(102, 0, 0, 0.7);
+        border: 3px solid #ff6600;
+        border-radius: 10px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-align: left;
+        line-height: 1.4;
+        color: white;
+        font-size: 0.8rem;
+    }
+    
+    .dialogue-choice:hover {
+        transform: translateY(-3px);
+        border-color: #ffcc00;
+        box-shadow: 0 5px 20px rgba(255, 102, 0, 0.4);
+        background: rgba(153, 0, 0, 0.7);
+    }
+    
+    .game-scene {
+        display: none;
+        flex: 1;
+        flex-direction: row;
+        background: #000;
+        border: 4px solid #8B4513;
+        border-radius: 10px;
+        overflow: hidden;
+        position: relative;
+        background: linear-gradient(to right, #1a0a0a, #331100);
+    }
+    
+    .video-column {
+        flex: 0 0 65%;
+        position: relative;
+        background: #000;
+    }
+    
+    .dragon-video-main {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        background: #000;
+        max-height: 600px;
+        width: 95%;
+    }
+    
+    .dragon-video-wrapper {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .dragon-video {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: none;
+    }
+    
+    .dragon-video.active {
+        display: block;
+    }
+    
+    .video-fallback {
+        color: #ff6600;
+        font-size: 2rem;
+        text-align: center;
+        display: none;
+    }
+    
+    .ui-column {
+        flex: 0 0 35%;
+        background: rgba(20, 0, 0, 0.95);
+        border-left: 4px solid #8B4513;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .game-stats {
+        background: rgba(255, 102, 0, 0.1);
+        padding: 15px;
+        border-radius: 8px;
+        border: 2px solid rgba(255, 102, 0, 0.3);
+        margin-bottom: 15px;
+    }
+    
+    .stat-title {
+        color: #ff9966;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+    
+    .stat-value {
+        color: #ffcc00;
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+    }
+    
+    .alertness-container {
+        margin-top: 10px;
+    }
+    
+    .alertness-label {
+        color: #ff9966;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
+        display: block;
+    }
+    
+    .alertness-bar {
+        width: 100%;
+        height: 20px;
+        background: #330000;
+        border: 2px solid #ff6600;
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+        margin-bottom: 5px;
+    }
+    
+    .alertness-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #660000, #ff3300);
+        transition: width 0.5s;
+    }
+    
+    .alertness-percent {
+        color: #ffcc00;
+        font-size: 1.2rem;
+        display: block;
+        text-align: right;
+        padding-right: 5px;
+        margin-top: 5px;
+    }
+    
+    .hint-box {
+        background: rgba(255, 107, 107, 0.1);
+        padding: 20px;
+        border-radius: 10px;
+        border: 3px solid rgba(255, 107, 107, 0.3);
+        margin-bottom: 15px;
+        min-height: 140px;
+        display: flex;
+        align-items: center;
+        gap: 25px;
+    }
+    
+    .yumi-icon {
+        width: 140px;
+        height: 140px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+        border: 3px solid rgba(255, 102, 0, 0.7);
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .yumi-icon::before {
+        content: '';
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        right: -5px;
+        bottom: -5px;
+        background: linear-gradient(45deg, #ff6600, #ffcc00, #ff6600);
+        border-radius: 12px;
+        z-index: -1;
+        opacity: 0.3;
+        animation: glowBorder 3s infinite alternate;
+    }
+    
+    @keyframes glowBorder {
+        from { opacity: 0.2; }
+        to { opacity: 0.5; }
+    }
+    
+    .yumi-img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow(0 0 5px rgba(255, 204, 0, 0.5));
+        transition: all 0.3s ease;
+    }
+    
+    .hint-text {
+        color: white;
+        font-size: 1rem;
+        line-height: 1.5;
+        transition: all 0.3s;
+        flex: 1;
+        padding: 10px;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        border-left: 4px solid rgba(255, 102, 0, 0.5);
+    }
+    
+    .controls {
+        margin-top: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .control-row {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .game-btn {
+        flex: 1;
+        padding: 15px;
+        background: linear-gradient(135deg, #8B4513, #A0522D);
+        border: 3px solid #FFD700;
+        color: #FFD700;
+        font-size: 0.8rem;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.2s;
+        position: relative;
+        overflow: hidden;
+        letter-spacing: 1px;
+        text-shadow: 1px 1px 0 #000;
+        box-shadow: 0 4px 0 #5D2900;
+    }
+    
+    .game-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        transform: translate(-50%, -50%);
+        transition: width 0.3s, height 0.3s;
+    }
+    
+    .game-btn:active::before {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .game-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 #5D2900;
+        background: linear-gradient(135deg, #A0522D, #8B4513);
+    }
+    
+    .game-btn:active:not(:disabled) {
+        transform: translateY(1px);
+        box-shadow: 0 2px 0 #5D2900;
+    }
+    
+    .game-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background: linear-gradient(135deg, #444444, #222222);
+        border-color: #666666;
+        box-shadow: 0 2px 0 #222222;
+    }
+    
+    .stone-btn {
+        background: linear-gradient(135deg, #666666, #333333);
+        border: 3px solid #999999;
+        box-shadow: 0 4px 0 #222222;
+    }
+    
+    .stone-btn:disabled {
+        background: linear-gradient(135deg, #444444, #222222);
+        border-color: #666666;
+        box-shadow: 0 2px 0 #222222;
+    }
+    
+    .event-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        padding: 20px;
+    }
+    
+    .event-box {
+        background: linear-gradient(135deg, rgba(30, 15, 0, 0.95), rgba(20, 10, 0, 0.95));
+        border: 4px solid #ff6600;
+        border-radius: 15px;
+        padding: 25px;
+        max-width: 700px;
+        width: 95%;
+        text-align: center;
+        box-shadow: 0 0 40px rgba(255, 102, 0, 0.7);
+    }
+    
+    .event-title {
+        color: #ffcc00;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        text-shadow: 0 0 10px #ff6600;
+        padding-bottom: 10px;
+        border-bottom: 2px solid rgba(255, 102, 0, 0.5);
+    }
+    
+    .event-description {
+        color: #ffcc99;
+        font-size: 0.9rem;
+        margin-bottom: 25px;
+        line-height: 1.6;
+        background: rgba(0, 0, 0, 0.4);
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 102, 0, 0.3);
+    }
+    
+    .choices-comparison {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    
+    .choice-column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border-radius: 10px;
+        overflow: hidden;
+        border: 3px solid transparent;
+    }
+    
+    .choice-column.risky {
+        border-color: #FF9800;
+        background: rgba(255, 152, 0, 0.1);
+    }
+    
+    .choice-column.safe {
+        border-color: #4CAF50;
+        background: rgba(76, 175, 80, 0.1);
+    }
+    
+    .choice-header {
+        padding: 15px;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+    
+    .risky .choice-header {
+        background: linear-gradient(135deg, #FF9800, #F57C00);
+        color: #000000;
+    }
+    
+    .safe .choice-header {
+        background: linear-gradient(135deg, #4CAF50, #2E7D32);
+        color: #000000;
+    }
+    
+    .choice-details {
+        padding: 15px;
+        text-align: left;
+        flex-grow: 1;
+        color: #ffffff;
+        font-size: 0.8rem;
+        line-height: 1.5;
+    }
+    
+    .choice-details ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 10px 0;
+    }
+    
+    .choice-details li {
+        margin-bottom: 8px;
+        padding-left: 20px;
+        position: relative;
+    }
+    
+    .choice-details li::before {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: #ffcc00;
+    }
+    
+    .choice-outcome {
+        padding: 10px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        border-top: 2px solid rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+    }
+    
+    .risky .choice-outcome {
+        background: rgba(255, 152, 0, 0.2);
+    }
+    
+    .safe .choice-outcome {
+        background: rgba(76, 175, 80, 0.2);
+    }
+    
+    .choice-buttons {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .choice-btn {
+        flex: 1;
+        padding: 18px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        border-radius: 8px;
+        border: 3px solid;
+        transition: all 0.2s;
+        font-weight: bold;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+    }
+    
+    .choice-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 rgba(0,0,0,0.3);
+    }
+    
+    .choice-btn:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+    }
+    
+    .btn-risky {
+        background: linear-gradient(135deg, #FF9800, #F57C00);
+        border-color: #FFB74D;
+        color: #000000;
+    }
+    
+    .btn-risky:hover {
+        background: linear-gradient(135deg, #FFB74D, #FF9800);
+        box-shadow: 0 6px 0 rgba(255, 152, 0, 0.6);
+    }
+    
+    .btn-safe {
+        background: linear-gradient(135deg, #4CAF50, #2E7D32);
+        border-color: #81C784;
+        color: #000000;
+    }
+    
+    .btn-safe:hover {
+        background: linear-gradient(135deg, #66BB6A, #4CAF50);
+        box-shadow: 0 6px 0 rgba(76, 175, 80, 0.6);
+    }
+    
+    .risk-badge {
+        display: inline-block;
+        background: #ff3333;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        margin-left: 5px;
+    }
+    
+    .safe-badge {
+        display: inline-block;
+        background: #33cc33;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        margin-left: 5px;
+    }
+    
+    .shake {
+        animation: shake 0.5s;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+    
+    .pulse-success {
+        animation: pulseSuccess 0.5s;
+    }
+    
+    @keyframes pulseSuccess {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .pulse-fail {
+        animation: pulseFail 0.5s;
+    }
+    
+    @keyframes pulseFail {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .sound-toggle {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: rgba(0,0,0,0.8);
+        border: 2px solid #ffcc00;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        z-index: 1000;
+        transition: all 0.2s;
+        letter-spacing: 1px;
+    }
+    
+    .sound-toggle:hover {
+        background: rgba(255,102,0,0.8);
+        transform: translateY(-2px);
+    }
+    
+    .pixel-border {
+        image-rendering: pixelated;
+        border-style: solid;
+        border-width: 4px;
+        border-image: repeating-linear-gradient(45deg, #ffcc00, #ff6600 10px) 10;
+    }
+    
+    .btn-pixel {
+        image-rendering: pixelated;
+        position: relative;
+    }
+    
+    .btn-pixel::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        right: -2px;
+        bottom: -2px;
+        background: rgba(0,0,0,0.3);
+        z-index: -1;
+        border-radius: 8px;
+    }
+    
+    .glow {
+        animation: glow 2s infinite alternate;
+    }
+    
+    @keyframes glow {
+        from { box-shadow: 0 0 10px #ff6600; }
+        to { box-shadow: 0 0 20px #ffcc00, 0 0 30px #ff6600; }
+    }
+    
+    .pixel-text {
+        text-shadow: 2px 2px 0 #000,
+                    -2px -2px 0 #000,
+                    2px -2px 0 #000,
+                    -2px 2px 0 #000;
+    }
+    
+    .music-controls {
+        position: absolute;
+        top: 20px;
+        right: 120px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(0,0,0,0.8);
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 2px solid #00ccff;
+        z-index: 1000;
+    }
+    
+    .music-toggle {
+        background: transparent;
+        border: none;
+        color: white;
+        padding: 0;
+        cursor: pointer;
+        font-size: 0.8rem;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+    
+    .music-toggle:hover {
+        color: #00ccff;
+        transform: translateY(-2px);
+    }
+    
+    .volume-slider-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 100px;
+    }
+    
+    .volume-icon {
+        color: white;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .volume-slider {
+        width: 100%;
+        -webkit-appearance: none;
+        appearance: none;
+        height: 8px;
+        background: #330000;
+        border-radius: 4px;
+        border: 1px solid #00ccff;
+        outline: none;
+        cursor: pointer;
+    }
+    
+    .volume-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        background: #00ccff;
+        border-radius: 50%;
+        border: 2px solid #ffffff;
+        cursor: pointer;
+        box-shadow: 0 0 5px rgba(0, 204, 255, 0.8);
+    }
+    
+    .volume-slider::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        background: #00ccff;
+        border-radius: 50%;
+        border: 2px solid #ffffff;
+        cursor: pointer;
+        box-shadow: 0 0 5px rgba(0, 204, 255, 0.8);
+    }
+    
+    .volume-value {
+        color: white;
+        font-size: 0.7rem;
+        min-width: 30px;
+        text-align: center;
+    }
+    
+    .stone-throw-effect {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 4rem;
+        z-index: 50;
+        animation: stoneThrow 1.5s ease-out;
+        pointer-events: none;
+    }
+    
+    @keyframes stoneThrow {
+        0% {
+            transform: translate(-50%, -50%) scale(0.5);
+            opacity: 1;
+        }
+        50% {
+            transform: translate(100%, -100%) scale(1);
+            opacity: 0.8;
+        }
+        100% {
+            transform: translate(200%, -200%) scale(1.5);
+            opacity: 0;
+        }
+    }
+    
+    .stone-result-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 90;
+        padding: 20px;
+    }
+    
+    .stone-result-box {
+        background: linear-gradient(135deg, rgba(30, 15, 0, 0.95), rgba(20, 10, 0, 0.95));
+        border: 4px solid;
+        border-radius: 15px;
+        padding: 30px;
+        max-width: 500px;
+        width: 95%;
+        text-align: center;
+        animation: resultAppear 0.5s ease-out;
+    }
+    
+    @keyframes resultAppear {
+        0% {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+    
+    .stone-result-title {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+        text-shadow: 0 0 10px currentColor;
+    }
+    
+    .stone-result-description {
+        font-size: 1rem;
+        margin-bottom: 25px;
+        line-height: 1.6;
+    }
+    
+    .result-success {
+        border-color: #4CAF50;
+        box-shadow: 0 0 40px rgba(76, 175, 80, 0.7);
+    }
+    
+    .result-success .stone-result-title {
+        color: #4CAF50;
+    }
+    
+    .result-fail {
+        border-color: #F44336;
+        box-shadow: 0 0 40px rgba(244, 67, 54, 0.7);
+    }
+    
+    .result-fail .stone-result-title {
+        color: #F44336;
+    }
+    
+    .continue-btn {
+        background: linear-gradient(135deg, #8B4513, #A0522D);
+        border: 3px solid #FFD700;
+        color: #FFD700;
+        padding: 15px 30px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.2s;
+        margin-top: 20px;
+        letter-spacing: 1px;
+        text-shadow: 1px 1px 0 #000;
+        box-shadow: 0 4px 0 #5D2900;
+    }
+    
+    .continue-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 0 #5D2900;
+        background: linear-gradient(135deg, #A0522D, #8B4513);
+    }
+    
+    .continue-btn:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 0 #5D2900;
+    }
+    
+    .music-controls .music-toggle[title]:hover::after {
+        content: attr(title);
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        z-index: 1001;
+    }
+    
+    .volume-slider-container:hover::after {
+        content: "Громкость эмбиента";
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.8);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        z-index: 1001;
+    }
+    
+    .scale-up {
+        animation: scaleUp 0.5s ease-out;
+    }
+    
+    @keyframes scaleUp {
+        0% { transform: scale(0.9); opacity: 0.7; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .yumi-img.changing {
+        animation: spriteChange 0.3s ease;
+    }
+    
+    @keyframes spriteChange {
+        0% { opacity: 0.5; transform: scale(0.95); }
+        50% { opacity: 0.8; transform: scale(1.05); }
+        100% { opacity: 1; transform: scale(1); }
+    }
+
+    .minigame-intro {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.95);
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 200;
+        padding: 20px;
+    }
+
+    .minigame-box {
+        background: linear-gradient(135deg, rgba(30, 15, 0, 0.95), rgba(20, 10, 0, 0.95));
+        border: 4px solid #ff6600;
+        border-radius: 15px;
+        padding: 25px;
+        max-width: 700px;
+        width: 95%;
+        text-align: center;
+        box-shadow: 0 0 40px rgba(255, 102, 0, 0.7);
+    }
+
+    .minigame-description {
+        color: #ffcc99;
+        font-size: 1rem;
+        margin-bottom: 25px;
+        line-height: 1.6;
+        background: rgba(0, 0, 0, 0.4);
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 102, 0, 0.3);
+    }
+
+    .cutscene-next-btn {
+        font-family: 'Press Start 2P', 'Courier New', Courier, monospace !important;
+    }
+
+    .fade-transition {
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    .fade-in {
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    .final-screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #000;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .final-message {
+        background: rgba(0, 0, 0, 0.9);
+        padding: 40px;
+        border-radius: 15px;
+        border: 4px solid #ffcc00;
+        max-width: 800px;
+        width: 100%;
+        box-shadow: 0 0 50px rgba(255, 204, 0, 0.5);
+        animation: finalAppear 1s ease-out;
+    }
+
+    @keyframes finalAppear {
+        0% {
+            transform: scale(0.8);
+            opacity: 0;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .final-title {
+        color: #ffcc00;
+        font-size: 2.5rem;
+        margin-bottom: 30px;
+        text-shadow: 0 0 15px #ff3300;
+        font-family: 'Press Start 2P', monospace;
+    }
+
+    .final-text {
+        color: #ffcc99;
+        font-size: 1.2rem;
+        line-height: 1.8;
+        margin-bottom: 40px;
+        font-family: 'Press Start 2P', monospace;
+    }
+
+    .return-button {
+        background: linear-gradient(135deg, #8B4513, #A0522D);
+        border: 4px solid #FFD700;
+        color: #FFD700;
+        padding: 20px 50px;
+        font-size: 1.2rem;
+        cursor: pointer;
+        border-radius: 10px;
+        transition: all 0.3s;
+        font-family: 'Press Start 2P', monospace;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-shadow: 2px 2px 0 #000;
+        box-shadow: 0 5px 0 #5D2900;
+        margin-top: 20px;
+        animation: pulseReturn 2s infinite alternate;
+    }
+
+    @keyframes pulseReturn {
+        0% {
+            transform: scale(1);
+            box-shadow: 0 5px 0 #5D2900;
+        }
+        100% {
+            transform: scale(1.05);
+            box-shadow: 0 5px 0 #5D2900, 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+    }
+
+    .return-button:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 8px 0 #5D2900, 0 0 40px rgba(255, 215, 0, 0.7);
+        background: linear-gradient(135deg, #A0522D, #8B4513);
+    }
+
+    .return-button:active {
+        transform: translateY(2px) scale(1);
+        box-shadow: 0 2px 0 #5D2900;
+    }
+</style>
+</head>
+<body>
+    <button class="sound-toggle" id="soundToggle" title="Переключить звуковые эффекты">🔊 ВКЛ</button>
+    
+    <div class="music-controls" id="musicControls">
+        <button class="music-toggle" id="musicToggle" title="Эмбиент пещеры: ВКЛ">🎵</button>
+        <div class="volume-slider-container">
+            <div class="volume-icon">🔊</div>
+            <input type="range" min="0" max="100" value="8" class="volume-slider" id="volumeSlider">
+            <div class="volume-value" id="volumeValue">8%</div>
+        </div>
+    </div>
+    
+    <div class="game-container">
+        <!-- ЭКРАН ЗАСТАВКИ -->
+        <div class="title-screen" id="titleScreen">
+            <h1 class="game-title pixel-text">🐉 ПЕЩЕРА ДРАКОНА: ТИХАЯ КРАЖА</h1>
+            <p class="title-subtitle">
+                Ледяной Пик — так называют эту гору из-за её вечно заснеженной вершины.<br><br>
+                Но те, кто спускается в его глубины, знают правду: под ледяной коркой скрывается 
+                огненное сердце горы. Здесь, в раскалённых пещерах, где камни светятся 
+                багровым светом, спит древний страж — дракон изумрудных чешуй, охраняющий 
+                самоцветы, что пылают изнутри алым огнём.<br><br>
+                Говорят, он просыпается только от крика — или от кражи.
+            </p>
+            <button class="start-button btn-pixel" id="startButton">
+                ▶ НАЧАТЬ ИГРУ
+            </button>
+        </div>
+        
+        <!-- ЭКРАН КАТСЦЕНЫ -->
+        <div class="cutscene-screen" id="cutsceneScreen">
+            <div class="cutscene-video-container">
+                <video class="cutscene-video" id="cutsceneVideo1" loop muted playsinline>
+    <source src="video/Nik idet po peshere.mp4" type="video/mp4">
+</video>
+<video class="cutscene-video" id="cutsceneVideo2" loop muted playsinline>
+    <source src="video/Nik obnarujil drakona.mp4" type="video/mp4">
+</video>
+<video class="cutscene-video" id="cutsceneVideo3" loop muted playsinline>
+    <source src="video/ogony.mp4" type="video/mp4">
+</video>
+<video class="cutscene-video" id="cutsceneVideo4" loop muted playsinline>
+    <source src="video/presledyet.mp4" type="video/mp4">
+</video>
+<video class="cutscene-video" id="cutsceneVideo5" loop muted playsinline>
+    <source src="video/Ybegaut.mp4" type="video/mp4">
+</video>
+<video class="cutscene-video" id="cutsceneVideo6" loop muted playsinline>
+    <source src="video/Deeper tunnel.mp4" type="video/mp4">
+</video>
+<video class="cutscene-video" id="cutsceneVideo7" loop muted playsinline>
+    <source src="video/Underground lake.mp4" type="video/mp4">
+</video>
+<video class="cutscene-video" id="cutsceneVideo8" loop muted playsinline>
+    <source src="video/Crystal in hands.mp4" type="video/mp4">
+</video>
+<video class="cutscene-video" id="cutsceneVideo9" loop muted playsinline>
+    <source src="video/Climbing out.mp4" type="video/mp4">
+</video>
+<video class="cutscene-video" id="cutsceneVideo10" loop muted playsinline>
+    <source src="video/Exit on mountainside.mp4" type="video/mp4">
+</video>
+<video class="cutscene-video" id="cutsceneVideo11" loop muted playsinline>
+    <source src="video/Final.mp4" type="video/mp4">
+</video>
+            </div>
+            
+            <div class="cutscene-text-container" id="cutsceneTextContainer">
+                <div class="cutscene-text" id="cutsceneText">
+                    Загрузка сцены...
+                </div>
+                
+                <div class="dialogue-choices" id="dialogueChoices">
+                    <!-- Кнопки выбора будут добавлены через JS -->
+                </div>
+                
+                <button class="cutscene-next-btn btn-pixel" id="cutsceneNextBtn">
+                    ▶ ДАЛЕЕ
+                </button>
+            </div>
+        </div>
+        
+        <!-- ИГРОВАЯ СЦЕНА (МИНИ-ИГРА) -->
+        <div class="game-scene" id="gameScene">
+            <!-- ЛЕВАЯ ЧАСТЬ - ВИДЕО ДРАКОНА -->
+            <div class="video-column">
+                <div class="dragon-video-main">
+                    <div class="dragon-video-wrapper">
+                        <video class="dragon-video" id="dragonSleepVideo" loop muted playsinline>
+                            <source src="video/spit.mp4" type="video/mp4">
+                        </video>
+                        <video class="dragon-video" id="dragonRestlessVideo" loop muted playsinline>
+                            <source src="video/vorochaetsya.mp4" type="video/mp4">
+                        </video>
+                        <video class="dragon-video" id="dragonAwakeVideo" loop muted playsinline>
+                            <source src="video/smotrit.mp4" type="video/mp4">
+                        </video>
+                        <div class="video-fallback" id="videoFallback">
+                            🐉<br>
+                            <div style="font-size: 1rem; margin-top: 20px;">
+                                Видео дракона
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ПРАВАЯ ЧАСТЬ - ИНТЕРФЕЙС -->
+            <div class="ui-column">
+                <!-- СТАТУС -->
+                <div class="game-stats">
+                    <div class="stat-title">СТРАЖ ПЕЩЕРЫ</div>
+                    <div class="stat-value pixel-text" id="dragonStatus">ГЛУБОКО СПИТ</div>
+                    
+                    <div class="stat-title" style="margin-top: 15px;">ШАГИ</div>
+                    <div class="stat-value pixel-text" id="stepCounter">0/30</div>
+                    
+                    <!-- КОНТЕЙНЕР БДИТЕЛЬНОСТИ -->
+                    <div class="alertness-container">
+                        <div class="stat-title">БДИТЕЛЬНОСТЬ</div>
+                        <div class="alertness-bar">
+                            <div class="alertness-fill" id="alertnessFill"></div>
+                        </div>
+                        <div class="alertness-percent pixel-text" id="alertnessPercent">0%</div>
+                    </div>
+                </div>
+                
+                <!-- ПАНЕЛЬ ПОДСКАЗОК -->
+                <div class="hint-box">
+                    <div class="yumi-icon" id="yumiIcon">
+                        <img src="img/Yumi sitting.svg" alt="Юми" class="yumi-img float" id="yumiImage">
+                    </div>
+                    <div class="hint-text" id="hintText">
+                        Тише... Начинаем путь...
+                    </div>
+                </div>
+                
+                <!-- УПРАВЛЕНИЕ -->
+                <div class="controls" id="controlsContainer">
+                    <div class="control-row">
+                        <button class="game-btn btn-pixel" id="waitButton">
+                            ⏸️ ПОДОЖДАТЬ
+                        </button>
+                        <button class="game-btn btn-pixel" id="stepButton">
+                            👣 ШАГ ВПЕРЁД
+                        </button>
+                    </div>
+                    <!-- Кнопка камня появится на 15 шаге -->
+                    <button class="game-btn stone-btn btn-pixel" id="stoneButton" style="display: none;">
+                        🪨 КИНУТЬ КАМЕНЬ
+                    </button>
+                </div>
+            </div>
+            
+            <!-- ЗАСТАВКА ПЕРЕД МИНИ-ИГРОЙ -->
+            <div class="minigame-intro" id="minigameIntro">
+                <div class="minigame-box">
+                    <div class="minigame-title pixel-text">ВНИМАНИЕ: ДРАКОН ВПЕРЕДИ!</div>
+                    <div class="minigame-description">
+                        Ник наклоняется к Юми, говорит почти без звука, только губами:<br><br>
+                        <em>"Запомни: любое падение камня, любой скрип — конец. Мы не бежим. Мы не дышим громко. Мы — тень."</em><br><br>
+                        Впереди спящий дракон. Нужно пройти 30 шагов до кристаллов и не разбудить его!
+                    </div>
+                    <button class="start-minigame-btn btn-pixel" id="startMinigameBtn">
+                        ▶ НАЧАТЬ ПРОХОЖДЕНИЕ
+                    </button>
+                </div>
+            </div>
+            
+            <!-- ОВЕРЛЕЙ ДЛЯ СОБЫТИЙ -->
+            <div class="event-overlay" id="eventOverlay">
+                <div class="event-box">
+                    <div class="event-title pixel-text" id="eventTitle">СОБЫТИЕ</div>
+                    <div class="event-description" id="eventDescription">
+                        Описание события...
+                    </div>
+                    
+                    <!-- ЭЛЕМЕНТ ДЛЯ СРАВНЕНИЯ ВАРИАНТОВ -->
+                    <div class="choices-comparison" id="choicesComparison">
+                        <!-- Будет заполняться JavaScript -->
+                    </div>
+                    
+                    <!-- ЭЛЕМЕНТ ДЛЯ КНОПОК ВЫБОРА -->
+                    <div class="choice-buttons">
+                        <button class="choice-btn btn-risky btn-pixel" id="eventChoice1">
+                            ВЫБРАТЬ РИСКОВАННЫЙ ПУТЬ
+                        </button>
+                        <button class="choice-btn btn-safe btn-pixel" id="eventChoice2">
+                            ВЫБРАТЬ БЕЗОПАСНЫЙ ПУТЬ
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ОВЕРЛЕЙ РЕЗУЛЬТАТА БРОСКА КАМНЯ -->
+            <div class="stone-result-overlay" id="stoneResultOverlay">
+                <div class="stone-result-box" id="stoneResultBox">
+                    <div class="stone-result-title" id="stoneResultTitle">РЕЗУЛЬТАТ</div>
+                    <div class="stone-result-description" id="stoneResultDescription">
+                        Описание результата...
+                    </div>
+                    <button class="continue-btn" id="stoneContinueBtn">ПРОДОЛЖИТЬ</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ФИНАЛЬНЫЙ ЭКРАН -->
+    <div class="final-screen" id="finalScreen" style="display: none;">
+        <div class="final-message">
+            <h2 class="final-title">ПУТЕШЕСТВИЕ ПРОДОЛЖАЕТСЯ...</h2>
+            <p class="final-text">
+                Ник и Юми успешно выбрались из пещеры дракона с заветным кристаллом.<br><br>
+                Но это только начало их приключения...<br><br>
+                Сердце Горы, которое они забрали, открывает путь к древним тайнам,<br>
+                скрытым в глубинах этого мира.
+            </p>
+            <button class="return-button" id="returnButton">
+                🏠 ВЕРНУТЬСЯ НА ГЛАВНУЮ
+            </button>
+        </div>
+    </div>
+
+    <script>
+class DragonStealthGame {
+    constructor() {
+        this.state = 'menu';
+        this.cutsceneIndex = 0;
+        
+        // Мини-игра
+        this.step = 0;
+        this.maxSteps = 30;
+        this.alertness = 0;
+        this.dragonState = 'sleeping';
+        this.hasStone = false;
+        this.stoneUsed = false;
+        this.canAct = true;
+        this.videoPlaying = false;
+        this.justRestless = false;
+        this.soundEnabled = true;
+        this.musicEnabled = true;
+        this.musicVolume = 0.08;
+        this.currentYumiState = 'sitting';
+        this.pauseMode = false;
+        this.awakeCount = 0;
+        this.firstVideoPlayed = false;
+        
+        this.awakeBlockTimer = null;
+        this.awakeBlockDuration = 5000;
+        
+        this.initAudio();
+        
+        // Сцены перед мини-игрой
+        this.cutscenes = [
+            {
+                video: 'cutsceneVideo1',
+                text: 'Стены из красно-коричневого камня покрыты налётом серы. В воздухе висит лёгкая дымка, а из трещин в полу пробивается слабое красное свечение.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo1',
+                text: '<span class="character-name">ЮМИ</span> (вытирая пот со лба):<br>Жарко, как в печи... И пахнет серой. Это точно Ледяной Пик?',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo1',
+                text: '<span class="character-name">НИК</span> (касаясь тёплой стены):<br>Название обманчиво. Снаружи — ледник, внутри — вулканическая активность. Гора спит лишь снаружи.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo1',
+                text: 'Они проходят под аркой из нагретого камня. Воздух становится ещё горячее, пахнет расплавленной породой и сероводородом.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo1',
+                text: '<span class="character-name">ЮМИ</span> (шепчет):<br>Ты слышал истории? Говорят, тот, кто разбудит дракона… никогда не выйдет отсюда.',
+                hasChoices: true,
+                choices: [
+                    {
+                        text: '🔥 «Истории — для детей. Мы пришли за реальной добычей.»',
+                        effect: '+5% уверенности'
+                    },
+                    {
+                        text: '🌋 «Тем тише нужно быть. Жара искажает звук.»',
+                        effect: 'Начальная бдительность -5%'
+                    },
+                    {
+                        text: '👂 «Слушай его дыхание. Ритм горячего воздуха — наше преимущество.»',
+                        effect: 'Лучшее чувство ритма'
+                    },
+                    {
+                        text: '💎 «Если бы это было безопасно — кристаллы давно бы забрали.»',
+                        effect: '+10% осторожности'
+                    }
+                ]
+            },
+            {
+                video: 'cutsceneVideo1',
+                text: 'После ответа Ника они продвигаются глубже. Температура растёт. На стенах появляются отложения вулканического стекла, а в воздухе плавают искорки пепла.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo1',
+                text: '<span class="character-name">ЮМИ</span> (шепчет, указывая на потолок):<br>Смотри… сталактиты. Но не ледяные, а из охлаждённой лавы. И они всё ещё тёплые.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo1',
+                text: '<span class="character-name">НИК</span> (присматриваясь к узорам):<br>Да. Вся пещера — как гигантская печь. Значит, мы почти у цели. Дракон должен быть где-то здесь.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo2',
+                text: 'Ещё несколько шагов — и они выходят в огромный зал с куполообразным потолок. В центре, на нагретой каменной плите, свернувшись кольцами, лежит оно.<br><br><strong>ДРАКОН.</strong> Чешуя переливается изумрудно-зелёными и золотистыми оттенками. Из ноздрей выходит тёплый пар, а под боками видны небольшие трещины в полу, откуда пробивается слабое красное свечение магмы.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo2',
+                text: '<span class="character-name">ЮМИ</span> (замирая, чувствуя волну тепла):<br>Он… он дышит. Каждый выдох — как из кузнечного горна. И смотри — вокруг него камни нагреты до красна.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo2',
+                text: '<span class="character-name">НИК</span> (медленно выдыхая, капли пота на лбу):<br>Вижу. И вижу кристаллы. Прямо у его лап. Они светятся изнутри — тепло активирует их свечение.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo2',
+                text: 'Между передними лапами дракона, в небольшом углублении в нагретом камне, лежит гроздь светящихся самоцветов. Они пульсируют тёплым оранжево-красным светом, как угли в костре.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo2',
+                text: '<span class="character-name">ЮМИ</span>:<br>Тридцать шагов, Ник. Всего тридцать шагов… по раскалённому полу. Мимо него.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo2',
+                text: '<span class="character-name">НИК</span>:<br>У нас есть преимущество. Жара делает воздух плотным — звук распространяется хуже. Он спит глубоким сном в своём тепле. Он не видит нас. Не слышит, если мы будем осторожны, как тень.',
+                hasChoices: false
+            }
+        ];
+        
+        // Сцены после мини-игры (дракон просыпается и продолжение)
+        this.postMinigameCutscenes = [
+            {
+                video: 'cutsceneVideo3',
+                text: 'Рука Ника сжимает тёплый кристалл. Алая пульсация самоцвета освещает его пальцы странным, тревожным светом.<br><br><span class="character-name">ЮМИ</span> (шепчет):<br>У нас получилось! Давай выбираться отсюда!',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo3',
+                text: 'Но как только кристалл покидает своё место, в пещере что-то меняется. Воздух становится тяжелее. Тепло, что исходило от пола, начинает пульсировать, словно сердце чего-то огромного замедлило свой ритм.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo3',
+                text: '<span class="character-name">ДРАКОН</span> (шевельнулся во сне):<br>*Глубокий вздох, похожий на раскаты подземного грома*<br><br><span class="character-name">ЮМИ</span> (хватая Ника за рукав):<br>Он чувствует! Дракон чувствует, что кристалла нет!',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo3',
+                text: 'Веки дракона вздрагивают. Из ноздрей вырываются клубы пара и первые искры пламени. Он чувствует пустоту там, где веками лежала его святыня.<br><br><span class="character-name">НИК</span> (сжимая кристалл):<br>Кристалл... он связан с ним. Магма горы питала и дракона, и самоцвет.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo3',
+                text: '<span class="character-name">ДРАКОН</span> (открывает один глаз — щель, полную раскалённого золота):<br>*Низкое, нарастающее рычание, от которого дрожат камни под ногами*<br><br>ЗАБРАЛИ. ПОТРОГАЛИ. УКРАЛИ.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo3',
+                text: '<span class="character-name">НИК</span> (отталкивая Юми назад):<br>БЕЖИМ! Теперь только бежать!<br><br>Дракон медленно поднимается на ноги, чешуя звенит, как стальная броня. Его пасть разевается, и внутри уже пылает огненный шар, готовый извергнуться потоком пламени.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo4',
+                text: '<span class="character-name">ПОГОНЯ</span>:<br><br>Каменные стены пещеры начинают трястись. Из главного зала доносится грохот — дракон сносит сталактиты на своём пути. Его шаги отдаются глухими ударами по каменному полу, и с каждым ударом к сводам пещеры поднимается облако пепла и пыли.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo4',
+                text: '<span class="character-name">ЮМИ</span> (задыхаясь, оглядываясь через плечо):<br>Он идёт! Я слышу... каждый шаг — как обвал!<br><br><span class="character-name">НИК</span> (таща её за собой):<br>Не оглядывайся! Беги! Помни туннель — впереди развилка, налево!',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo4',
+                text: 'За ними раздаётся оглушительный рёв, от которого осыпаются мелкие камни с потолка. Пламя вырывается из пасти дракона, опаляя стены, оставляя за собой полосы расплавленного камня. Тепло нарастает сзади, как приближающаяся волна.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo4',
+                text: '<span class="character-name">НИК</span> (кричит, перекрывая грохот):<br>Он не остановится! Он будет преследовать нас до самого выхода! Кристалл для него — часть его самого!<br><br><span class="character-name">ЮМИ</span> (спотыкаясь):<br>Мы не успеем! Он слишком быстрый!',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo5',
+                text: '<span class="character-name">СПАСЕНИЕ</span>:<br><br>Ник резко сворачивает в узкий проход, едва заметный в стене. Юми протискивается следом. Они бегут по низкому туннелю, где потолок почти касается головы, а под ногами хрустит вулканическое стекло.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo5',
+                text: '<span class="character-name">ЮМИ</span> (шепчет, задыхаясь):<br>Мы его потеряли?<br><br><span class="character-name">НИК</span> (прислушиваясь):<br>Нет... Он всё ещё там. Слышишь? Рычит. Ищет нас. Но этот проход для него слишком узок.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo5',
+                text: 'Вдалеке слышен яростный рёв дракона, бьющегося о стены туннеля. Камни сыплются, но проход держится. Через несколько минут они выбегают в более широкий коридор, и впереди показывается слабый свет — свет дня, проникающий через вход в пещеру.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo5',
+                text: '<span class="character-name">ПЕРЕДЫШКА</span>:<br><br>Спустя час бега по извилистым туннелям Ник наконец останавливается, прислонившись к холодной стене. Звуки дракона давно затихли вдалеке.<br><br><span class="character-name">ЮМИ</span> (опускаясь на колени):<br>Мы... мы оторвались от него...',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo8',
+                text: '<span class="character-name">КРИСТАЛЛ</span>:<br><br>Ник достаёт из сумки кристалл. Даже в темноте туннеля он светится мягким оранжевым светом, отбрасывая на стены причудливые тени.<br><br><span class="character-name">НИК</span> (осторожно касаясь кристалла):<br>Посмотри на это... Чувствуешь тепло? Как будто держишь маленькое солнце в руке.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo8',
+                text: '<span class="character-name">ЮМИ</span> (заворожённо):<br>Он... живой? Или это просто отражение магмы?<br><br><span class="character-name">НИК</span> (внимательно изучая):<br>Нет, это не просто камень. Смотри — внутри что-то движется, как расплавленное золото. Говорят, такие кристаллы могут быть ключом...',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo8',
+                text: '<span class="character-name">НИК</span> (замолкает, затем продолжает тише):<br>...ключом к чему-то более древнему, чем драконы. Но об этом позже. Сейчас нам нужно найти выход.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo6',
+                text: '<span class="character-name">ПРОДОЛЖЕНИЕ ПУТИ</span>:<br><br>Они идут дальше по туннелю, который становится всё шире и прохладнее. Влажный воздух пахнет мхом и сыростью — признак того, что где-то рядом есть вода.<br><br><span class="character-name">ЮМИ</span> (прислушиваясь):<br>Ты слышишь? Как будто... журчание.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo6',
+                text: 'Туннель ведёт их вниз, в ещё более глубокие слои горы. Стены покрыты блестящими минеральными отложениями, а под ногами появляются следы влаги. Температура продолжает падать, и жар пещеры дракона остаётся далеко позади.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo6',
+                text: '<span class="character-name">НИК</span> (осматривая развилку):<br>Направо туннель сужается, налево — расширяется. И оттуда идёт тот самый звук воды.<br><br><span class="character-name">ЮМИ</span> (указывая налево):<br>Туда. Если есть вода, значит, есть и выход к поверхности.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo7',
+                text: '<span class="character-name">ПОДЗЕМНОЕ ОЗЕРО</span>:<br><br>Туннель внезапно открывается в огромную пещеру, потолок которой теряется в темноте. Но самое удивительное — в центре пещеры лежит озеро кристально чистой воды, освещённое голубоватым светом, исходящим от биолюминесцентных грибов на стенах.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo7',
+                text: 'Вода в озере настолько прозрачна, что видно дно, усыпанное белым песком и гладкими камнями. С потолка свисают сталактиты, с кончиков которых капает вода, создавая тихую, умиротворяющую музыку.<br><br><span class="character-name">ЮМИ</span> (заворожённо):<br>Это... невероятно...',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo7',
+                text: '<span class="character-name">НИК</span> (подходя к краю воды):<br>Смотри — на той стороне. Видишь отражение?<br><br>В спокойной воде озера отражается слабый луч света, пробивающийся сквозь трещину в дальнем конце пещеры.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo7',
+                text: '<span class="character-name">ЮМИ</span> (взволнованно):<br>Это... дневной свет! Выход!<br><br><span class="character-name">НИК</span> (улыбаясь):<br>Озеро не только указало нам путь, но и дало надежду. Вода всегда находит дорогу к поверхности.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo9',
+                text: '<span class="character-name">ВЫХОД ИЗ ПЕЩЕРЫ</span>:<br><br>Ник и Юми начинают карабкаться по узкому проходу, который ведёт вверх. Свет становится всё ярче, а воздух — свежее. Они слышат шум ветра и чувствуют холодный горный воздух.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo9',
+                text: 'Через некоторое время они достигают узкого выхода, сквозь который видно небо. Ник помогает Юми выбраться наружу, а затем и сам вылезает из темноты пещеры.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo10',
+                text: '<span class="character-name">ГОРНЫЙ СКЛОН</span>:<br><br>Они стоят на склоне горы, над пропастью. Внизу, в долине, видна деревня — маленькие домики, дым из труб, освещённые окна. После долгих часов в темноте пещеры этот вид кажется нереальным.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo10',
+                text: '<span class="character-name">ЮМИ</span> (вдыхая холодный воздух):<br>Мы... мы выбрались. Я не верила, что мы сможем...<br><br><span class="character-name">НИК</span> (смотря на деревню):<br>Теперь нужно добраться туда. Кристалл у нас, но это только начало.',
+                hasChoices: false
+            },
+            {
+                video: 'cutsceneVideo11',
+                text: '<span class="character-name">ФИНАЛЬНЫЙ ВИД</span>:<br><br>Ник и Юми стоят на склоне горы, смотря на деревню внизу. Кристалл в руке Ника мягко светится в сумерках. Их приключение в пещере дракона закончилось, но новое только начинается...',
+                hasChoices: false
+            }
+        ];
+        
+        // События мини-игры
+        this.events = {
+    5: {  // ДОБАВЛЕНО НОВОЕ СОБЫТИЕ С МЕЧОМ
+        type: 'sword_choice', 
+        done: false,
+        title: 'НЕЛЕПЫЙ ВЫБОР',
+        description: 'Вы вспоминаете про меч, который нашли в первый день. Может, стоит его использовать?',
+        risky: {
+            name: 'ПОПРОБОВАТЬ УДАРИТЬ МЕЧОМ',
+            description: 'Абсолютно безумная, но смелая идея',
+            details: [
+                'Шанс на успех: 1%',
+                'При успехе: ИНСТАНТ-ПОБЕДА!',
+                'При провале: Дракон ПРОСЫПАЕТСЯ мгновенно!',
+                '+50% бдительности в любом случае'
+            ],
+            outcome: '🎲 1% на чудо, 99% на катастрофу'
+        },
+        safe: {
+            name: 'ОСТАВИТЬ МЕЧ В ПОКОЕ',
+            description: 'Разумное решение',
+            details: [
+                'Безопасный проход',
+                '+1 обычный шаг вперёд',
+                '-10% бдительности (осознание своей глупости)',
+                'Меч остаётся на месте'
+            ],
+            outcome: '🧠 Мудрое решение'
+        }
+    },
+    10: { 
+        type: 'crack', 
+        done: false,
+        title: 'ТРЕЩИНА С МАГМОЙ',
+        description: 'Перед вами глубокая трещина, из которой пробивается красное свечение магмы. Нужно решить, как её преодолеть.',
+        risky: {
+            name: 'ПЕРЕПРЫГНУТЬ ЧЕРЕЗ ТРЕЩИНУ',
+            description: 'ОЧЕНЬ рискованный, но быстрый способ',
+            details: [
+                'Шанс успеха: 70%',
+                'При успехе: +3 шага вперёд!',
+                'При провале: Дракон ПРОСЫПАЕТСЯ от всплеска магмы!',
+                '+5% бдительности в любом случае'
+            ],
+            outcome: '🎲 70% на БОЛЬШОЙ ВЫИГРЫШ, 30% на катастрофу'
+        },
+        safe: {
+            name: 'ОБОЙТИ ПО КРАЮ',
+            description: 'Медленный, но надёжный путь по краю трещины',
+            details: [
+                'Абсолютно безопасно',
+                'Без риска разбудить дракона',
+                '-5% бдительности (осторожность окупается)',
+                'Шаг не тратится - можно сразу идти дальше'
+            ],
+            outcome: '🛡️ Гарантированная безопасность'
+        }
+    },
+    20: { 
+        type: 'stalactites', 
+        done: false,
+        title: 'РАСКАЛЁННЫЕ СТАЛАКТИТЫ',
+        description: 'Потолок усыпан нагретыми сталактитами. Один неверный шаг - и грохот падающего камня разбудит дракона!',
+        risky: {
+            name: 'БЫСТРО ПРОБЕЖАТЬ ПОД НИМИ',
+            description: 'Сэкономить время, но рисковать',
+            details: [
+                'Шанс успеха: 50%',
+                'При успехе: +3 шага вперёд!',
+                'При провале: +40% бдительности',
+                'При провале: Дракон ПРОСЫПАЕТСЯ!'
+            ],
+            outcome: '⚡ 50/50 - либо большой выигрыш, либо катастрофа'
+        },
+        safe: {
+            name: 'ТИХО ПРОЙТИ МЕЖДУ НИМИ',
+            description: 'Осторожно и без риска',
+            details: [
+                'Безопасный проход',
+                '+1 обычный шаг вперёд',
+                'Бдительность не меняется',
+                'Нет риска разбудить дракона'
+            ],
+            outcome: '✅ Гарантированный прогресс'
+        }
+    },
+    25: { 
+        type: 'fork', 
+        done: false,
+        title: 'РАЗВИЛКА У ТЕПЛОВОГО ИСТОЧНИКА',
+        description: 'Две тропы ведут к цели. Правая — короче, но проходит рядом с геотермальным источником. Левая — безопаснее, но длиннее.',
+        risky: {
+            name: 'ПРАВАЯ ТРОПА (ЧЕРЕЗ ИСТОЧНИК)',
+            description: 'Ближе к теплу дракона, но быстрее',
+            details: [
+                'Короткий путь: +2 шага за раз',
+                'Но ближе к дракону: +20% бдительности',
+                'Риск выше обычного',
+                'Экономия времени'
+            ],
+            outcome: '📈 +2 шага, но +20% бдительности'
+        },
+        safe: {
+            name: 'ЛЕВАЯ ТРОПА (В ОТДАЛЕНИИ)',
+            description: 'Дальше от тепла дракона, но безопаснее',
+            details: [
+                'Безопасный маршрут',
+                '+1 обычный шаг вперёд',
+                'Бдительность не меняется',
+                'Минимальный риск'
+            ],
+            outcome: '🔄 Стандартное продвижение'
+        }
+    }
+};
+        
+        this.yumiStates = {
+            sitting: { image: 'img/Yumi sitting.svg', className: 'float', description: 'Юми сидит и наблюдает' },
+            pointing: { image: 'img/Yumi pointing.svg', className: 'pulse', description: 'Юми показывает направление' },
+            panicking: { image: 'img/Yumi panicking.svg', className: 'shake', description: 'Юми в панике!' },
+            whispering: { image: 'img/Yumi whispering.svg', className: 'stealth-glow', description: 'Юми шепчет совет' },
+            success: { image: 'img/Yumi pointing.svg', className: 'success-glow', description: 'Юми радуется успеху!' },
+            danger: { image: 'img/Yumi panicking.svg', className: 'danger-glow', description: 'Юми предупреждает об опасности!' },
+            warning: { image: 'img/Yumi whispering.svg', className: 'warning-glow', description: 'Юми осторожничает' }
+        };
+        
+        this.risks = { sleeping: 10, restless: 60, awake: 90 };
+        this.elements = {};
+        this.stateHistory = [];
+        
+        this.init();
+    }
+    
+    initAudio() {
+        try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+            console.log('Web Audio API не поддерживается');
+        }
+        
+        this.loadAudioSettings();
+        this.createAmbientMusic();
+    }
+    
+    createAmbientMusic() {
+        this.stopBackgroundMusic();
+        
+        if (!this.musicEnabled) return;
+        
+        try {
+            this.backgroundMusic = new Audio();
+            this.backgroundMusic.src = 'audio/Moist Soul - Inner Beauty [audiovk.com].mp3';
+            this.backgroundMusic.loop = true;
+            this.backgroundMusic.volume = this.musicVolume;
+            this.backgroundMusic.preload = 'auto';
+            
+            const playPromise = this.backgroundMusic.play();
+            
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        console.log('Эмбиент успешно запущен');
+                    })
+                    .catch(error => {
+                        const startOnInteraction = () => {
+                            if (this.musicEnabled && this.backgroundMusic) {
+                                this.backgroundMusic.play()
+                                    .then(() => {
+                                        console.log('Эмбиент запущен после взаимодействия');
+                                    })
+                                    .catch(e => console.log('Не удалось запустить эмбиент'));
+                            }
+                            document.removeEventListener('click', startOnInteraction);
+                            document.removeEventListener('keydown', startOnInteraction);
+                        };
+                        
+                        document.addEventListener('click', startOnInteraction);
+                        document.addEventListener('keydown', startOnInteraction);
+                    });
+            }
+        } catch (error) {
+            console.error('Ошибка создания эмбиента:', error);
+        }
+    }
+    
+    stopBackgroundMusic() {
+        if (this.backgroundMusic) {
+            this.backgroundMusic.pause();
+            this.backgroundMusic.currentTime = 0;
+            this.backgroundMusic = null;
+        }
+    }
+    
+    loadAudioSettings() {
+        const savedMusic = localStorage.getItem('dragonGameMusicEnabled');
+        const savedVolume = localStorage.getItem('dragonGameMusicVolume');
+        
+        if (savedMusic !== null) {
+            this.musicEnabled = savedMusic === 'true';
+        }
+        
+        if (savedVolume !== null) {
+            this.musicVolume = parseFloat(savedVolume);
+        }
+    }
+    
+    init() {
+        this.setupElements();
+        this.setupEvents();
+        this.setupVideoHandlers();
+        this.updateUI();
+        this.setYumiState('sitting');
+    }
+    
+    setupElements() {
+        this.elements = {
+            titleScreen: document.getElementById('titleScreen'),
+            cutsceneScreen: document.getElementById('cutsceneScreen'),
+            gameScene: document.getElementById('gameScene'),
+            minigameIntro: document.getElementById('minigameIntro'),
+            startMinigameBtn: document.getElementById('startMinigameBtn'),
+            finalScreen: document.getElementById('finalScreen'),
+            returnButton: document.getElementById('returnButton'),
+            
+            cutsceneVideo1: document.getElementById('cutsceneVideo1'),
+            cutsceneVideo2: document.getElementById('cutsceneVideo2'),
+            cutsceneVideo3: document.getElementById('cutsceneVideo3'),
+            cutsceneVideo4: document.getElementById('cutsceneVideo4'),
+            cutsceneVideo5: document.getElementById('cutsceneVideo5'),
+            cutsceneVideo6: document.getElementById('cutsceneVideo6'),
+            cutsceneVideo7: document.getElementById('cutsceneVideo7'),
+            cutsceneVideo8: document.getElementById('cutsceneVideo8'),
+            cutsceneVideo9: document.getElementById('cutsceneVideo9'),
+            cutsceneVideo10: document.getElementById('cutsceneVideo10'),
+            cutsceneVideo11: document.getElementById('cutsceneVideo11'),
+            cutsceneText: document.getElementById('cutsceneText'),
+            cutsceneNextBtn: document.getElementById('cutsceneNextBtn'),
+            dialogueChoices: document.getElementById('dialogueChoices'),
+            
+            dragonSleepVideo: document.getElementById('dragonSleepVideo'),
+            dragonRestlessVideo: document.getElementById('dragonRestlessVideo'),
+            dragonAwakeVideo: document.getElementById('dragonAwakeVideo'),
+            startButton: document.getElementById('startButton'),
+            stepButton: document.getElementById('stepButton'),
+            waitButton: document.getElementById('waitButton'),
+            stoneButton: document.getElementById('stoneButton'),
+            soundToggle: document.getElementById('soundToggle'),
+            musicToggle: document.getElementById('musicToggle'),
+            musicControls: document.getElementById('musicControls'),
+            volumeSlider: document.getElementById('volumeSlider'),
+            volumeValue: document.getElementById('volumeValue'),
+            dragonStatus: document.getElementById('dragonStatus'),
+            stepCounter: document.getElementById('stepCounter'),
+            alertnessFill: document.getElementById('alertnessFill'),
+            alertnessPercent: document.getElementById('alertnessPercent'),
+            hintText: document.getElementById('hintText'),
+            eventOverlay: document.getElementById('eventOverlay'),
+            eventTitle: document.getElementById('eventTitle'),
+            eventDescription: document.getElementById('eventDescription'),
+            eventChoice1: document.getElementById('eventChoice1'),
+            eventChoice2: document.getElementById('eventChoice2'),
+            stoneResultOverlay: document.getElementById('stoneResultOverlay'),
+            stoneResultBox: document.getElementById('stoneResultBox'),
+            stoneResultTitle: document.getElementById('stoneResultTitle'),
+            stoneResultDescription: document.getElementById('stoneResultDescription'),
+            stoneContinueBtn: document.getElementById('stoneContinueBtn')
+        };
+    }
+    
+    startGame() {
+        this.state = 'cutscene';
+        this.cutsceneIndex = 0;
+        
+        this.elements.titleScreen.style.display = 'none';
+        this.elements.cutsceneScreen.style.display = 'flex';
+        this.elements.gameScene.style.display = 'none';
+        this.elements.finalScreen.style.display = 'none';
+        
+        this.showCutscene();
+    }
+    
+    showCutscene() {
+        let cutsceneArray;
+    
+    // Определяем какой массив сцен показывать
+    if (this.state === 'postMinigame') {
+        cutsceneArray = this.postMinigameCutscenes;
+    } else {
+        cutsceneArray = this.cutscenes;
+    }
+    
+    if (this.cutsceneIndex >= cutsceneArray.length) {
+        if (this.state === 'postMinigame') {
+            // Заканчиваем игру после пост-мини-игровых сцен
+            this.showFinalScreen();
+            return;
+        } else {
+            this.showMinigameIntro();
+            return;
+        }
+    }
+    
+    const cutscene = cutsceneArray[this.cutsceneIndex]
+        
+        // Останавливаем все видео
+        const videos = [
+            'cutsceneVideo1', 'cutsceneVideo2', 'cutsceneVideo3', 'cutsceneVideo4',
+            'cutsceneVideo5', 'cutsceneVideo6', 'cutsceneVideo7', 'cutsceneVideo8',
+            'cutsceneVideo9', 'cutsceneVideo10', 'cutsceneVideo11'
+        ];
+        
+        videos.forEach(video => {
+            if (this.elements[video]) {
+                this.elements[video].classList.remove('active');
+                this.elements[video].pause();
+            }
+        });
+        
+         // Показываем нужное видео
+    const newVideo = this.elements[cutscene.video];
+    if (newVideo) {
+        newVideo.classList.add('active');
+        
+        // НЕ сбрасываем время и НЕ перезапускаем видео!
+        // Видео продолжает играть с того места, где остановилось
+        if (newVideo.paused) {
+            const playPromise = newVideo.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log(`Воспроизводится видео: ${cutscene.video}`);
+                }).catch(e => {
+                    console.log(`Не удалось воспроизвести ${cutscene.video}:`, e.name);
+                });
+            }
+        }
+    }
+    
+    this.elements.cutsceneText.innerHTML = cutscene.text;
+    
+    if (cutscene.hasChoices && cutscene.choices) {
+        this.elements.dialogueChoices.style.display = 'grid';
+        this.showCutsceneChoices(cutscene.choices);
+    } else {
+        this.elements.dialogueChoices.style.display = 'none';
+    }
+}
+
+    
+    showCutsceneChoices(choices) {
+        this.elements.dialogueChoices.innerHTML = '';
+        
+        choices.forEach((choice, index) => {
+            const button = document.createElement('button');
+            button.className = 'dialogue-choice';
+            button.innerHTML = choice.text;
+            button.addEventListener('click', () => {
+                this.selectCutsceneChoice(choice);
+            });
+            this.elements.dialogueChoices.appendChild(button);
+        });
+    }
+    
+    selectCutsceneChoice(choice) {
+        console.log('Выбран ответ:', choice.text, 'Эффект:', choice.effect);
+        
+        if (choice.effect.includes('Начальная бдительность -')) {
+            const percent = parseInt(choice.effect.match(/\d+/)[0]);
+            this.alertness = Math.max(0, this.alertness - percent);
+        }
+        
+        this.nextCutscene();
+    }
+    
+    nextCutscene() {
+    this.cutsceneIndex++;
+    this.playPixelSound('click');
+    
+    // ВАЖНОЕ ИЗМЕНЕНИЕ: Не останавливаем текущее видео
+    // Просто переходим к следующей сцене
+    this.showCutscene();
+}
+    
+    showMinigameIntro() {
+        this.state = 'minigame';
+        
+        // Останавливаем все видео
+        const videos = [
+            'cutsceneVideo1', 'cutsceneVideo2', 'cutsceneVideo3', 'cutsceneVideo4',
+            'cutsceneVideo5', 'cutsceneVideo6', 'cutsceneVideo7', 'cutsceneVideo8',
+            'cutsceneVideo9', 'cutsceneVideo10', 'cutsceneVideo11'
+        ];
+        
+        videos.forEach(video => {
+            if (this.elements[video]) {
+                this.elements[video].pause();
+                this.elements[video].classList.remove('active');
+            }
+        });
+        
+        this.elements.cutsceneScreen.style.display = 'none';
+        this.elements.gameScene.style.display = 'flex';
+        this.elements.minigameIntro.style.display = 'flex';
+        this.elements.finalScreen.style.display = 'none';
+        
+        this.elements.dragonSleepVideo.classList.add('active');
+        this.elements.dragonSleepVideo.play().catch(e => console.log("Не удалось воспроизвести видео дракона"));
+    }
+    
+    startMinigame() {
+        this.elements.minigameIntro.style.display = 'none';
+        this.resetMinigame();
+    }
+    
+    resetMinigame() {
+        this.step = 0;
+        this.alertness = 0;
+        this.dragonState = 'sleeping';
+        this.hasStone = false;
+        this.stoneUsed = false;
+        this.canAct = true;
+        this.videoPlaying = false;
+        this.justRestless = false;
+        this.pauseMode = false;
+        this.awakeCount = 0;
+        this.firstVideoPlayed = false;
+        this.stateHistory = ['sleeping'];
+        
+        if (this.awakeBlockTimer) {
+            clearTimeout(this.awakeBlockTimer);
+            this.awakeBlockTimer = null;
+        }
+        
+        Object.keys(this.events).forEach(key => {
+            this.events[key].done = false;
+        });
+        
+        this.elements.stoneButton.style.display = 'none';
+        this.elements.eventOverlay.style.display = 'none';
+        this.elements.stoneResultOverlay.style.display = 'none';
+        
+        this.setYumiState('sitting');
+        this.showHint('Тихо... Начинаем путь...');
+        this.updateUI();
+    }
+    
+    winGame() {
+        this.showHint('🎉 КРИСТАЛЛ УКРАДЕН!');
+        this.playPixelSound('success');
+        this.stopBackgroundMusic();
+        
+        setTimeout(() => {
+            // Плавный переход к кат-сцене
+            this.elements.gameScene.style.opacity = '0';
+            this.elements.gameScene.classList.add('fade-transition');
+            
+            setTimeout(() => {
+                this.state = 'postMinigame';
+                this.cutsceneIndex = 0;
+                
+                this.elements.gameScene.style.display = 'none';
+                this.elements.cutsceneScreen.style.display = 'flex';
+                this.elements.cutsceneScreen.style.opacity = '0';
+                this.elements.cutsceneScreen.classList.add('fade-transition');
+                
+                setTimeout(() => {
+                    this.elements.cutsceneScreen.classList.remove('fade-transition');
+                    this.elements.cutsceneScreen.classList.add('fade-in');
+                    this.elements.cutsceneScreen.style.opacity = '1';
+                    
+                    // Показываем первую сцену после мини-игры
+                    this.showCutscene();
+                }, 50);
+            }, 500);
+        }, 1500);
+    }
+    
+    showFinalScreen() {
+        // Плавный переход к финальному экрану
+        this.elements.cutsceneScreen.classList.add('fade-transition');
+        this.elements.cutsceneScreen.style.opacity = '0';
+        
+        setTimeout(() => {
+            this.elements.cutsceneScreen.style.display = 'none';
+            this.elements.finalScreen.style.display = 'flex';
+            this.elements.finalScreen.style.opacity = '0';
+            this.elements.finalScreen.classList.add('fade-transition');
+            
+            setTimeout(() => {
+                this.elements.finalScreen.classList.remove('fade-transition');
+                this.elements.finalScreen.classList.add('fade-in');
+                this.elements.finalScreen.style.opacity = '1';
+            }, 50);
+        }, 500);
+    }
+    
+    returnToMain() {
+        // Переход на главную страницу
+        this.playPixelSound('menu_click');
+        window.location.href = 'index1.html';
+    }
+    
+    setYumiState(stateKey) {
+        if (this.currentYumiState === stateKey) return;
+        
+        const state = this.yumiStates[stateKey];
+        if (!state) return;
+        
+        const yumiImage = document.getElementById('yumiImage');
+        if (yumiImage) {
+            yumiImage.classList.add('changing');
+            
+            setTimeout(() => {
+                yumiImage.src = state.image;
+                yumiImage.alt = state.description;
+                yumiImage.className = 'yumi-img ' + state.className + ' scale-up';
+                
+                setTimeout(() => {
+                    yumiImage.classList.remove('scale-up');
+                    yumiImage.classList.remove('changing');
+                }, 500);
+                
+                this.currentYumiState = stateKey;
+            }, 300);
+        }
+    }
+    
+    playPixelSound(type) {
+        if (!this.soundEnabled || !this.audioContext) return;
+        
+        const oscillator = this.audioContext.createOscillator();
+        const gainNode = this.audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(this.audioContext.destination);
+        
+        let frequency = 440, duration = 0.1;
+        
+        switch(type) {
+            case 'click': frequency = 220 + Math.random() * 110; duration = 0.05; break;
+            case 'step': frequency = 150 + Math.random() * 50; duration = 0.08; break;
+            case 'success': frequency = 880; duration = 0.2; break;
+            case 'fail': frequency = 110; duration = 0.3; break;
+            case 'stone': frequency = 300; duration = 0.15; break;
+            case 'stone_throw': frequency = 400; duration = 0.3; break;
+            case 'stone_success': frequency = 660; duration = 0.5; break;
+            case 'stone_fail': frequency = 120; duration = 0.6; break;
+            case 'dragon_wake': frequency = 60; duration = 0.8; break;
+            case 'dragon_sleep': frequency = 80; duration = 0.5; break;
+            case 'hover': frequency = 330; duration = 0.03; break;
+            case 'menu_click': frequency = 550; duration = 0.1; break;
+        }
+        
+        oscillator.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
+        gainNode.gain.setValueAtTime(0.1, this.audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
+        oscillator.start(this.audioContext.currentTime);
+        oscillator.stop(this.audioContext.currentTime + duration);
+    }
+    
+    setupVideoHandlers() {
+        const dragonVideos = [this.elements.dragonSleepVideo, this.elements.dragonRestlessVideo, this.elements.dragonAwakeVideo];
+        
+        dragonVideos.forEach(video => {
+            if (!video) return;
+            
+            video.muted = true;
+            
+            video.addEventListener('ended', () => {
+                this.videoPlaying = false;
+                
+                if (video === this.elements.dragonRestlessVideo) {
+                    this.dragonState = 'sleeping';
+                    this.showVideo('sleeping');
+                    this.stateHistory.push('sleeping');
+                    this.showHint('Дракон успокоился и снова заснул...');
+                    this.canAct = true;
+                } else if (video === this.elements.dragonAwakeVideo) {
+                    video.currentTime = 0;
+                    video.play().catch(e => console.log('Не удалось перезапустить видео пробуждения'));
+                    this.showHint('⚠️ ДРАКОН БОДРСТВУЕТ! Любое движение опасно! (Блокировка 5 сек)');
+                    this.canAct = false;
+                }
+                
+                this.updateUI();
+            });
+        });
+        
+        this.elements.dragonSleepVideo.addEventListener('loadeddata', () => {
+            this.showVideo('sleeping');
+        });
+    }
+    
+    setupEvents() {
+        this.elements.startButton.addEventListener('click', () => {
+            this.playPixelSound('menu_click');
+            this.startGame();
+        });
+        
+        this.elements.cutsceneNextBtn.addEventListener('click', () => {
+            this.playPixelSound('click');
+            this.nextCutscene();
+        });
+        
+        this.elements.startMinigameBtn.addEventListener('click', () => {
+            this.playPixelSound('menu_click');
+            this.startMinigame();
+        });
+        
+        this.elements.returnButton.addEventListener('click', () => {
+            this.returnToMain();
+        });
+        
+        this.elements.stepButton.addEventListener('click', () => {
+            this.playPixelSound('click');
+            this.makeStep();
+        });
+        
+        this.elements.waitButton.addEventListener('click', () => {
+            this.playPixelSound('click');
+            this.waitTurn();
+        });
+        
+        this.elements.stoneButton.addEventListener('click', () => {
+            this.playPixelSound('stone_throw');
+            this.useStone();
+        });
+        
+        this.elements.soundToggle.addEventListener('click', () => {
+            this.toggleSound();
+        });
+        
+        this.elements.musicToggle.addEventListener('click', () => {
+            this.toggleMusic();
+        });
+        
+        this.elements.stoneContinueBtn.addEventListener('click', () => {
+            this.closeStoneResult();
+            this.handleNextTurn();
+        });
+        
+        this.elements.volumeSlider.addEventListener('input', (e) => {
+            const newVolume = parseInt(e.target.value);
+            this.changeVolume(newVolume);
+        });
+        
+        this.elements.eventChoice1.addEventListener('click', () => {
+            this.playPixelSound('click');
+            this.handleEventChoice(1);
+        });
+        
+        this.elements.eventChoice2.addEventListener('click', () => {
+            this.playPixelSound('click');
+            this.handleEventChoice(2);
+        });
+        
+        const buttons = [
+            this.elements.startButton, this.elements.stepButton, 
+            this.elements.waitButton, this.elements.stoneButton, this.elements.soundToggle, 
+            this.elements.musicToggle, this.elements.eventChoice1, this.elements.eventChoice2, 
+            this.elements.stoneContinueBtn, this.elements.cutsceneNextBtn, 
+            this.elements.startMinigameBtn, this.elements.returnButton
+        ];
+        
+        buttons.forEach(button => {
+            if (button) button.addEventListener('mouseenter', () => this.playPixelSound('hover'));
+        });
+        
+        document.addEventListener('keydown', (e) => {
+            if (this.state === 'cutscene' || this.state === 'postMinigame') {
+                if (e.code === 'Enter' || e.code === 'Space') {
+                    e.preventDefault();
+                    this.playPixelSound('click');
+                    this.nextCutscene();
+                }
+            }
+            
+            if (this.state === 'minigame' && !this.pauseMode && this.elements.minigameIntro.style.display !== 'flex') {
+                if (e.code === 'Space' || e.code === 'ArrowRight' || e.code === 'KeyD') {
+                    e.preventDefault(); this.playPixelSound('click'); this.makeStep();
+                } else if (e.code === 'ArrowUp' || e.code === 'KeyW') {
+                    e.preventDefault(); this.playPixelSound('click'); this.waitTurn();
+                } else if (e.code === 'KeyS' && this.hasStone && !this.stoneUsed) {
+                    e.preventDefault(); this.playPixelSound('stone_throw'); this.useStone();
+                } else if (e.code === 'Digit1' && this.elements.eventOverlay.style.display === 'flex') {
+                    e.preventDefault(); this.playPixelSound('click'); this.handleEventChoice(1);
+                } else if (e.code === 'Digit2' && this.elements.eventOverlay.style.display === 'flex') {
+                    e.preventDefault(); this.playPixelSound('click'); this.handleEventChoice(2);
+                } else if (e.code === 'KeyM') {
+                    e.preventDefault(); this.toggleSound();
+                } else if (e.code === 'KeyN') {
+                    e.preventDefault(); this.toggleMusic();
+                } else if (e.code === 'ArrowUp' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault(); this.increaseVolume();
+                } else if (e.code === 'ArrowDown' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault(); this.decreaseVolume();
+                } else if (e.code === 'Enter' && this.elements.stoneResultOverlay.style.display === 'flex') {
+                    e.preventDefault(); this.closeStoneResult(); this.handleNextTurn();
+                }
+            }
+            
+            // Быстрая победа для тестирования (F12)
+            if (e.code === 'F12') {
+                e.preventDefault();
+                if (window.game) {
+                    console.log('Быстрая победа активирована по F12!');
+                    window.game.step = 30; // Устанавливаем максимальное количество шагов
+                    window.game.winGame();
+                }
+            }
+        });
+    }
+    
+    toggleSound() {
+        this.soundEnabled = !this.soundEnabled;
+        this.elements.soundToggle.textContent = this.soundEnabled ? '🔊 ВКЛ' : '🔇 ВЫКЛ';
+        this.elements.soundToggle.style.background = this.soundEnabled ? 
+            'rgba(0,0,0,0.8)' : 'rgba(255,0,0,0.8)';
+        this.elements.soundToggle.title = this.soundEnabled ? 
+            'Звуковые эффекты: ВКЛ' : 'Звуковые эффекты: ВЫКЛ';
+        
+        if (this.soundEnabled) this.playPixelSound('click');
+    }
+    
+    toggleMusic() {
+        this.musicEnabled = !this.musicEnabled;
+        
+        if (this.musicEnabled) {
+            this.elements.musicToggle.textContent = '🎵';
+            this.elements.musicToggle.title = 'Эмбиент пещеры: ВКЛ';
+            this.elements.musicToggle.style.color = '#00ccff';
+            
+            this.createAmbientMusic();
+        } else {
+            this.elements.musicToggle.textContent = '🔇';
+            this.elements.musicToggle.title = 'Эмбиент пещеры: ВЫКЛ';
+            this.elements.musicToggle.style.color = '#ff0000';
+            
+            this.stopBackgroundMusic();
+        }
+        
+        localStorage.setItem('dragonGameMusicEnabled', this.musicEnabled);
+        if (this.soundEnabled) this.playPixelSound('click');
+    }
+    
+    changeVolume(newVolumePercent) {
+        this.musicVolume = newVolumePercent / 100;
+        
+        if (this.backgroundMusic) {
+            this.backgroundMusic.volume = this.musicVolume;
+        }
+        
+        this.updateVolumeDisplay();
+        
+        localStorage.setItem('dragonGameMusicVolume', this.musicVolume);
+        
+        if (this.soundEnabled) this.playPixelSound('click');
+    }
+    
+    updateVolumeDisplay() {
+        const volumePercent = Math.round(this.musicVolume * 100);
+        if (this.elements.volumeValue) {
+            this.elements.volumeValue.textContent = volumePercent + '%';
+        }
+        if (this.elements.volumeSlider) {
+            this.elements.volumeSlider.value = volumePercent;
+        }
+    }
+    
+    increaseVolume() {
+        let newVolume = parseInt(this.elements.volumeSlider.value) + 5;
+        if (newVolume > 100) newVolume = 100;
+        this.changeVolume(newVolume);
+    }
+    
+    decreaseVolume() {
+        let newVolume = parseInt(this.elements.volumeSlider.value) - 5;
+        if (newVolume < 0) newVolume = 0;
+        this.changeVolume(newVolume);
+    }
+    
+    showVideo(state) {
+        this.elements.dragonSleepVideo.classList.remove('active');
+        this.elements.dragonRestlessVideo.classList.remove('active');
+        this.elements.dragonAwakeVideo.classList.remove('active');
+        
+        this.elements.dragonSleepVideo.pause();
+        this.elements.dragonRestlessVideo.pause();
+        this.elements.dragonAwakeVideo.pause();
+        
+        let video;
+        switch(state) {
+            case 'sleeping': video = this.elements.dragonSleepVideo; break;
+            case 'restless': video = this.elements.dragonRestlessVideo; break;
+            case 'awake': video = this.elements.dragonAwakeVideo; break;
+        }
+        
+        if (video) {
+            video.classList.add('active');
+            video.currentTime = 0;
+            
+            const statusMap = {
+                sleeping: { text: 'ГЛУБОКО СПИТ', color: '#4CAF50' },
+                restless: { text: 'ВОРОЧАЕТСЯ', color: '#FF9800' },
+                awake: { text: 'БОДРСТВУЕТ! ОПАСНО!', color: '#F44336' }
+            };
+            
+            if (statusMap[state]) {
+                this.elements.dragonStatus.textContent = statusMap[state].text;
+                this.elements.dragonStatus.style.color = statusMap[state].color;
+            }
+            
+            this.dragonState = state;
+            
+            if (state === 'sleeping') {
+                this.awakeCount = 0;
+                if (this.awakeBlockTimer) {
+                    clearTimeout(this.awakeBlockTimer);
+                    this.awakeBlockTimer = null;
+                }
+            } else if (state === 'awake') {
+                this.awakeCount++;
+                this.canAct = false;
+                
+                if (this.awakeBlockTimer) {
+                    clearTimeout(this.awakeBlockTimer);
+                }
+                
+                this.awakeBlockTimer = setTimeout(() => {
+                    this.unlockAfterAwake();
+                }, this.awakeBlockDuration);
+                
+            } else {
+                this.awakeCount = 0;
+                if (this.awakeBlockTimer) {
+                    clearTimeout(this.awakeBlockTimer);
+                    this.awakeBlockTimer = null;
+                }
+            }
+            
+            if (state === 'sleeping') {
+                video.loop = true;
+                this.videoPlaying = false;
+                this.canAct = true;
+                video.play().catch(e => console.log('Не удалось запустить видео сна'));
+                this.playPixelSound('dragon_sleep');
+            } else if (state === 'restless') {
+                video.loop = false;
+                this.videoPlaying = true;
+                this.canAct = false;
+                
+                video.play().then(() => {
+                    this.showHint('Дракон ворочается... Замри!');
+                    this.playPixelSound('dragon_sleep');
+                    
+                    if (!this.firstVideoPlayed) {
+                        video.addEventListener('ended', () => {
+                            this.firstVideoPlayed = true;
+                            this.videoPlaying = false;
+                            this.canAct = true;
+                            this.dragonState = 'sleeping';
+                            this.showVideo('sleeping');
+                        }, { once: true });
+                    } else {
+                        video.addEventListener('ended', () => {
+                            this.videoPlaying = false;
+                            this.canAct = true;
+                            this.dragonState = 'sleeping';
+                            this.showVideo('sleeping');
+                        }, { once: true });
+                    }
+                }).catch(e => {
+                    this.videoPlaying = false;
+                    this.canAct = true;
+                    this.updateUI();
+                });
+                
+            } else if (state === 'awake') {
+                video.loop = true;
+                this.videoPlaying = false;
+                
+                video.play().then(() => {
+                    this.showHint('⚠️ ДРАКОН БОДРСТВУЕТ! Любое движение опасно! (Блокировка 8 сек)');
+                    this.playPixelSound('dragon_wake');
+                    
+                    this.showAwakeCountdown();
+                    
+                }).catch(e => {
+                    console.log('Не удалось запустить видео пробуждения:', e);
+                    this.videoPlaying = false;
+                    this.updateUI();
+                });
+            }
+            
+            this.updateUI();
+        }
+    }
+    
+    unlockAfterAwake() {
+        if (this.dragonState === 'awake') {
+            this.canAct = true;
+            this.showHint('⚠️ Дракон всё ещё бодрствует, но можно осторожно действовать...');
+            this.updateUI();
+            this.awakeBlockTimer = null;
+        }
+    }
+    
+    showAwakeCountdown() {
+        if (this.dragonState !== 'awake' || !this.awakeBlockTimer) return;
+        
+        let secondsLeft = Math.ceil(this.awakeBlockDuration / 1000);
+        
+        const countdownInterval = setInterval(() => {
+            if (this.dragonState !== 'awake' || !this.awakeBlockTimer) {
+                clearInterval(countdownInterval);
+                return;
+            }
+            
+            secondsLeft--;
+            
+            if (secondsLeft <= 0) {
+                clearInterval(countdownInterval);
+                this.showHint('⚠️ Дракон всё ещё бодрствует, но можно осторожно действовать...');
+            } else {
+                this.showHint(`⚠️ ДРАКОН БОДРСТВУЕТ! Любое движение опасно! (Разблокировка через ${secondsLeft} сек)`);
+            }
+            
+            this.updateUI();
+        }, 1000);
+    }
+    
+    waitTurn() {
+        if (!this.canAct || this.state !== 'minigame' || this.pauseMode) {
+            return;
+        }
+        
+        this.canAct = false;
+        this.setYumiState('sitting');
+        
+        let alertnessDecrease = 10;
+        let sleepChance = 0.3;
+        
+        if (this.dragonState === 'awake') {
+            alertnessDecrease = 5;
+            sleepChance = 0.4;
+            
+            if (this.awakeCount >= 2) {
+                sleepChance = 0.7;
+            }
+            
+            this.showHint('Осторожно ждём... Дракон бодрствует. Шанс уснуть: ' + Math.round(sleepChance * 100) + '%');
+        } 
+        else if (this.dragonState === 'restless') {
+            alertnessDecrease = 8;
+            sleepChance = 0.5;
+            this.showHint('Ждём, пока дракон успокоится...');
+        }
+        else {
+            alertnessDecrease += Math.random() * 5;
+            this.showHint(`Выжидаем... Бдительность -${Math.round(alertnessDecrease)}%`);
+        }
+        
+        this.alertness = Math.max(0, this.alertness - alertnessDecrease);
+        
+        if ((this.dragonState === 'awake' || this.dragonState === 'restless') && 
+            Math.random() < sleepChance) {
+            
+            this.dragonState = 'sleeping';
+            this.awakeCount = 0;
+            
+            if (this.awakeBlockTimer) {
+                clearTimeout(this.awakeBlockTimer);
+                this.awakeBlockTimer = null;
+            }
+            
+            this.showVideo('sleeping');
+            this.stateHistory.push('sleeping');
+            this.justRestless = false;
+            
+            if (this.dragonState === 'awake') {
+                this.showHint('🎉 Дракон снова заснул! Можно продолжать!');
+                this.playPixelSound('dragon_sleep');
+            } else {
+                this.showHint('Дракон успокоился и снова заснул...');
+            }
+        }
+        
+        this.justRestless = false;
+        this.playPixelSound('click');
+        this.stateHistory.push('wait');
+        
+        this.updateUI();
+        this.handleNextTurn();
+    }
+    
+    handleNextTurn() {
+        if (this.alertness >= 100) {
+            setTimeout(() => this.loseGame(), 1000);
+            return;
+        }
+        
+        if (this.events[this.step] && !this.events[this.step].done) {
+            this.showEvent(this.events[this.step]);
+            return;
+        }
+        
+        this.canAct = true;
+        this.pauseMode = false;
+        
+        this.changeDragonState();
+        
+        this.updateUI();
+    }
+    
+    useStone() {
+        if (!this.canAct || !this.hasStone || this.stoneUsed || this.pauseMode) return;
+        
+        this.canAct = false;
+        this.pauseMode = true;
+        this.stoneUsed = true;
+        this.elements.stoneButton.style.display = 'none';
+        
+        this.showHint('Бросаем камень...');
+        this.createStoneThrowEffect();
+        
+        setTimeout(() => {
+            const success = Math.random() > 0.5;
+            
+            if (success) {
+                this.alertness = Math.max(0, this.alertness - 50);
+                this.dragonState = 'sleeping';
+                this.showVideo('sleeping');
+                this.stateHistory.push('sleeping');
+                this.justRestless = false;
+                
+                this.showStoneResult(
+                    '🎯 УСПЕХ!',
+                    'Камень ударился вдалеке! Дракон отвлекся на звук и не заметил вас.\n\nБдительность снижена на 50%!',
+                    true
+                );
+                
+                this.playPixelSound('stone_success');
+                
+            } else {
+                this.alertness = Math.min(100, this.alertness + 30);
+                this.dragonState = 'awake';
+                this.showVideo('awake');
+                this.stateHistory.push('awake');
+                
+                this.showStoneResult(
+                    '💥 ПРОВАЛ!',
+                    'Дракон заметил движение! Камень упал слишком близко, и дракон ПРОСНУЛСЯ.\n\nБдительность увеличена на 30%!',
+                    false
+                );
+                
+                this.playPixelSound('stone_fail');
+                this.shakeScreen();
+            }
+            
+            if (this.alertness >= 100) {
+                setTimeout(() => {
+                    this.closeStoneResult();
+                    this.loseGame();
+                }, 2000);
+                return;
+            }
+            
+            this.updateUI();
+        }, 1500);
+    }
+    
+    createStoneThrowEffect() {
+        const effect = document.createElement('div');
+        effect.className = 'stone-throw-effect';
+        effect.textContent = '🪨';
+        effect.style.color = '#ffffff';
+        
+        this.elements.gameScene.appendChild(effect);
+        
+        setTimeout(() => {
+            if (effect.parentNode) effect.parentNode.removeChild(effect);
+        }, 1500);
+    }
+    
+    showStoneResult(title, description, isSuccess) {
+        this.elements.stoneResultTitle.textContent = title;
+        this.elements.stoneResultDescription.textContent = description;
+        
+        if (isSuccess) {
+            this.elements.stoneResultBox.className = 'stone-result-box result-success';
+        } else {
+            this.elements.stoneResultBox.className = 'stone-result-box result-fail';
+        }
+        
+        this.elements.stoneResultOverlay.style.display = 'flex';
+    }
+    
+    closeStoneResult() {
+        this.elements.stoneResultOverlay.style.display = 'none';
+        this.pauseMode = false;
+    }
+    
+    showEvent(event) {
+        this.canAct = false;
+        this.pauseMode = true;
+        this.elements.eventOverlay.style.display = 'flex';
+        
+        this.elements.eventTitle.textContent = event.title;
+        this.elements.eventDescription.textContent = event.description;
+        
+        const comparisonHTML = `
+            <div class="choice-column risky">
+                <div class="choice-header">
+                    ${event.risky.name}
+                    <span class="risk-badge">РИСК</span>
+                </div>
+                <div class="choice-details">
+                    <div style="color: #ff9966; margin-bottom: 10px;">${event.risky.description}</div>
+                    <ul>
+                        ${event.risky.details.map(detail => `<li>${detail}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="choice-outcome">
+                    📊 ИТОГ: ${event.risky.outcome}
+                </div>
+            </div>
+            
+            <div class="choice-column safe">
+                <div class="choice-header">
+                    ${event.safe.name}
+                    <span class="safe-badge">БЕЗОПАСНО</span>
+                </div>
+                <div class="choice-details">
+                    <div style="color: #88ff88; margin-bottom: 10px;">${event.safe.description}</div>
+                    <ul>
+                        ${event.safe.details.map(detail => `<li>${detail}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="choice-outcome">
+                    📊 ИТОГ: ${event.safe.outcome}
+                </div>
+            </div>
+        `;
+        
+        const choicesComparison = document.getElementById('choicesComparison');
+        if (choicesComparison) choicesComparison.innerHTML = comparisonHTML;
+        
+        if (this.elements.eventChoice1 && this.elements.eventChoice2) {
+            this.elements.eventChoice1.textContent = `ВЫБРАТЬ: ${event.risky.name}`;
+            this.elements.eventChoice2.textContent = `ВЫБРАТЬ: ${event.safe.name}`;
+        }
+    }
+    
+    handleEventChoice(choice) {
+        const event = this.events[this.step];
+        if (!event) {
+            console.log('Событие не найдено для шага:', this.step);
+            return;
+        }
+        
+        event.done = true;
+        
+        this.elements.eventOverlay.style.display = 'none';
+        this.canAct = false;
+        
+        if (event.type === 'crack') {
+            if (choice === 1) {
+                this.showHint('Пытаемся перепрыгнуть...');
+                this.playPixelSound('step');
+                
+                setTimeout(() => {
+                    const success = Math.random() > 0.3;
+                    
+                    if (success) {
+                        this.step += 3;
+                        this.alertness = Math.min(100, this.alertness + 5);
+                        this.showHint('🎯 ИДЕАЛЬНЫЙ ПРЫЖОК! Прямо через трещину! +3 шага вперед!');
+                        this.playPixelSound('success');
+                        this.elements.gameScene.classList.add('pulse-success');
+                        setTimeout(() => this.elements.gameScene.classList.remove('pulse-success'), 500);
+                        
+                        setTimeout(() => {
+                            this.showResultMessage(
+                                '🎯 ИДЕАЛЬНЫЙ ПРЫЖОК!',
+                                'Вы успешно перепрыгнули трещину!\n\n+3 шага вперед!\n+5% бдительности',
+                                'success'
+                            );
+                        }, 1500);
+                        
+                    } else {
+                        this.alertness = Math.min(100, this.alertness + 20);
+                        this.showHint('💥 ПРОВАЛ! Вы споткнулись при приземлении! Дракон ПРОСЫПАЕТСЯ!');
+                        this.dragonState = 'awake';
+                        this.showVideo('awake');
+                        this.stateHistory.push('awake');
+                        this.playPixelSound('dragon_wake');
+                        this.shakeScreen();
+                        this.elements.gameScene.classList.add('pulse-fail');
+                        setTimeout(() => this.elements.gameScene.classList.remove('pulse-fail'), 500);
+                        
+                        setTimeout(() => {
+                            this.showResultMessage(
+                                '💥 ПРОВАЛ!',
+                                'Вы споткнулись при приземлении!\n\nДракон ПРОСНУЛСЯ!\n+20% бдительности',
+                                'fail'
+                            );
+                        }, 2000);
+                    }
+                }, 1500);
+                return;
+            } else {
+                this.alertness = Math.max(0, this.alertness - 5);
+                this.showHint('🛡️ Обошли трещину осторожно. Безопасный путь. -5% бдительности.');
+                this.playPixelSound('click');
+                
+                setTimeout(() => {
+                    this.showResultMessage(
+                        '🛡️ БЕЗОПАСНЫЙ ПУТЬ',
+                        'Вы осторожно обошли трещину.\n\nШаг не потрачен!\n-5% бдительности',
+                        'safe'
+                    );
+                }, 1000);
+            }
+        } else if (event.type === 'stalactites') {
+            if (choice === 1) {
+                this.showHint('Бежим быстро через сталактиты...');
+                this.playPixelSound('step');
+                
+                setTimeout(() => {
+                    const success = Math.random() > 0.5;
+                    
+                    if (success) {
+                        this.step += 3;
+                        this.alertness = Math.min(100, this.alertness + 10);
+                        this.showHint('🎯 БЫСТРЫЙ ПРОБЕГ! Успешно пробежали! +3 шага вперед!');
+                        this.playPixelSound('success');
+                        this.elements.gameScene.classList.add('pulse-success');
+                        setTimeout(() => this.elements.gameScene.classList.remove('pulse-success'), 500);
+                        
+                        setTimeout(() => {
+                            this.showResultMessage(
+                                '🎯 БЫСТРЫЙ ПРОБЕГ!',
+                                'Вы успешно пробежали через сталактиты!\n\n+3 шага вперед!\n+10% бдительности',
+                                'success'
+                            );
+                        }, 1500);
+                        
+                    } else {
+                        this.alertness = Math.min(100, this.alertness + 40);
+                        this.showHint('💥 ПРОВАЛ! Задели сталактит! ГРОХОТ! Дракон ПРОСЫПАЕТСЯ!');
+                        this.dragonState = 'awake';
+                        this.showVideo('awake');
+                        this.stateHistory.push('awake');
+                        this.playPixelSound('dragon_wake');
+                        this.shakeScreen();
+                        this.elements.gameScene.classList.add('pulse-fail');
+                        setTimeout(() => this.elements.gameScene.classList.remove('pulse-fail'), 500);
+                        
+                        setTimeout(() => {
+                            this.showResultMessage(
+                                '💥 ПРОВАЛ!',
+                                'Вы задели сталактит!\n\nДракон ПРОСНУЛСЯ!\n+40% бдительности',
+                                'fail'
+                            );
+                        }, 2000);
+                    }
+                }, 1500);
+                return;
+            } else {
+                this.step += 1;
+                this.showHint('🛡️ Тихо прошли между сталактитами. Безопасный путь. +1 шаг.');
+                this.playPixelSound('step');
+                
+                setTimeout(() => {
+                    this.showResultMessage(
+                        '🛡️ ТИХИЙ ПРОХОД',
+                        'Вы осторожно прошли между сталактитами.\n\n+1 шаг вперед\nБдительность не изменилась',
+                        'safe'
+                    );
+                }, 1000);
+            }
+        } else if (event.type === 'fork') {
+            if (choice === 1) {
+                this.step += 2;
+                this.alertness = Math.min(100, this.alertness + 20);
+                this.showHint('📈 Пошли правой тропой. Ближе к дракону, но быстрее! +2 шага, но +20% бдительности.');
+                this.playPixelSound('step');
+                
+                setTimeout(() => {
+                    this.showResultMessage(
+                        '📈 КОРОТКИЙ ПУТЬ',
+                        'Вы выбрали правую тропу.\n\n+2 шага вперед!\n+20% бдительности (ближе к дракону)',
+                        'risky'
+                    );
+                }, 1000);
+                
+            } else {
+                this.step += 1;
+                this.showHint('🛡️ Пошли левой тропой. Безопасный путь. +1 шаг.');
+                this.playPixelSound('step');
+                
+                setTimeout(() => {
+                    this.showResultMessage(
+                        '🛡️ БЕЗОПАСНАЯ ТРОПА',
+                        'Вы выбрали левую тропу.\n\n+1 шаг вперед\nБдительность не изменилась',
+                        'safe'
+                    );
+                }, 1000);
+            }
+        } else if (event.type === 'sword_choice') {
+        if (choice === 1) {
+            this.showHint('⚔️ Достаём меч... Это плохая идея...');
+            this.playPixelSound('dragon_wake');
+            
+            setTimeout(() => {
+                // 1% шанс на успех (чудо)
+                const success = Math.random() < 0.01;
+                
+                if (success) {
+                    // НЕВЕРОЯТНОЕ ЧУДО!
+                    this.step = this.maxSteps; // Мгновенная победа
+                    this.showHint('🎉 НЕВОЗМОЖНО! МЕЧ СРАБОТАЛ!');
+                    this.playPixelSound('success');
+                    this.elements.gameScene.classList.add('pulse-success');
+                    setTimeout(() => this.elements.gameScene.classList.remove('pulse-success'), 500);
+                    
+                    setTimeout(() => {
+                        this.showResultMessage(
+                            '🌟 НЕВЕРОЯТНОЕ ЧУДО!',
+                            'Вы достаёте меч...\n\nОн начинает светиться древней магией!\n\nОдин удар — и дракон мирно засыпает!\n\n🎯 ИНСТАНТ-ПОБЕДА!\n\n(Шанс был 1 из 100!)',
+                            'success'
+                        );
+                        
+                        setTimeout(() => {
+                            this.finishEvent(event);
+                            this.winGame();
+                        }, 3000);
+                    }, 1500);
+                    
+                } else {
+                    // Провал (99% случаев)
+                    this.alertness = Math.min(100, this.alertness + 50);
+                    this.showHint('💀 ДРАКОН ПРОСЫПАЕТСЯ ОТ БЛЕСКА СТАЛИ!');
+                    this.dragonState = 'awake';
+                    this.showVideo('awake');
+                    this.stateHistory.push('awake');
+                    this.shakeScreen();
+                    this.elements.gameScene.classList.add('pulse-fail');
+                    setTimeout(() => this.elements.gameScene.classList.remove('pulse-fail'), 500);
+                    
+                    setTimeout(() => {
+                        this.showResultMessage(
+                            '💀 САМАЯ ГЛУПАЯ ИДЕЯ В ИСТОРИИ',
+                            'Вы достаёте меч...\n\nДракон просыпается от блеска стали.\n\nОн смотрит на вас с таким выражением,\nбудто спрашивает: "Серьёзно? МЕЧОМ?"\n\n🎯 +50% бдительности\n🧠 Дракон теперь считает вас идиотами',
+                            'fail'
+                        );
+                        
+                        if (this.alertness >= 100) {
+                            setTimeout(() => {
+                                this.finishEvent(event);
+                                this.loseGame();
+                            }, 2000);
+                            return;
+                        }
+                    }, 2000);
+                }
+            }, 1500);
+            return;
+        } else {
+            this.step += 1;
+            this.alertness = Math.max(0, this.alertness - 10);
+            this.showHint('🧠 Оставляем меч в покое. Умное решение. -10% бдительности.');
+            this.playPixelSound('click');
+            
+            setTimeout(() => {
+                this.showResultMessage(
+                    '🧠 МУДРОЕ РЕШЕНИЕ',
+                    'Вы оставляете меч в ножнах.\n\n+1 шаг вперёд\n-10% бдительности (осознали свою глупость)\n\nМеч остаётся нетронутым,\nжду своего часа...',
+                    'safe'
+                );
+            }, 1000);
+        }
+    }
+        
+        setTimeout(() => {
+            this.finishEvent(event);
+        }, 1500);
+    }
+    
+    showResultMessage(title, description, type) {
+        this.pauseMode = true;
+        
+        const resultOverlay = document.createElement('div');
+        resultOverlay.className = 'event-overlay';
+        resultOverlay.id = 'eventResultOverlay';
+        resultOverlay.style.display = 'flex';
+        
+        let borderColor, titleColor;
+        switch(type) {
+            case 'success':
+                borderColor = '#4CAF50';
+                titleColor = '#4CAF50';
+                break;
+            case 'fail':
+                borderColor = '#F44336';
+                titleColor = '#F44336';
+                break;
+            case 'risky':
+                borderColor = '#FF9800';
+                titleColor = '#FF9800';
+                break;
+            case 'safe':
+                borderColor = '#4CAF50';
+                titleColor = '#4CAF50';
+                break;
+            default:
+                borderColor = '#ff6600';
+                titleColor = '#ffcc00';
+        }
+        
+        resultOverlay.innerHTML = `
+            <div class="event-box" style="border-color: ${borderColor}; max-width: 500px;">
+                <div class="event-title pixel-text" style="color: ${titleColor};">${title}</div>
+                <div class="event-description" style="white-space: pre-line; font-size: 1rem;">
+                    ${description}
+                </div>
+                <button class="choice-btn btn-safe" id="continueEventBtn" style="margin-top: 20px;">
+                    ПРОДОЛЖИТЬ
+                </button>
+            </div>
+        `;
+        
+        this.elements.gameScene.appendChild(resultOverlay);
+        
+        setTimeout(() => {
+            const continueBtn = document.getElementById('continueEventBtn');
+            if (continueBtn) {
+                continueBtn.addEventListener('click', () => {
+                    this.playPixelSound('click');
+                    resultOverlay.remove();
+                    this.pauseMode = false;
+                    this.handleNextTurn();
+                });
+            }
+            
+            const keyHandler = (e) => {
+                if (e.code === 'Enter' || e.code === 'Space') {
+                    e.preventDefault();
+                    this.playPixelSound('click');
+                    resultOverlay.remove();
+                    this.pauseMode = false;
+                    document.removeEventListener('keydown', keyHandler);
+                    this.handleNextTurn();
+                }
+            };
+            
+            document.addEventListener('keydown', keyHandler);
+        }, 100);
+    }
+    
+    finishEvent(event) {
+        if (event) {
+            event.done = true;
+        }
+        
+        this.justRestless = false;
+        
+        if (this.step >= this.maxSteps) {
+            this.winGame();
+            return;
+        }
+        
+        this.canAct = true;
+        this.pauseMode = false;
+        
+        this.handleNextTurn();
+    }
+    
+    changeDragonState() {
+        const states = ['sleeping', 'restless', 'awake'];
+        
+        if (this.dragonState === 'awake' && this.awakeCount >= 3) {
+            this.dragonState = 'sleeping';
+            this.awakeCount = 0;
+            
+            if (this.awakeBlockTimer) {
+                clearTimeout(this.awakeBlockTimer);
+                this.awakeBlockTimer = null;
+            }
+            
+            this.showVideo('sleeping');
+            this.stateHistory.push('sleeping');
+            this.showHint('Дракон устал и снова заснул...');
+            return;
+        }
+        
+        if (this.dragonState === 'awake') {
+            let sleepChance = 0.3;
+            
+            if (this.awakeCount >= 2) {
+                sleepChance = 0.7;
+            }
+            
+            if (Math.random() < sleepChance) {
+                this.dragonState = 'sleeping';
+                this.awakeCount = 0;
+                
+                if (this.awakeBlockTimer) {
+                    clearTimeout(this.awakeBlockTimer);
+                    this.awakeBlockTimer = null;
+                }
+                
+                this.showVideo('sleeping');
+                this.stateHistory.push('sleeping');
+                this.justRestless = false;
+                this.showHint('Дракон, похоже, снова засыпает...');
+                this.playPixelSound('dragon_sleep');
+                return;
+            }
+        }
+        
+        let weights;
+        
+        if (this.alertness < 30) weights = [85, 12, 3];
+        else if (this.alertness < 60) weights = [60, 30, 10];
+        else if (this.alertness < 80) weights = [40, 40, 20];
+        else weights = [20, 40, 40];
+        
+        if (this.awakeCount >= 1) {
+            weights[2] = Math.max(5, weights[2] - 20);
+            weights[0] += 10;
+            weights[1] += 10;
+        }
+        
+        if (this.stateHistory.length >= 2) {
+            const lastState = this.stateHistory[this.stateHistory.length - 1];
+            const secondLastState = this.stateHistory[this.stateHistory.length - 2];
+            
+            if (lastState === secondLastState) {
+                const stateIndex = states.indexOf(lastState);
+                if (stateIndex !== -1) {
+                    weights[stateIndex] = Math.max(10, weights[stateIndex] - 20);
+                    
+                    const remainingStates = states.filter((_, i) => i !== stateIndex);
+                    const weightToAdd = 20 / remainingStates.length;
+                    remainingStates.forEach(state => {
+                        const idx = states.indexOf(state);
+                        weights[idx] += weightToAdd;
+                    });
+                }
+            }
+        }
+        
+        weights[0] = Math.max(15, Math.min(90, weights[0]));
+        weights[1] = Math.max(5, Math.min(50, weights[1]));
+        weights[2] = Math.max(3, Math.min(40, weights[2]));
+        
+        const total = weights.reduce((a, b) => a + b, 0);
+        const normalizedWeights = weights.map(w => (w / total) * 100);
+        
+        let random = Math.random() * 100;
+        let chosen = states[0];
+        
+        for (let i = 0; i < normalizedWeights.length; i++) {
+            random -= normalizedWeights[i];
+            if (random <= 0) {
+                chosen = states[i];
+                break;
+            }
+        }
+        
+        this.stateHistory.push(chosen);
+        if (this.stateHistory.length > 8) this.stateHistory.shift();
+        
+        this.showVideo(chosen);
+    }
+    
+    makeStep() {
+        if (!this.canAct || this.state !== 'minigame' || this.pauseMode || this.dragonState !== 'sleeping') {
+            console.log('makeStep blocked:', { 
+                canAct: this.canAct, 
+                state: this.state, 
+                pauseMode: this.pauseMode,
+                dragonState: this.dragonState 
+            });
+            return;
+        }
+        
+        this.canAct = false;
+        this.setYumiState('pointing');
+        
+        let alertnessIncrease = 0;
+        
+        switch(this.dragonState) {
+            case 'sleeping': alertnessIncrease = 8; break;
+            case 'restless': alertnessIncrease = 15; break;
+            case 'awake': alertnessIncrease = 25; break;
+        }
+        
+        alertnessIncrease += (Math.random() * 8) - 3;
+        
+        let risk = Math.random() * 100;
+        let baseRisk = this.risks[this.dragonState];
+        
+        if (this.alertness > 50) baseRisk += (this.alertness - 50) / 2;
+        
+        const lastActions = this.stateHistory.slice(-3);
+        const recentSteps = lastActions.filter(action => action === 'step').length;
+        if (recentSteps > 1) baseRisk += recentSteps * 10;
+        
+        this.showHint(`Делаем шаг... Риск пробуждения: ${Math.round(baseRisk)}%`);
+        this.stateHistory.push('step');
+        
+        setTimeout(() => {
+            let resultMessage = '';
+            
+            if (risk <= baseRisk) {
+                resultMessage = 'Шум! Дракон заметил движение!';
+                alertnessIncrease += 20 + (Math.random() * 15);
+                
+                if (this.alertness + alertnessIncrease >= 80 || risk <= baseRisk * 0.5) {
+                    this.dragonState = 'awake';
+                    this.showVideo('awake');
+                    this.stateHistory.push('awake');
+                    this.playPixelSound('dragon_wake');
+                    this.shakeScreen();
+                    resultMessage = '💥 ГРОМКИЙ ШУМ! Дракон ПРОСЫПАЕТСЯ!';
+                    alertnessIncrease = Math.min(100, this.alertness + 40) - this.alertness;
+                } else if (this.alertness + alertnessIncrease >= 50) {
+                    this.dragonState = 'restless';
+                    this.showVideo('restless');
+                    this.stateHistory.push('restless');
+                    this.playPixelSound('dragon_sleep');
+                    resultMessage = '⚠️ Шорох! Дракон ворочается...';
+                }
+            } else {
+                resultMessage = 'Тихий шаг... Успех!';
+                alertnessIncrease = Math.max(3, alertnessIncrease * 0.5);
+            }
+            
+            this.alertness = Math.min(100, Math.max(0, this.alertness + alertnessIncrease));
+            
+            if (risk > baseRisk) {
+                this.step++;
+                this.showHint(`${resultMessage} +1 шаг. Бдительность +${Math.round(alertnessIncrease)}%`);
+                
+                if (this.step >= this.maxSteps) {
+                    this.winGame();
+                    return;
+                }
+                
+                if (this.events[this.step] && !this.events[this.step].done) {
+                    this.showEvent(this.events[this.step]);
+                } else {
+                    this.handleNextTurn();
+                }
+                
+                if (this.step === 15 && !this.hasStone) {
+                    this.hasStone = true;
+                    this.elements.stoneButton.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        this.showResultMessage(
+                            '🎉 ВАЖНАЯ НАХОДКА!',
+                            'Вы нашли небольшой камень!\n\nТеперь можно отвлечь дракона,\nбросив камень в другую сторону.\n\nКнопка камня теперь доступна!',
+                            'success'
+                        );
+                    }, 500);
+                    return;
+                }
+            } else {
+                this.showHint(`${resultMessage} Бдительность +${Math.round(alertnessIncrease)}%`);
+                
+                if (this.alertness >= 100) {
+                    setTimeout(() => this.loseGame(), 1500);
+                    return;
+                }
+            }
+            
+            this.playPixelSound(risk > baseRisk ? 'step' : 'fail');
+            this.updateUI();
+        }, 1000);
+    }
+    
+    shakeScreen() {
+        this.elements.gameScene.classList.add('shake');
+        setTimeout(() => this.elements.gameScene.classList.remove('shake'), 500);
+    }
+    
+    showHint(text) {
+    // ВАЖНО: Проверка на меч должна быть ПЕРВОЙ, до установки текста!
+    if (text.includes('⚔️') || text.includes('меч') || text.toLowerCase().includes('меча')) {
+        const swordReactions = [
+            '🤦 Меч? ПРОТИВ ДРАКОНА?',
+            '⚔️ Ты хочешь, чтобы он нас СЖЕГ?',
+            '😱 О БОЖЕ, НЕТ! СПРЯЧЬ ЭТО!',
+            '🗡️ Этот меч годится разве что масло на хлеб намазать!',
+            '🤔 Интересно, драконы любят, когда их тыкают острым?'
+        ];
+        
+        const reaction = swordReactions[Math.floor(Math.random() * swordReactions.length)];
+        this.elements.hintText.textContent = reaction;
+        this.setYumiState('panicking');
+        this.elements.hintText.style.color = '#FF3333';
+        this.elements.hintText.style.textShadow = '0 0 10px #FF3333';
+        return; // Прерываем, чтобы не перезаписать текст
+    }
+    
+    // Обычная логика для остальных подсказок
+    this.elements.hintText.textContent = text;
+    
+    let newState = 'sitting';
+    let textColor = 'white';
+    let textShadow = 'none';
+    
+    const lowerText = text.toLowerCase();
+    
+    if (lowerText.includes('🎯') || lowerText.includes('успех') || lowerText.includes('идеальный') || 
+        lowerText.includes('победа') || lowerText.includes('отлично')) {
+        newState = 'success';
+        textColor = '#4CAF50';
+        textShadow = '0 0 10px #4CAF50';
+    } 
+    else if (lowerText.includes('💥') || lowerText.includes('провал') || lowerText.includes('катастрофа') || 
+             lowerText.includes('опасность') || lowerText.includes('дракон проснулся')) {
+        newState = 'danger';
+        textColor = '#F44336';
+        textShadow = '0 0 10px #F44336';
+    }
+    else if (lowerText.includes('⚡') || lowerText.includes('риск') || lowerText.includes('внимание') || 
+             lowerText.includes('осторожно') || lowerText.includes('замри')) {
+        newState = 'warning';
+        textColor = '#FF9800';
+        textShadow = '0 0 10px #FF9800';
+    }
+    else if (lowerText.includes('🛡️') || lowerText.includes('безопасно') || lowerText.includes('тихо') || 
+             lowerText.includes('шепот') || lowerText.includes('осторожность')) {
+        newState = 'whispering';
+        textColor = '#00ccff';
+        textShadow = '0 0 10px #00ccff';
+    }
+    else if (lowerText.includes('шаг') || lowerText.includes('идём') || lowerText.includes('направление') ||
+             lowerText.includes('вперёд') || lowerText.includes('путь')) {
+        newState = 'pointing';
+        textColor = '#FFCC00';
+        textShadow = '0 0 10px #FFCC00';
+    }
+    else if (lowerText.includes('ждём') || lowerText.includes('передышка') || lowerText.includes('наблюдаем') ||
+             lowerText.includes('спит') || lowerText.includes('тишина')) {
+        newState = 'sitting';
+        textColor = '#ffffff';
+        textShadow = 'none';
+    }
+    
+    this.setYumiState(newState);
+    this.elements.hintText.style.color = textColor;
+    this.elements.hintText.style.textShadow = textShadow;
+}
+    
+    updateUI() {
+        this.elements.stepCounter.textContent = `${this.step}/${this.maxSteps}`;
+        
+        this.elements.alertnessFill.style.width = `${this.alertness}%`;
+        this.elements.alertnessPercent.textContent = `${Math.round(this.alertness)}%`;
+        
+        if (this.alertness < 30) {
+            this.elements.alertnessPercent.style.color = '#4CAF50';
+            this.elements.alertnessFill.style.background = 'linear-gradient(90deg, #006600, #00cc00)';
+        } else if (this.alertness < 70) {
+            this.elements.alertnessPercent.style.color = '#FF9800';
+            this.elements.alertnessFill.style.background = 'linear-gradient(90deg, #996600, #ff9900)';
+        } else {
+            this.elements.alertnessPercent.style.color = '#F44336';
+            this.elements.alertnessFill.style.background = 'linear-gradient(90deg, #660000, #ff3300)';
+        }
+        
+        const risk = this.risks[this.dragonState];
+        const adjustedRisk = risk + (this.alertness > 50 ? (this.alertness - 50) / 2 : 0);
+        
+        const isAwakeBlocked = this.dragonState === 'awake' && !this.canAct;
+        
+        if (this.dragonState === 'restless') {
+            this.elements.stepButton.title = 'Нельзя двигаться - дракон ворочается!';
+            this.elements.waitButton.title = 'Ждать (шанс уснуть 50%)';
+            this.elements.waitButton.style.background = 'linear-gradient(135deg, #FF9800, #F57C00)';
+            this.elements.waitButton.innerHTML = '⏸️ ЖДАТЬ';
+        } else if (this.dragonState === 'awake') {
+            if (isAwakeBlocked) {
+                this.elements.stepButton.title = 'БЛОКИРОВАНО! Дракон только что проснулся!';
+                this.elements.waitButton.title = 'БЛОКИРОВАНО! Подождите пока дракон успокоится';
+                this.elements.waitButton.style.background = 'linear-gradient(135deg, #FF3333, #CC0000)';
+                this.elements.waitButton.innerHTML = '⏸️ БЛОКИРОВАНО';
+            } else {
+                this.elements.stepButton.title = 'ОПАСНО! Дракон бодрствует! Риск 90%+';
+                this.elements.waitButton.title = 'Ждать (шанс уснуть 40-70%)';
+                this.elements.waitButton.style.background = 'linear-gradient(135deg, #FF9800, #F57C00)';
+                this.elements.waitButton.innerHTML = '⏸️ ЖДАТЬ (ШАНС УСНУТЬ)';
+            }
+        } else {
+            this.elements.stepButton.title = `Риск: ${Math.round(adjustedRisk)}%`;
+            this.elements.waitButton.title = 'Подождать и успокоить дракона';
+            this.elements.waitButton.style.background = 'linear-gradient(135deg, #8B4513, #A0522D)';
+            this.elements.waitButton.innerHTML = '⏸️ ПОДОЖДАТЬ';
+        }
+        
+        this.elements.stepButton.disabled = !this.canAct || this.pauseMode || this.dragonState !== 'sleeping';
+        this.elements.waitButton.disabled = !this.canAct || this.pauseMode;
+        this.elements.stoneButton.disabled = !this.canAct || this.stoneUsed || this.pauseMode || this.dragonState !== 'sleeping';
+        
+        if (adjustedRisk <= 30) {
+            this.elements.stepButton.style.background = 'linear-gradient(135deg, #4CAF50, #2E7D32)';
+        } else if (adjustedRisk <= 60) {
+            this.elements.stepButton.style.background = 'linear-gradient(135deg, #FF9800, #F57C00)';
+        } else {
+            this.elements.stepButton.style.background = 'linear-gradient(135deg, #F44336, #C62828)';
+        }
+        
+        if (isAwakeBlocked) {
+            this.elements.stepButton.style.background = 'linear-gradient(135deg, #666666, #333333)';
+            this.elements.waitButton.style.background = 'linear-gradient(135deg, #FF3333, #CC0000)';
+            this.elements.stoneButton.style.background = 'linear-gradient(135deg, #666666, #333333)';
+        }
+    }
+    
+    loseGame() {
+    // Останавливаем все игровые процессы
+    this.canAct = false;
+    this.pauseMode = true;
+    
+    this.dragonState = 'awake';
+    this.showVideo('awake');
+    this.showHint('💀 ДРАКОН ПРОСНУЛСЯ! ПРОИГРЫШ!');
+    this.playPixelSound('dragon_wake');
+    this.shakeScreen();
+    this.stopBackgroundMusic();
+    
+    // Блокируем кнопки
+    this.elements.stepButton.disabled = true;
+    this.elements.waitButton.disabled = true;
+    this.elements.stoneButton.disabled = true;
+    
+    // Показываем окошко поражения через 1 секунду
+    setTimeout(() => {
+        // Проверяем, не показано ли уже окошко
+        if (document.getElementById('defeatOverlay')) {
+            return;
+        }
+        
+        const defeatOverlay = document.createElement('div');
+        defeatOverlay.id = 'defeatOverlay';
+        defeatOverlay.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        `;
+        
+        defeatOverlay.innerHTML = `
+            <div style="
+                background: linear-gradient(135deg, rgba(60, 0, 0, 0.95), rgba(30, 0, 0, 0.95));
+                border: 4px solid #ff3300;
+                border-radius: 15px;
+                padding: 30px;
+                max-width: 600px;
+                width: 90%;
+                text-align: center;
+                box-shadow: 0 0 50px rgba(255, 51, 0, 0.7);
+            ">
+                <div style="
+                    color: #ff3300;
+                    font-size: 2.2rem;
+                    margin-bottom: 20px;
+                    text-shadow: 0 0 10px #ff3300;
+                    font-family: 'Orbitron', sans-serif;
+                    font-weight: bold;
+                ">
+                    🐉 ПОРАЖЕНИЕ! 🐉
+                </div>
+                
+                <div style="
+                    font-size: 3rem;
+                    margin: 20px 0;
+                ">
+                    💀
+                </div>
+                
+                <div style="
+                    color: #ff9966;
+                    font-size: 1.1rem;
+                    margin-bottom: 10px;
+                    font-family: 'Press Start 2P', monospace;
+                ">
+                    Дракон проснулся и обнаружил вас!
+                </div>
+                
+                <div style="
+                    background: rgba(0, 0, 0, 0.5);
+                    border: 2px solid rgba(255, 51, 0, 0.3);
+                    border-radius: 10px;
+                    padding: 15px;
+                    margin: 20px 0;
+                    font-family: 'Press Start 2P', monospace;
+                ">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: #ff9966;">Прогресс:</span>
+                        <span style="color: #ff3333; font-weight: bold;">${this.step}/${this.maxSteps}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="color: #ff9966;">Бдительность:</span>
+                        <span style="color: #ff3333; font-weight: bold;">${Math.round(this.alertness)}%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: #ff9966;">Статус:</span>
+                        <span style="color: #ff3333; font-weight: bold;">ОБНАРУЖЕН</span>
+                    </div>
+                </div>
+                
+                <div style="
+                    color: #ffcc99;
+                    font-size: 0.9rem;
+                    margin: 20px 0;
+                    padding: 15px;
+                    background: rgba(255, 51, 0, 0.1);
+                    border-radius: 8px;
+                    border-left: 4px solid #ff3300;
+                    font-family: 'Press Start 2P', monospace;
+                ">
+                    "Огненное дыхание дракона опалило ваши планы..."
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin-top: 25px;">
+                    <button id="retryBtn" style="
+                        flex: 1;
+                        padding: 15px;
+                        background: linear-gradient(135deg, #ff3300, #cc0000);
+                        border: 3px solid #ff9966;
+                        color: white;
+                        font-family: 'Press Start 2P', monospace;
+                        font-size: 0.9rem;
+                        cursor: pointer;
+                        border-radius: 8px;
+                        transition: all 0.2s;
+                    ">
+                        🔄 ПОВТОРИТЬ
+                    </button>
+                    <button id="menuBtn" style="
+                        flex: 1;
+                        padding: 15px;
+                        background: linear-gradient(135deg, #333333, #666666);
+                        border: 3px solid #999999;
+                        color: white;
+                        font-family: 'Press Start 2P', monospace;
+                        font-size: 0.9rem;
+                        cursor: pointer;
+                        border-radius: 8px;
+                        transition: all 0.2s;
+                    ">
+                        🏠 МЕНЮ
+                    </button>
+                </div>
+                
+                <div style="
+                    color: #ff9966;
+                    font-size: 0.8rem;
+                    margin-top: 15px;
+                    padding-top: 10px;
+                    border-top: 1px solid rgba(255, 102, 0, 0.3);
+                    font-family: 'Press Start 2P', monospace;
+                ">
+                    Совет: Будьте тише и следите за бдительностью дракона
+                </div>
+            </div>
+        `;
+        
+        // Добавляем оверлей на страницу
+        this.elements.gameScene.appendChild(defeatOverlay);
+        
+        // Сохраняем ссылку на this для использования в обработчиках
+        const game = this;
+        
+        // Функция перезапуска игры
+        const restartGame = () => {
+            game.playPixelSound('menu_click');
+            
+            // Удаляем оверлей
+            if (defeatOverlay.parentNode) {
+                defeatOverlay.parentNode.removeChild(defeatOverlay);
+            }
+            
+            // Перезапускаем мини-игру
+            game.restartMinigame();
+        };
+        
+        // Функция перехода в меню
+        const goToMenu = () => {
+            game.playPixelSound('menu_click');
+            
+            // Удаляем оверлей
+            if (defeatOverlay.parentNode) {
+                defeatOverlay.parentNode.removeChild(defeatOverlay);
+            }
+            
+            // Возвращаемся в меню
+            game.state = 'menu';
+            game.elements.gameScene.style.display = 'none';
+            game.elements.titleScreen.style.display = 'flex';
+            
+            // Перезапускаем музыку
+            game.createAmbientMusic();
+        };
+        
+        // Добавляем обработчики событий ДО добавления элементов в DOM
+        setTimeout(() => {
+            const retryBtn = document.getElementById('retryBtn');
+            const menuBtn = document.getElementById('menuBtn');
+            
+            if (retryBtn) {
+                retryBtn.addEventListener('click', restartGame);
+                // Добавляем стили при наведении
+                retryBtn.addEventListener('mouseenter', () => {
+                    retryBtn.style.transform = 'translateY(-2px)';
+                    retryBtn.style.boxShadow = '0 5px 15px rgba(255, 51, 0, 0.5)';
+                    retryBtn.style.background = 'linear-gradient(135deg, #ff5500, #ff3300)';
+                });
+                retryBtn.addEventListener('mouseleave', () => {
+                    retryBtn.style.transform = '';
+                    retryBtn.style.boxShadow = '';
+                    retryBtn.style.background = 'linear-gradient(135deg, #ff3300, #cc0000)';
+                });
+                retryBtn.addEventListener('mousedown', () => {
+                    retryBtn.style.transform = 'translateY(1px)';
+                });
+                retryBtn.addEventListener('mouseup', () => {
+                    retryBtn.style.transform = 'translateY(-2px)';
+                });
+            }
+            
+            if (menuBtn) {
+                menuBtn.addEventListener('click', goToMenu);
+                // Добавляем стили при наведении
+                menuBtn.addEventListener('mouseenter', () => {
+                    menuBtn.style.transform = 'translateY(-2px)';
+                    menuBtn.style.boxShadow = '0 5px 15px rgba(102, 102, 102, 0.5)';
+                    menuBtn.style.background = 'linear-gradient(135deg, #444444, #666666)';
+                });
+                menuBtn.addEventListener('mouseleave', () => {
+                    menuBtn.style.transform = '';
+                    menuBtn.style.boxShadow = '';
+                    menuBtn.style.background = 'linear-gradient(135deg, #333333, #666666)';
+                });
+                menuBtn.addEventListener('mousedown', () => {
+                    menuBtn.style.transform = 'translateY(1px)';
+                });
+                menuBtn.addEventListener('mouseup', () => {
+                    menuBtn.style.transform = 'translateY(-2px)';
+                });
+            }
+            
+            // Обработчик горячих клавиш
+            const keyHandler = (e) => {
+                if (e.code === 'KeyR' || e.code === 'Digit1') {
+                    e.preventDefault();
+                    restartGame();
+                    document.removeEventListener('keydown', keyHandler);
+                } else if (e.code === 'KeyM' || e.code === 'Digit2' || e.code === 'Escape') {
+                    e.preventDefault();
+                    goToMenu();
+                    document.removeEventListener('keydown', keyHandler);
+                }
+            };
+            
+            document.addEventListener('keydown', keyHandler);
+            
+            // Сохраняем обработчики для последующего удаления
+            defeatOverlay._keyHandler = keyHandler;
+            
+        }, 100);
+        
+    }, 1000);
+}
+    
+    restartMinigame() {
+    // Удаляем окошко поражения если оно есть
+    const defeatOverlay = document.getElementById('defeatOverlay');
+    if (defeatOverlay) {
+        // Удаляем обработчик клавиш
+        if (defeatOverlay._keyHandler) {
+            document.removeEventListener('keydown', defeatOverlay._keyHandler);
+        }
+        if (defeatOverlay.parentNode) {
+            defeatOverlay.parentNode.removeChild(defeatOverlay);
+        }
+    }
+    
+    // Сбрасываем игровые переменные
+    this.step = 0;
+    this.alertness = 0;
+    this.dragonState = 'sleeping';
+    this.hasStone = false;
+    this.stoneUsed = false;
+    this.canAct = true;
+    this.videoPlaying = false;
+    this.justRestless = false;
+    this.pauseMode = false;
+    this.awakeCount = 0;
+    this.firstVideoPlayed = false;
+    this.stateHistory = ['sleeping'];
+    
+    if (this.awakeBlockTimer) {
+        clearTimeout(this.awakeBlockTimer);
+        this.awakeBlockTimer = null;
+    }
+    
+    // Сбрасываем события
+    Object.keys(this.events).forEach(key => {
+        this.events[key].done = false;
+    });
+    
+    // Сбрасываем UI
+    this.elements.stoneButton.style.display = 'none';
+    this.elements.eventOverlay.style.display = 'none';
+    this.elements.stoneResultOverlay.style.display = 'none';
+    
+    this.setYumiState('sitting');
+    this.showHint('Тихо... Начинаем путь...');
+    this.showVideo('sleeping');
+    
+    this.updateUI();
+}
+}
+
+// Инициализация игры при загрузке страницы
+document.addEventListener('DOMContentLoaded', () => {
+    const game = new DragonStealthGame();
+    window.game = game;
+    
+    // Предзагрузка изображений
+    const images = [
+        'img/Yumi sitting.svg',
+        'img/Yumi pointing.svg',
+        'img/Yumi panicking.svg',
+        'img/Yumi whispering.svg'
+    ];
+    
+    images.forEach(src => {
+        const img = new Image();
+        img.src = src;
+    });
+    
+    // Разблокировка аудио после взаимодействия пользователя
+    const unlockAudio = () => {
+        if (game.musicEnabled && (!game.backgroundMusic || game.backgroundMusic.paused)) {
+            game.createAmbientMusic();
+        }
+        document.removeEventListener('click', unlockAudio);
+        document.removeEventListener('keydown', unlockAudio);
+    };
+    
+    document.addEventListener('click', unlockAudio);
+    document.addEventListener('keydown', unlockAudio);
+});
+</script>
+</body>
+</html>

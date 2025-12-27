@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Инвентарь и Карта - Зимнее Приключение</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0d1930, #1a1a2e);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.8s ease-out;
+            position: relative;
+        }
+        
+        h1 {
+            color: #4fc3f7;
+            font-size: 48px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
+            font-family: 'Pixelify Sans', sans-serif;
+        }
+        
+        .subtitle {
+            color: #bbdefb;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        
+        /* Стиль для кнопки возврата */
+        .back-home-btn {
+            position: absolute;
+            top: 10px;
+            left: 0;
+            background: linear-gradient(145deg, #2196F3, #1976D2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-family: 'Pixelify Sans', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+        }
+        
+        .back-home-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+            background: linear-gradient(145deg, #42A5F5, #1E88E5);
+        }
+        
+        .back-home-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        /* Секция инвентаря */
+        .inventory-section {
+            background: rgba(25, 35, 70, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            border: 3px solid #2196F3;
+            box-shadow: 0 10px 30px rgba(33, 150, 243, 0.1);
+        }
+        
+        .section-title {
+            color: #ffcc80;
+            font-size: 32px;
+            margin-bottom: 25px;
+            font-family: 'Pixelify Sans', sans-serif;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, #2196F3, #ffcc80);
+            border-radius: 3px;
+        }
+        
+        .stats-container {
+            background: rgba(33, 150, 243, 0.15);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 2px solid #2196F3;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-5px);
+            background: rgba(33, 150, 243, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            color: #ffcc80;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #bbdefb;
+            font-size: 16px;
+        }
+        
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+        
+        .item-card {
+            background: rgba(30, 40, 80, 0.7);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 3px solid #2196F3;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .item-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(33, 150, 243, 0.3);
+            border-color: #ffcc80;
+        }
+        
+        .item-card.new {
+            border-color: #ffcc80;
+            animation: pulse 2s infinite;
+        }
+        
+        .item-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .item-name {
+            font-size: 16px;
+            color: #e3f2fd;
+            margin-bottom: 10px;
+            font-family: 'Pixelify Sans', sans-serif;
+        }
+        
+        .item-description {
+            font-size: 13px;
+            color: #90a4ae;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+        
+        .item-day {
+            font-size: 11px;
+            color: #5c6bc0;
+            margin-top: auto;
+        }
+        
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(30, 40, 80, 0.3);
+            border-radius: 15px;
+            border: 2px dashed #5c6bc0;
+        }
+        
+        .empty-state h3 {
+            color: #bbdefb;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .empty-state p {
+            color: #90a4ae;
+            font-size: 16px;
+        }
+        
+        /* Секция карты - ЕЩЕ БОЛЬШЕ */
+        .map-section {
+            background: rgba(25, 35, 70, 0.8);
+            border-radius: 20px;
+            padding: 30px;
+            border: 3px solid #ff9800;
+            box-shadow: 0 10px 30px rgba(255, 152, 0, 0.1);
+            margin-top: 20px;
+        }
+        
+        /* Контейнер карты - МАКСИМАЛЬНО БОЛЬШОЙ */
+        .map-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255, 152, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            min-height: 600px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .map-image {
+            width: 95%;
+            height: auto;
+            max-height: 550px;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+            transition: transform 0.3s ease;
+            border: 4px solid rgba(255, 255, 255, 0.15);
+            object-fit: contain;
+        }
+        
+        .map-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9);
+        }
+        
+        /* Краткое описание под картой */
+        .map-description {
+            background: rgba(30, 40, 80, 0.5);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            border-top: 3px solid rgba(255, 152, 0, 0.3);
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .description-title {
+            color: #ffcc80;
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-family: 'Pixelify Sans', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+            justify-content: center;
+        }
+        
+        .description-text {
+            color: #e3f2fd;
+            line-height: 1.6;
+            font-size: 17px;
+            text-align: center;
+            margin-bottom: 0;
+        }
+        
+        .description-highlight {
+            color: #ffcc80;
+            font-weight: bold;
+            font-style: italic;
+        }
+        
+        /* Анимации */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 1200px) {
+            .container {
+                max-width: 1200px;
+            }
+            
+            .map-container {
+                max-width: 1100px;
+                min-height: 550px;
+            }
+            
+            .map-image {
+                max-height: 500px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .container {
+                max-width: 900px;
+            }
+            
+            .map-container {
+                max-width: 850px;
+                min-height: 500px;
+            }
+            
+            .map-image {
+                max-height: 450px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+                max-width: 100%;
+            }
+            
+            h1 {
+                font-size: 36px;
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
+            
+            .inventory-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+            }
+            
+            .item-card {
+                padding: 20px;
+                min-height: 160px;
+            }
+            
+            .item-icon {
+                font-size: 40px;
+            }
+            
+            .map-container {
+                min-height: 400px;
+                padding: 15px;
+                max-width: 100%;
+            }
+            
+            .map-image {
+                width: 98%;
+                max-height: 380px;
+                border-width: 3px;
+            }
+            
+            .map-description {
+                padding: 20px;
+                margin-top: 25px;
+            }
+            
+            .description-title {
+                font-size: 22px;
+            }
+            
+            .description-text {
+                font-size: 16px;
+            }
+            
+            .back-home-btn {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin-bottom: 20px;
+                display: inline-block;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .inventory-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stat-value {
+                font-size: 28px;
+            }
+            
+            .map-container {
+                min-height: 350px;
+                padding: 10px;
+            }
+            
+            .map-image {
+                max-height: 330px;
+                border-width: 2px;
+            }
+            
+            .map-description {
+                padding: 15px;
+                margin-top: 20px;
+            }
+            
+            .description-title {
+                font-size: 20px;
+            }
+            
+            .description-text {
+                font-size: 15px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .map-container {
+                min-height: 300px;
+            }
+            
+            .map-image {
+                max-height: 280px;
+            }
+            
+            .map-description {
+                padding: 12px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="index1.html" class="back-home-btn">
+                ← На главную
+            </a>
+            <h1>🎒 Инвентарь и Карта</h1>
+            <p class="subtitle">Собери все артефакты и изучи карту зимнего путешествия</p>
+        </header>
+        
+        <!-- Секция инвентаря -->
+        <section class="inventory-section">
+            <h2 class="section-title">📦 Собранные Артефакты</h2>
+            
+            <div class="stats-container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalItems">0</div>
+                        <div class="stat-label">Всего предметов</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="completedDays">0</div>
+                        <div class="stat-label">Завершено дней</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="progressPercent">0%</div>
+                        <div class="stat-label">Прогресс игры</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="rareItems">0</div>
+                        <div class="stat-label">Редких предметов</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="inventory-grid" id="inventoryGrid">
+                <!-- Предметы будут загружены здесь -->
+            </div>
+        </section>
+        
+        <!-- Секция карты - МАКСИМАЛЬНО КРУПНАЯ -->
+        <section class="map-section">
+            <h2 class="section-title">🗺️ Карта Зимнего Пути</h2>
+            
+            <p style="text-align: center; color: #bbdefb; margin-bottom: 25px; line-height: 1.6;">
+                Изучи путь Ника через зимние земли
+            </p>
+            
+            <!-- ОЧЕНЬ КРУПНАЯ КАРТА -->
+            <div class="map-container" id="mapContainer">
+                <img 
+                    src="img/Karta.svg" 
+                    alt="Карта Зимнего Пути" 
+                    class="map-image" 
+                    id="mapImage"
+                >
+            </div>
+            
+            <!-- Краткое описание -->
+            <div class="map-description">
+                <h3 class="description-title">📜 Легенда карты</h3>
+                <p class="description-text">
+                    Эта карта ведёт Ника через <span class="description-highlight">зимние чудеса</span>. 
+                    Каждый день — новое приключение: от заснеженных лесов до ледяных пещер. 
+                    <span class="description-highlight">Следи за прогрессом</span> и открывай новые места!
+                </p>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // База данных предметов - ДОБАВЛЕН ДРАКОНИЙ КРИСТАЛЛ
+        const itemsDatabase = {
+            "Тёплая свеча 🕯️": {
+                icon: "🕯️",
+                description: "Освещает путь в темноте",
+                day: 1,
+                rarity: "common"
+            },
+            "Драконий кристалл 🔥": {
+                icon: "🔥",
+                description: "Пылающий кристалл из сердца дракона. Содержит древнюю магию огня.",
+                day: 2,
+                rarity: "epic"
+            },
+            "Мышка Юми 🐭": {
+                icon: "🐭",
+                description: "Верный спутник",
+                day: 3,
+                rarity: "common"
+            },
+            "Тёплый плащ 🧥": {
+                icon: "🧥",
+                description: "Защищает от ветра",
+                day: 4,
+                rarity: "common"
+            },
+            "Корзина дров 🪵": {
+                icon: "🪵",
+                description: "Хворост для костра",
+                day: 5,
+                rarity: "common"
+            },
+            "Звездочёт ⭐": {
+                icon: "⭐",
+                description: "Читает звёздные карты",
+                day: 6,
+                rarity: "rare"
+            },
+            "Зимний пирог 🥧": {
+                icon: "🥧",
+                description: "Восстанавливает силы",
+                day: 7,
+                rarity: "common"
+            },
+            "Доброе сердце ❤️": {
+                icon: "❤️",
+                description: "Помогает находить друзей",
+                day: 8,
+                rarity: "epic"
+            },
+            "Волшебный шар 🔮": {
+                icon: "🔮",
+                description: "Показывает будущее",
+                day: 9,
+                rarity: "rare"
+            },
+            "Персональное поздравление 🎁": {
+                icon: "🎁",
+                description: "Особый подарок",
+                day: 10,
+                rarity: "legendary"
+            }
+        };
+        
+        // Загрузка данных
+        function loadInventory() {
+            const inventoryGrid = document.getElementById('inventoryGrid');
+            const totalItems = document.getElementById('totalItems');
+            const completedDays = document.getElementById('completedDays');
+            const progressPercent = document.getElementById('progressPercent');
+            const rareItems = document.getElementById('rareItems');
+            
+            // Получаем инвентарь из localStorage
+            const inventory = JSON.parse(localStorage.getItem('winterAdventureInventory')) || [];
+            
+            // Получаем прогресс
+            const progress = JSON.parse(localStorage.getItem('adventProgress')) || { adventDays: {} };
+            
+            // Считаем статистику
+            const completedCount = Object.values(progress.adventDays || {})
+                .filter(day => day.completed).length;
+            
+            // Считаем редкие предметы
+            const rareCount = inventory.filter(item => {
+                const itemData = itemsDatabase[item.name] || itemsDatabase[item];
+                return itemData && itemData.rarity !== "common";
+            }).length;
+            
+            totalItems.textContent = inventory.length;
+            completedDays.textContent = completedCount;
+            progressPercent.textContent = Math.round((completedCount / 10) * 100) + '%';
+            rareItems.textContent = rareCount;
+            
+            // Очищаем сетку
+            inventoryGrid.innerHTML = '';
+            
+            if (inventory.length === 0) {
+                // Показываем состояние "пусто"
+                inventoryGrid.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 80px; margin-bottom: 20px;">🎒</div>
+                        <h3>Инвентарь пуст</h3>
+                        <p>Выполняйте задания в календаре, чтобы собирать артефакты!</p>
+                        <a href="index.html#advent-section" style="
+                            display: inline-block;
+                            margin-top: 20px;
+                            padding: 12px 30px;
+                            background: linear-gradient(145deg, #4caf50, #2e7d32);
+                            color: white;
+                            text-decoration: none;
+                            border-radius: 8px;
+                            font-family: 'Pixelify Sans', sans-serif;
+                        ">Перейти к заданиям →</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Сортируем предметы по дню получения
+            const sortedItems = [...inventory].sort((a, b) => {
+                const itemDataA = itemsDatabase[a.name] || itemsDatabase[a];
+                const itemDataB = itemsDatabase[b.name] || itemsDatabase[b];
+                const dayA = itemDataA?.day || 0;
+                const dayB = itemDataB?.day || 0;
+                return dayA - dayB;
+            });
+            
+            // Добавляем предметы в сетку
+            sortedItems.forEach((itemObj, index) => {
+                let itemName, itemData;
+                
+                // Обрабатываем как новый формат (объект) или старый (строка)
+                if (typeof itemObj === 'object' && itemObj.name) {
+                    itemName = itemObj.name;
+                    // Ищем данные в базе или используем данные из объекта
+                    itemData = itemsDatabase[itemName] || {
+                        icon: itemObj.icon || "🎁",
+                        description: itemObj.description || "Таинственный предмет",
+                        day: itemObj.day || "?",
+                        rarity: itemObj.rarity || "common"
+                    };
+                } else {
+                    itemName = itemObj;
+                    itemData = itemsDatabase[itemName] || {
+                        icon: "🎁",
+                        description: "Таинственный предмет",
+                        day: "?",
+                        rarity: "common"
+                    };
+                }
+                
+                // Определяем цвет рамки по редкости
+                let borderColor = "#2196F3";
+                let rarityText = "";
+                
+                switch(itemData.rarity) {
+                    case "rare":
+                        borderColor = "#FF9800";
+                        rarityText = "★";
+                        break;
+                    case "epic":
+                        borderColor = "#9C27B0";
+                        rarityText = "★★";
+                        break;
+                    case "legendary":
+                        borderColor = "#FFD700";
+                        rarityText = "★★★";
+                        break;
+                }
+                
+                const itemCard = document.createElement('div');
+                itemCard.className = 'item-card';
+                itemCard.style.borderColor = borderColor;
+                itemCard.style.animationDelay = `${index * 0.1}s`;
+                
+                // Помечаем новые предметы
+                const isNew = checkIfItemIsNew(itemName, itemObj);
+                
+                itemCard.innerHTML = `
+                    ${rarityText ? `<div style="position: absolute; top: 10px; left: 10px; color: ${borderColor}; font-size: 14px;">${rarityText}</div>` : ''}
+                    ${isNew ? '<div style="position: absolute; top: 10px; right: 10px; background: #ff9800; color: white; padding: 3px 8px; border-radius: 10px; font-size: 10px;">NEW</div>' : ''}
+                    
+                    <div class="item-icon">${itemData.icon}</div>
+                    <div class="item-name">${itemName}</div>
+                    <div class="item-description">${itemData.description}</div>
+                    <div class="item-day">День ${itemData.day}</div>
+                `;
+                
+                // Добавляем эффект при наведении
+                itemCard.addEventListener('mouseenter', () => {
+                    itemCard.style.transform = 'translateY(-10px)';
+                    itemCard.style.boxShadow = `0 15px 30px ${borderColor}40`;
+                });
+                
+                itemCard.addEventListener('mouseleave', () => {
+                    itemCard.style.transform = 'translateY(0)';
+                    itemCard.style.boxShadow = 'none';
+                });
+                
+                inventoryGrid.appendChild(itemCard);
+            });
+        }
+        
+        // Проверяем, новый ли предмет
+        function checkIfItemIsNew(itemName, itemObj) {
+            const lastAdded = localStorage.getItem('lastAddedItem');
+            if (lastAdded) {
+                const [name, timestamp] = lastAdded.split('|');
+                if (name === itemName) {
+                    const timeDiff = Date.now() - parseInt(timestamp);
+                    return timeDiff < 3600000; // 1 час
+                }
+            }
+            
+            // Также проверяем по timestamp в объекте
+            if (itemObj && itemObj.timestamp) {
+                const timeDiff = Date.now() - itemObj.timestamp;
+                return timeDiff < 3600000; // 1 час
+            }
+            
+            return false;
+        }
+        
+        // Загрузка страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Загружаем инвентарь
+            loadInventory();
+            
+            console.log('Проверка карты...');
+            const mapImage = document.getElementById('mapImage');
+            
+            // Если карта загрузилась
+            mapImage.onload = function() {
+                console.log('✅ Карта Karta.svg успешно загружена!');
+                // Автоматическое масштабирование для очень больших карт
+                if (this.naturalWidth > 2000) {
+                    this.style.maxHeight = '650px';
+                }
+            };
+            
+            // Если ошибка загрузки
+            mapImage.onerror = function() {
+                console.log('❌ Файл Karta.svg не найден');
+                
+                // Показываем заглушку
+                const container = document.getElementById('mapContainer');
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: #bbdefb; width: 100%;">
+                        <div style="font-size: 80px; margin-bottom: 20px;">🗺️</div>
+                        <h3 style="color: #ffcc80; font-size: 28px;">Карта Зимнего Пути</h3>
+                        <p style="margin: 15px 0; font-size: 18px;">Положите файл <strong>Karta.svg</strong> в папку</p>
+                        <div style="background: rgba(255,255,255,0.1); 
+                                    padding: 20px; 
+                                    border-radius: 10px; 
+                                    margin: 25px 0;
+                                    font-family: monospace;
+                                    color: #90a4ae;
+                                    font-size: 16px;">
+                            Файл должен быть в той же папке, что и эта страница<br>
+                            Название файла: <strong>Karta.svg</strong>
+                        </div>
+                    </div>
+                `;
+            };
+            
+            console.log('Страница загружена');
+            
+            // Обновляем инвентарь при возвращении на страницу
+            window.addEventListener('focus', loadInventory);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Клинок Застывшей Звезды</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@300;400;500;600;700&display=swap');
+        
+        /* ===== ОСНОВНЫЕ СТИЛИ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Pixelify Sans', 'Segoe UI', sans-serif;
+            background: 
+                linear-gradient(135deg, #0a0f1a 0%, #121828 100%),
+                url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="%231a243f" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(%23grid)"/></svg>');
+            color: #e6f1ff;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* ===== ПРЕЛОАДЕР ===== */
+        .preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0a0f1a 0%, #121828 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        
+        .preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        /* ===== ШАПКА ===== */
+        .page-header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-top: 30px;
+        }
+        
+        .main-title {
+            font-size: 48px;
+            color: #4fc3f7;
+            margin-bottom: 15px;
+            text-shadow: 
+                0 0 20px rgba(79, 195, 247, 0.5),
+                2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            font-size: 20px;
+            color: #bbdefb;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        /* ===== ОСНОВНОЙ КОНТЕНТ (60/40) ===== */
+        .main-content {
+            display: grid;
+            grid-template-columns: 60% 40%;
+            gap: 40px;
+            margin-bottom: 80px;
+            align-items: start;
+        }
+        
+        /* ЛЕВАЯ КОЛОНКА - МЕЧ */
+        .sword-column {
+            position: sticky;
+            top: 40px;
+        }
+        
+        .sword-container {
+            background: rgba(10, 15, 30, 0.85);
+            border: 8px solid #3949ab;
+            border-image: repeating-linear-gradient(
+                45deg,
+                #4fc3f7,
+                #4fc3f7 10px,
+                #1565c0 10px,
+                #1565c0 20px
+            ) 8;
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(5px);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.7),
+                inset 0 0 60px rgba(79, 195, 247, 0.15);
+            text-align: center;
+        }
+        
+        .sword-frame {
+            width: 100%;
+            height: 600px;
+            background: linear-gradient(145deg, 
+                rgba(20, 30, 60, 0.9), 
+                rgba(10, 20, 40, 0.95));
+            border: 6px solid #283593;
+            position: relative;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                inset 0 0 50px rgba(0, 0, 0, 0.6),
+                0 15px 40px rgba(0, 0, 0, 0.8);
+            overflow: hidden;
+            border-radius: 12px;
+        }
+        
+        .sword-image {
+            width: 85%;
+            height: auto;
+            max-height: 550px;
+            object-fit: contain;
+            filter: 
+                drop-shadow(0 0 40px rgba(79, 195, 247, 0.9))
+                drop-shadow(0 0 20px rgba(255, 255, 255, 0.6))
+                brightness(1.2)
+                contrast(1.1);
+            transition: transform 0.5s ease;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        
+        /* КНОПКА ПОВОРОТА МЕЧА */
+        .rotate-controls {
+            margin-top: 20px;
+        }
+        
+        .rotate-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 30px;
+            background: linear-gradient(145deg, #3949ab, #5c6bc0);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Pixelify Sans', sans-serif;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid #7986cb;
+        }
+        
+        .rotate-btn:hover {
+            background: linear-gradient(145deg, #5c6bc0, #7986cb);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .rotate-btn i {
+            transition: transform 0.5s ease;
+        }
+        
+        .rotate-btn.rotating i {
+            animation: spin 1s linear infinite;
+        }
+        
+        .rotate-counter {
+            margin-top: 10px;
+            color: #bbdefb;
+            font-size: 14px;
+        }
+        
+        /* ПРАВАЯ КОЛОНКА - ХАРАКТЕРИСТИКИ */
+        .stats-column {
+            padding: 20px;
+        }
+        
+        .stats-card {
+            background: rgba(30, 40, 80, 0.6);
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid rgba(92, 107, 192, 0.4);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stats-title {
+            color: #4fc3f7;
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
+        }
+        
+        .stats-list {
+            list-style: none;
+        }
+        
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(79, 195, 247, 0.2);
+        }
+        
+        .stats-item:last-child {
+            border-bottom : none;
+        }
+        
+        .stat-name {
+            color: #e3f2fd;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stat-value {
+            color: #ffcc80;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        /* ===== БЛОК ИСТОРИИ ===== */
+        .history-section {
+            background: rgba(30, 40, 80, 0.6);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 60px auto;
+            max-width: 1000px;
+            border: 3px solid rgba(79, 195, 247, 0.3);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .section-header {
+            color: #4fc3f7;
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .history-text {
+            color: #e3f2fd;
+            line-height: 1.8;
+            font-size: 18px;
+            text-align: justify;
+        }
+        
+        .history-text p {
+            margin-bottom: 20px;
+        }
+        
+        /* ===== БЛОК СТАТУСА АРТЕФАКТА ===== */
+        .status-section {
+            background: rgba(30, 40, 80, 0.6);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 60px auto;
+            max-width: 1000px;
+            border: 3px solid rgba(255, 152, 0, 0.3);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .status-list {
+            list-style: none;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid #ff9800;
+            transition: all 0.3s ease;
+        }
+        
+        .status-item:hover {
+            background: rgba(255, 152, 0, 0.1);
+            transform: translateX(10px);
+        }
+        
+        .status-icon {
+            font-size: 24px;
+            color: #ff9800;
+        }
+        
+        .status-text {
+            color: #e3f2fd;
+            font-size: 18px;
+        }
+        
+        /* ===== УНИКАЛЬНЫЕ СВОЙСТВА ===== */
+        .properties-section {
+            background: rgba(30, 40, 80, 0.6);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 60px auto;
+            max-width: 1200px;
+            border: 3px solid rgba(76, 175, 80, 0.3);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .property-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid rgba(79, 195, 247, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-align: center;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .property-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            border-color: #4fc3f7;
+            background: rgba(79, 195, 247, 0.1);
+        }
+        
+        .property-icon {
+            font-size: 40px;
+            margin-bottom: 20px;
+            color: #4fc3f7;
+        }
+        
+        .property-title {
+            color: #ffcc80;
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+        
+        .property-preview {
+            color: #bbdefb;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        /* ===== МОДАЛЬНОЕ ОКНО ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: linear-gradient(145deg, #0d47a1, #1a237e);
+            width: 90%;
+            max-width: 700px;
+            border: 5px solid #3949ab;
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8);
+            animation: modalAppear 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #5c6bc0;
+        }
+        
+        .modal-title {
+            font-family: 'Pixelify Sans', sans-serif;
+            color: #ffcc80;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .modal-close {
+            background: #ff5252;
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .modal-close:hover {
+            background: #ff1744;
+            transform: rotate(90deg);
+        }
+        
+        .modal-body {
+            color: #e3f2fd;
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        
+        .modal-icon {
+            font-size: 32px;
+            margin-right: 10px;
+        }
+        
+        /* ===== ФУТЕР ===== */
+        .footer-section {
+            text-align: center;
+            padding: 40px;
+            margin-top: 80px;
+            color: #90a4ae;
+            border-top: 2px solid rgba(79, 195, 247, 0.2);
+            background: rgba(20, 30, 60, 0.2);
+            border-radius: 10px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* ===== АНИМАЦИИ ===== */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes swordRotate3D {
+            0% { transform: rotateY(0deg); }
+            25% { transform: rotateY(90deg); }
+            50% { transform: rotateY(180deg); }
+            75% { transform: rotateY(270deg); }
+            100% { transform: rotateY(360deg); }
+        }
+        
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* ===== ОТСТУПЫ И ДРУГОЕ ===== */
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(79, 195, 247, 0.5), 
+                transparent
+            );
+            margin: 40px 0;
+        }
+        
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            background: linear-gradient(145deg, rgba(57, 73, 171, 0.3), rgba(92, 107, 192, 0.2));
+            color: #bbdefb;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+            border: 2px solid rgba(92, 107, 192, 0.5);
+            backdrop-filter: blur(10px);
+            font-size: 18px;
+            z-index: 100;
+            cursor: pointer;
+            border: none;
+            font-family: 'Pixelify Sans', sans-serif;
+        }
+        
+        .back-button:hover {
+            background: linear-gradient(145deg, rgba(57, 73, 171, 0.5), rgba(92, 107, 192, 0.4));
+            transform: translateY(-2px);
+            border-color: #7986cb;
+        }
+        
+        /* Анимация появления при скролле */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* ===== УВЕДОМЛЕНИЕ ОБ ИНВЕНТАРЕ (как в главной игре) ===== */
+        .inventory-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(145deg, #1a237e, #0d47a1);
+            border: 3px solid #5c6bc0;
+            border-radius: 12px;
+            padding: 20px;
+            min-width: 320px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            z-index: 10001;
+            display: none;
+            animation: slideInRight 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-family: "Pixelify Sans", sans-serif;
+        }
+
+        .notification-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .notification-icon {
+            font-size: 40px;
+            text-align: center;
+            animation: pulse 1.5s infinite;
+        }
+
+        .notification-text {
+            color: #e3f2fd;
+            text-align: center;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .notification-text strong {
+            color: #ffcc80;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 18px;
+            text-shadow: 0 0 5px rgba(255, 204, 128, 0.5);
+        }
+
+        .notification-link {
+            display: block;
+            text-align: center;
+            background: linear-gradient(145deg, #5c6bc0, #3949ab);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            border: 2px solid #7986cb;
+            transition: all 0.3s;
+            font-family: "Pixelify Sans", sans-serif;
+            font-size: 14px;
+        }
+
+        .notification-link:hover {
+            background: linear-gradient(145deg, #3949ab, #303f9f);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(92, 107, 192, 0.3);
+        }
+
+        .notification-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid #f44336;
+            color: #ffebee;
+            font-size: 18px;
+            cursor: pointer;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .notification-close:hover {
+            background: rgba(244, 67, 54, 0.4);
+            color: #ffcdd2;
+            transform: scale(1.1);
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1); 
+                filter: brightness(1);
+            }
+            50% { 
+                transform: scale(1.1); 
+                filter: brightness(1.3);
+            }
+        }
+        
+        /* ===== АДАПТИВНОСТЬ ===== */
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sword-column {
+                position: relative;
+                top: 0;
+            }
+            
+            .properties-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .properties-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-title {
+                font-size: 36px;
+            }
+            
+            .sword-frame {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Прелоадер -->
+    <div class="preloader" id="preloader">
+        <div class="loading-text">
+            <h2>ЗАГРУЗКА КЛИНКА</h2>
+            <div class="loading-dots"></div>
+        </div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <p class="loading-subtext">Извлечение из вечного льда...</p>
+    </div>
+    
+    <!-- Кнопка назад -->
+    <button class="back-button" id="backToGameBtn">
+        <i class="fas fa-arrow-left"></i>
+        <span>Вернуться в игру</span>
+    </button>
+    
+    <div class="container">
+        <!-- Шапка страницы -->
+        <header class="page-header">
+            <h1 class="main-title">🗡️ Клинок Застывшей Звезды</h1>
+            <p class="subtitle">Артефакт, найденный в глубинах вечного льда. Осколок звёздной материи, сохранивший память о космическом холоде.</p>
+        </header>
+        
+        <!-- Основной контент (60/40) -->
+        <section class="main-content">
+            <!-- Левая колонка: Меч -->
+            <div class="sword-column">
+                <div class="sword-container">
+                    <div class="sword-frame">
+                        <img src="/img/sword.svg" alt="Клинок Застывшей Звезды" class="sword-image" id="swordImage">
+                    </div>
+                    
+                    <div class="rotate-controls">
+                        <button class="rotate-btn" id="rotateBtn">
+                            <i class="fas fa-sync-alt"></i>
+                            Повернуть меч
+                        </button>
+                        <div class="rotate-counter" id="rotateCounter">
+                            Меч повёрнут: <span id="rotateCount">0</span> раз
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Правая колонка: Характеристики -->
+            <div class="stats-column">
+                <div class="stats-card">
+                    <h2 class="stats-title">⚙️ Характеристики</h2>
+                    <ul class="stats-list">
+                        <li class="stats-item">
+                            <span class="stat-name"><i class="fas fa-gem"></i> Материал</span>
+                            <span class="stat-value">Космический лёд</span>
+                        </li>
+                        <li class="stats-item">
+                            <span class="stat-name"><i class="fas fa-ruler-vertical"></i> Длина</span>
+                            <span class="stat-value">70 см</span>
+                        </li>
+                        <li class="stats-item">
+                            <span class="stat-name"><i class="fas fa-weight-hanging"></i> Вес</span>
+                            <span class="stat-value">1.2 кг</span>
+                        </li>
+                        <li class="stats-item">
+                            <span class="stat-name"><i class="fas fa-thermometer-half"></i> Температура</span>
+                            <span class="stat-value">-10°C</span>
+                        </li>
+                        <li class="stats-item">
+                            <span class="stat-name"><i class="fas fa-hourglass-half"></i> Возраст</span>
+                            <span class="stat-value">5000+ лет</span>
+                        </li>
+                        <li class="stats-item">
+                            <span class="stat-name"><i class="fas fa-shield-alt"></i> Состояние</span>
+                            <span class="stat-value">Идеальное</span>
+                        </li>
+                        <li class="stats-item">
+                            <span class="stat-name"><i class="fas fa-link"></i> Связь</span>
+                            <span class="stat-value">Установлена</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <div class="section-divider"></div>
+        
+        <!-- История обнаружения -->
+        <section class="history-section animate-on-scroll">
+            <h2 class="section-header">
+                <i class="fas fa-scroll"></i>
+                История обнаружения
+            </h2>
+            <div class="history-text">
+                <p>Клинок был найден в самой глубокой шахте "Угольного Сердца", там, где горные породы встречаются с вечной мерзлотой. Это место находилось так глубоко под землей, что даже самые опытные шахтёры редко туда спускались.</p>
+                <p>Ник обнаружил его во время своей последней экспедиции перед уходом из родной деревни. По его словам, клинок "позвал" его — он почувствовал странное тепло, исходящее из ледяной стены, хотя вокруг был мороз ниже -30°C.</p>
+                <p>Когда он пробил лёд специальным инструментом, обнаружил артефакт, лежащий на естественном ледяном пьедестале, будто ждал своего часа. Клинок был полностью окружён льдом, но сам оставался абсолютно сухим, а его поверхность излучала мягкое голубоватое свечение.</p>
+                <p>Как только Ник коснулся рукояти, лёд вокруг мгновенно растаял, но температура клинка осталась неизменной. С этого момента между ними установилась особая связь — клинок отзывался только на его прикосновения.</p>
+            </div>
+        </section>
+        
+        <!-- Статус артефакта -->
+        <section class="status-section animate-on-scroll">
+            <h2 class="section-header">
+                <i class="fas fa-clipboard-check"></i>
+                ⚔️ Статус Артефакта
+            </h2>
+            <ul class="status-list">
+                <li class="status-item">
+                    <div class="status-icon">❄️</div>
+                    <div class="status-text"><strong>Обнаружен:</strong> Зимнее солнцестояние, глубокая ночь</div>
+                </li>
+                <li class="status-item">
+                    <div class="status-icon">🗺️</div>
+                    <div class="status-text"><strong>Местонахождение:</strong> В пути с Ником (северные земли)</div>
+                </li>
+                <li class="status-item">
+                    <div class="status-icon">💎</div>
+                    <div class="status-text"><strong>Состояние:</strong> Идеальное, без сколов и повреждений</div>
+                </li>
+                <li class="status-item">
+                    <div class="status-icon">🔗</div>
+                    <div class="status-text"><strong>Связь с владельцем:</strong> Полностью установлена</div>
+                </li>
+                <li class="status-item">
+                    <div class="status-icon">🛡️</div>
+                    <div class="status-text"><strong>Защита:</strong> Активная, уровень максимальный</div>
+                </li>
+                <li class="status-item">
+                    <div class="status-icon">⚡</div>
+                    <div class="status-text"><strong>Энергетический уровень:</strong> Стабильный, 100%</div>
+                </li>
+            </ul>
+        </section>
+        
+        <div class="section-divider"></div>
+        
+        <!-- Уникальные свойства -->
+        <section class="properties-section animate-on-scroll">
+            <h2 class="section-header">
+                <i class="fas fa-bolt"></i>
+                ⚡ Уникальные свойства клинка
+            </h2>
+            <p style="text-align: center; color: #bbdefb; margin-bottom: 30px; font-size: 18px;">
+                Кликните на свойство для подробной информации
+            </p>
+            
+            <div class="properties-grid">
+                <!-- Свойство 1 -->
+                <div class="property-card" data-property="1">
+                    <div class="property-icon">✨</div>
+                    <h3 class="property-title">Самосвечение</h3>
+                    <p class="property-preview">Излучает свет без внешнего источника</p>
+                </div>
+                
+                <!-- Свойство 2 -->
+                <div class="property-card" data-property="2">
+                    <div class="property-icon">❄️</div>
+                    <h3 class="property-title">Вечный холод</h3>
+                    <p class="property-preview">Постоянная температура -10°C</p>
+                </div>
+                
+                <!-- Свойство 3 -->
+                <div class="property-card" data-property="3">
+                    <div class="property-icon">🔮</div>
+                    <h3 class="property-title">Избирательный отклик</h3>
+                    <p class="property-preview">Отзывается только на владельца</p>
+                </div>
+                
+                <!-- Свойство 4 -->
+                <div class="property-card" data-property="4">
+                    <div class="property-icon">💎</div>
+                    <h3 class="property-title">Космическая структура</h3>
+                    <p class="property-preview">Содержит частицы звёздной материи</p>
+                </div>
+                
+                <!-- Свойство 5 -->
+                <div class="property-card" data-property="5">
+                    <div class="property-icon">🌀</div>
+                    <h3 class="property-title">Энергетический резонанс</h3>
+                    <p class="property-preview">Синхронизация с космическим излучением</p>
+                </div>
+                
+                <!-- Свойство 6 -->
+                <div class="property-card" data-property="6">
+                    <div class="property-icon">🛡️</div>
+                    <h3 class="property-title">Защитное поле</h3>
+                    <p class="property-preview">Создаёт энергетический барьер</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Футер -->
+        <footer class="footer-section">
+            <div class="footer-content">
+                <h3 style="color: #4fc3f7; margin-bottom: 20px;">⚠️ Артефакт вне категорий</h3>
+                <p style="margin-bottom: 15px; line-height: 1.6;">
+                    Не подлежит оценке, продаже или передаче. Истинная ценность раскрывается только через личный опыт владельца.
+                </p>
+                <p style="color: #ffcc80; font-size: 18px;">
+                    <i class="fas fa-user-shield"></i> Хранится у Ника с момента обнаружения
+                </p>
+                <p style="margin-top: 20px; font-size: 14px; color: #90a4ae;">
+                    Страница обновлена: <span id="currentDate"></span>
+                </p>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Модальное окно для свойств -->
+    <div class="modal-overlay" id="propertyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalPropertyTitle">
+                    <span class="modal-icon" id="modalPropertyIcon">✨</span>
+                    <span id="modalPropertyName">Самосвечение</span>
+                </h3>
+                <button class="modal-close" id="modalCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body" id="modalPropertyDescription">
+                <!-- Контент будет загружен через JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- JavaScript -->
+   <script>
+// ===== ГЛАВНЫЙ КОД =====
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Страница клинка загружена');
+    
+    // ===== ПРЕЛОАДЕР =====
+    const preloader = document.getElementById('preloader');
+    setTimeout(() => {
+        if (preloader) {
+            preloader.classList.add('hidden');
+            setTimeout(() => {
+                if (preloader.parentNode) {
+                    preloader.style.display = 'none';
+                }
+                document.body.style.overflow = 'auto';
+            }, 800);
+        }
+    }, 2000);
+
+    // Устанавливаем текущую дату
+    const currentDateElement = document.getElementById('currentDate');
+    if (currentDateElement) {
+        currentDateElement.textContent = new Date().toLocaleDateString('ru-RU', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
+
+    // ===== КНОПКА «ВЕРНУТЬСЯ В ИГРУ» — ИСПРАВЛЕННАЯ ВЕРСИЯ =====
+const backButton = document.getElementById('backToGameBtn');
+if (backButton) {
+    backButton.addEventListener('click', function() {
+        // Сначала пробуем вернуться через историю
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            // Если не получается - покажем где искать index.html
+            alert('Перейдите в папку с игрой и откройте index.html вручную');
+            console.log('Ищите файл index.html в этих местах:');
+            console.log('1. В той же папке, где находится текущая страница');
+            console.log('2. На один уровень выше (в родительской папке)');
+        }
+    });
+}
+
+    // ===== ПОВОРОТ МЕЧА =====
+    let rotateCount = 0;
+    const swordImage = document.getElementById('swordImage');
+    const rotateBtn = document.getElementById('rotateBtn');
+    const rotateCountElement = document.getElementById('rotateCount');
+
+    if (rotateBtn && swordImage) {
+        rotateBtn.addEventListener('click', function() {
+            if (rotateBtn.disabled) return;
+            
+            rotateBtn.disabled = true;
+            rotateBtn.classList.add('rotating');
+
+            // Анимация вращения
+            swordImage.style.transition = 'transform 3s cubic-bezier(0.4, 0, 0.2, 1)';
+            swordImage.style.transform = 'rotateY(360deg)';
+
+            // Увеличиваем счетчик
+            rotateCount++;
+            if (rotateCountElement) {
+                rotateCountElement.textContent = rotateCount;
+            }
+
+            // Показываем уведомления при достижении определенных вращений
+            if (rotateCount === 3) {
+                showNotification('🎯 Достижение: Знакомство с клинком');
+                // Показываем уведомление об инвентаре при первом вращении
+                setTimeout(showInventoryNotification, 1000);
+            } else if (rotateCount === 5) {
+                showNotification('🌟 Достижение: Мастер вращения');
+            } else if (rotateCount === 10) {
+                showNotification('👑 Достижение: Повелитель клинка!');
+            }
+
+            // Сбрасываем анимацию
+            setTimeout(() => {
+                swordImage.style.transition = 'transform 0.5s ease';
+                swordImage.style.transform = 'rotateY(0deg)';
+                setTimeout(() => {
+                    rotateBtn.disabled = false;
+                    rotateBtn.classList.remove('rotating');
+                }, 500);
+            }, 3000);
+        });
+    }
+
+    // ===== МОДАЛЬНЫЕ ОКНА СВОЙСТВ =====
+    const modal = document.getElementById('propertyModal');
+    const propertyCards = document.querySelectorAll('.property-card');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+
+    // Данные для модальных окон
+    const propertiesData = {
+        1: {
+            title: "Самосвечение",
+            icon: "✨",
+            desc: `<p>Клинок излучает постоянный мягкий голубоватый свет без какого-либо внешнего источника энергии. Свечение имеет переменную интенсивность - оно усиливается в полной темноте и при приближении владельца. Анализ спектра показал наличие неизвестных спектральных линий, не соответствующих ни одному земному элементу.</p>
+                   <p>Интенсивность свечения: 15-25 люмен<br>
+                      Спектр: 450-480 нм (голубой диапазон)<br>
+                      Особенность: Не производит тепла</p>`
+        },
+        2: {
+            title: "Вечный холод",
+            icon: "❄️",
+            desc: `<p>Температура клинка стабильно держится на отметке -10°C независимо от внешних условий. При контакте с водой клинок мгновенно замораживает её, создавая иней на поверхности. Интересно, что холод ощущается только при прямом контакте - на расстоянии 10 см температура уже нормальная.</p>
+                   <p>Температура: -10°C ± 0.1°C<br>
+                      Теплоемкость: неизмеримо высокая<br>
+                      Особенность: Не конденсирует влагу из воздуха</p>`
+        },
+        3: {
+            title: "Избирательный отклик",
+            icon: "🔮",
+            desc: `<p>Клинок реагирует только на прикосновения Ника. Когда другие люди пытаются взять его, поверхность становится скользкой, как лёд, или излучает слабый электрический разряд (безопасный, но неприятный). При контакте с Ником клинок слегка вибрирует и свечение становится теплее.</p>
+                   <p>Идентификация: Биометрическая + энергетическая<br>
+                      Защита: 3 уровня (скольжение, разряд, блокировка)<br>
+                      Особенность: "Узнаёт" владельца на расстоянии 5 метров</p>`
+        },
+        4: {
+            title: "Космическая структура",
+            icon: "💎",
+            desc: `<p>Материал клинка содержит микроскопические включения звёздной пыли и частицы, не встречающиеся на Земле. Кристаллическая структура материала имеет неевклидову геометрию - при увеличении видно, что углы между гранями не соответствуют земной кристаллографии.</p>
+                   <p>Состав: 65% неизвестный сплав, 30% космический лёд, 5% звёздная пыль<br>
+                      Плотность: 3.2 г/см³<br>
+                      Твёрдость: 8.5 по шкале Мооса</p>`
+        },
+        5: {
+            title: "Энергетический резонанс",
+            icon: "🌀",
+            desc: `<p>Клинок синхронизируется с космическим излучением, особенно с радиационными поясами Земли и солнечным ветром. В период магнитных бурь свечение усиливается на 40%. Также зафиксирована слабая реакция на прохождение спутников на низкой орбите.</p>
+                   <p>Резонансные частоты: 7.8 Гц (Шумана), 14.1 Гц, 20.3 Гц<br>
+                      Энергопоглощение: 0.5 мкВт/час<br>
+                      Особенность: "Поёт" при полярном сиянии</p>`
+        },
+        6: {
+            title: "Защитное поле",
+            icon: "🛡️",
+            desc: `<p>При активации клинок создаёт слабое энергетическое поле радиусом около 1 метра, которое отклоняет мелкие частицы пыли и капли воды. В моменты опасности поле может усиливаться, создавая видимый голубоватый щит. Поле не блокирует воздух, но замедляет быстрые объекты.</p>
+                   <p>Радиус: 0.8-1.2 м (зависит от владельца)<br>
+                      Прочность: отклоняет частицы до 1 г при скорости 100 м/с<br>
+                      Особенность: Автоматическая активация при угрозе</p>`
+        }
+    };
+
+    // Обработчики для карточек свойств
+    propertyCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const propertyId = this.dataset.property;
+            const propertyData = propertiesData[propertyId];
+            
+            if (propertyData && modal) {
+                document.getElementById('modalPropertyName').textContent = propertyData.title;
+                document.getElementById('modalPropertyIcon').textContent = propertyData.icon;
+                document.getElementById('modalPropertyDescription').innerHTML = propertyData.desc;
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        });
+    });
+
+    // Закрытие модалки
+    if (modalCloseBtn) {
+        modalCloseBtn.addEventListener('click', function() {
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+    }
+
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+    }
+
+    // ===== УВЕДОМЛЕНИЕ ОБ ИНВЕНТАРЕ =====
+    const inventoryNotification = document.getElementById('inventoryNotification');
+    const closeNotificationBtn = document.getElementById('closeNotificationBtn');
+    const goToInventoryBtn = document.getElementById('goToInventoryBtn');
+
+    // Показываем уведомление об инвентаре
+    function showInventoryNotification() {
+        if (inventoryNotification) {
+            inventoryNotification.style.display = 'block';
+            
+            // Автоматическое скрытие через 8 секунд
+            setTimeout(() => {
+                if (inventoryNotification.style.display === 'block') {
+                    hideInventoryNotification();
+                }
+            }, 8000);
+        }
+    }
+
+    // Скрываем уведомление
+    function hideInventoryNotification() {
+        if (inventoryNotification) {
+            inventoryNotification.style.display = 'none';
+        }
+    }
+
+    // Обработчики для уведомления
+    if (closeNotificationBtn) {
+        closeNotificationBtn.addEventListener('click', hideInventoryNotification);
+    }
+
+    if (goToInventoryBtn) {
+        goToInventoryBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            hideInventoryNotification();
+            // Здесь можно добавить переход в инвентарь
+            showNotification('📦 Инвентарь будет доступен в полной версии игры!');
+        });
+    }
+
+    // ===== АНИМАЦИЯ ПРИ СКРОЛЛЕ =====
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+
+    // Наблюдаем за всеми элементами с анимацией
+    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+        observer.observe(el);
+    });
+
+    // ===== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =====
+    function showNotification(message) {
+        // Создаем элемент уведомления
+        const notification = document.createElement('div');
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(145deg, #3949ab, #283593);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            z-index: 10000;
+            animation: slideIn 0.5s ease;
+            font-family: 'Pixelify Sans', sans-serif;
+            border: 2px solid #5c6bc0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            max-width: 300px;
+        `;
+        
+        // Добавляем стиль для анимации
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        document.body.appendChild(notification);
+        
+        // Автоматическое удаление через 3 секунды
+        setTimeout(() => {
+            notification.style.animation = 'slideOut 0.5s ease forwards';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 500);
+        }, 3000);
+    }
+
+    // ===== ПРОВЕРКА ИСПРАВЛЕНИЙ =====
+    console.log('Проверка элементов:');
+    console.log('- Кнопка "Назад":', backButton ? 'OK' : 'НЕ НАЙДЕНА');
+    console.log('- Изображение меча:', swordImage ? 'OK' : 'НЕ НАЙДЕНО');
+    console.log('- Модальное окно:', modal ? 'OK' : 'НЕ НАЙДЕНО');
+    console.log('- Уведомление:', inventoryNotification ? 'OK' : 'НЕ НАЙДЕНО');
+});
+</script>
+</body>
+</html>

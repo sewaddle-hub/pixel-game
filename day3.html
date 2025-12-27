@@ -1,0 +1,4386 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Глубокая шахта. Вечная мерзлота</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: 
+                linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 20, 40, 0.9)),
+                url('img/Fon day3.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: auto;
+            line-height: 1.6;
+            position: relative;
+            padding: 20px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px,
+                    transparent 2px,
+                    rgba(160, 220, 255, 0.05) 2px,
+                    rgba(160, 220, 255, 0.05) 4px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent 0px,
+                    transparent 2px,
+                    rgba(160, 220, 255, 0.05) 2px,
+                    rgba(160, 220, 255, 0.05) 4px
+                );
+            pointer-events: none;
+            z-index: -1;
+            animation: iceGlow 4s infinite alternate;
+        }
+
+        #game-container {
+            width: 1000px;
+            height: 700px;
+            position: relative;
+            background: rgba(0, 10, 20, 0.95);
+            border: 6px solid #4a7a9a;
+            box-shadow: 
+                0 0 0 10px #2a5a7a,
+                0 0 0 16px #1a3a5a,
+                0 0 40px rgba(74, 122, 154, 0.8),
+                inset 0 0 50px rgba(0, 20, 40, 0.7);
+            overflow: hidden;
+            border-radius: 8px;
+            z-index: 1;
+        }
+
+        .ice-border {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 1000;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0px,
+                    transparent 3px,
+                    rgba(160, 220, 255, 0.05) 3px,
+                    rgba(160, 220, 255, 0.05) 5px
+                ),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent 0px,
+                    transparent 3px,
+                    rgba(160, 220, 255, 0.05) 3px,
+                    rgba(160, 220, 255, 0.05) 5px
+                );
+            border-radius: 8px;
+            animation: iceGlow 4s infinite alternate;
+        }
+
+        .game-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #title-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 10, 20, 0.9);
+            z-index: 2000;
+        }
+
+        .title-container {
+            text-align: center;
+            animation: titleFadeIn 2s ease-out;
+        }
+
+        .main-title {
+            font-size: 36px;
+            color: #a0d0ff;
+            text-shadow: 
+                3px 3px 0 #2a5a7a,
+                6px 6px 0 #1a3a5a,
+                0 0 30px rgba(160, 208, 255, 0.7);
+            margin-bottom: 40px;
+            letter-spacing: 4px;
+            animation: titleGlow 4s infinite alternate;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #80e0ff;
+            text-shadow: 
+                2px 2px 0 #2a5a7a,
+                4px 4px 0 #1a3a5a;
+            margin-bottom: 60px;
+            letter-spacing: 2px;
+        }
+
+        .day-counter {
+            font-size: 14px;
+            color: #f0f0f0;
+            background: rgba(20, 40, 80, 0.5);
+            padding: 12px 24px;
+            border: 3px solid #4a7a9a;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            box-shadow: 0 0 15px rgba(74, 122, 154, 0.5);
+        }
+
+        .quote {
+            font-size: 12px;
+            color: #c0d0e0;
+            max-width: 600px;
+            line-height: 1.8;
+            margin-bottom: 50px;
+            text-align: center;
+            padding: 20px;
+            background: rgba(10, 20, 40, 0.4);
+            border-left: 4px solid #4a7a9a;
+            border-right: 4px solid #4a7a9a;
+            animation: quoteFade 1.5s ease-in-out;
+        }
+
+        .start-button {
+            background: linear-gradient(to bottom, #2a5a7a, #1a3a5a);
+            border: 4px solid #4a9aff;
+            color: #e0f0ff;
+            padding: 18px 50px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 0 #000;
+            transition: all 0.2s;
+            box-shadow: 
+                6px 6px 0 #1a3a5a,
+                0 0 20px rgba(74, 154, 255, 0.5),
+                inset 2px 2px 0 rgba(100, 180, 255, 0.3);
+            border-radius: 6px;
+            animation: buttonPulse 2s infinite alternate;
+        }
+
+        .start-button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 
+                4px 4px 0 #1a3a5a,
+                0 0 25px rgba(74, 154, 255, 0.7),
+                inset 2px 2px 0 rgba(100, 180, 255, 0.3);
+            background: linear-gradient(to bottom, #3a6a8a, #2a4a6a);
+        }
+
+        .game-header {
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            background: rgba(10, 20, 40, 0.8);
+            border: 4px solid #4a7a9a;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 0 #2a5a7a;
+        }
+
+        .game-title {
+            font-size: 20px;
+            color: #a0d0ff;
+            text-shadow: 
+                2px 2px 0 #2a5a7a,
+                4px 4px 0 #1a3a5a;
+            letter-spacing: 2px;
+        }
+
+        .location-label {
+            font-size: 12px;
+            color: #80b0e0;
+            background: rgba(20, 40, 80, 0.6);
+            padding: 8px 16px;
+            border: 2px solid #4a7a9a;
+            border-radius: 4px;
+        }
+
+        .video-container {
+            flex: 1;
+            position: relative;
+            background: #000;
+            border: 6px solid #2a5a7a;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 
+                inset 0 0 30px rgba(0, 40, 80, 0.5),
+                0 8px 0 #1a3a5a;
+        }
+
+        .dwarves-video-container {
+            flex: 1;
+            position: relative;
+            background: #000;
+            border: 6px solid #8a6a4a;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 
+                inset 0 0 30px rgba(80, 60, 40, 0.5),
+                0 8px 0 #5a4a32;
+        }
+
+        .scene-video, .dwarves-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .guardian-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.7) contrast(1.2) saturate(1.1);
+        }
+
+        .dwarves-video {
+            filter: brightness(0.7) contrast(1.2);
+        }
+
+        .video-overlay, .dwarves-video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 60%,
+                rgba(0, 0, 0, 0.8) 90%
+            );
+            pointer-events: none;
+        }
+
+        .dwarves-video-overlay {
+            background: linear-gradient(
+                to bottom,
+                transparent 40%,
+                rgba(0, 0, 0, 0.6) 80%
+            );
+        }
+
+        .text-panel, .dwarves-panel {
+            background: rgba(10, 20, 40, 0.95);
+            border: 4px solid #4a7a9a;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 120px;
+            box-shadow: 
+                0 6px 0 #2a5a7a,
+                inset 3px 3px 0 rgba(100, 180, 255, 0.2);
+        }
+
+        .dwarves-panel {
+            background: rgba(20, 15, 10, 0.95);
+            border: 4px solid #8a6a4a;
+            box-shadow: 
+                0 6px 0 #5a4a32,
+                inset 3px 3px 0 rgba(208, 176, 112, 0.2);
+        }
+
+        .dialogue-text, .dwarves-dialogue {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #e0f0ff;
+            margin-bottom: 10px;
+            min-height: 60px;
+            overflow-y: auto;
+            max-height: 80px;
+            padding-right: 10px;
+            scroll-behavior: smooth;
+        }
+
+        .dwarves-dialogue {
+            color: #f0e0b0;
+        }
+
+        .text-line, .dwarves-line {
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        .speaker-name {
+            color: #80e0ff;
+            font-weight: bold;
+        }
+
+        .speaker-nick {
+            color: #80e0ff;
+            font-weight: bold;
+        }
+
+        .speaker-yumi {
+            color: #ffd070;
+            font-weight: bold;
+        }
+
+        .speaker-dwarf {
+            color: #f0b080;
+            font-weight: bold;
+        }
+
+        .speaker-guardian {
+            color: #80ffff;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(128, 255, 255, 0.5);
+        }
+
+        .button-container, .dwarves-button-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .game-button {
+            background: linear-gradient(to bottom, #2a5a7a, #1a3a5a);
+            border: 4px solid #4a9aff;
+            color: #e0f0ff;
+            padding: 12px 30px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 0 #000;
+            transition: all 0.1s;
+            box-shadow: 
+                4px 4px 0 #1a3a5a,
+                inset 2px 2px 0 rgba(100, 180, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        .game-button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 
+                2px 2px 0 #1a3a5a,
+                inset 2px 2px 0 rgba(100, 180, 255, 0.3);
+            background: linear-gradient(to bottom, #3a6a8a, #2a4a6a);
+        }
+
+        .dwarves-next-button {
+            background: linear-gradient(to bottom, #8a6a4a, #5a4a3a);
+            border: 4px solid #d0b070;
+            color: #fff8e0;
+            padding: 12px 30px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 0 #000;
+            transition: all 0.1s;
+            box-shadow: 
+                4px 4px 0 #3a2a1a,
+                inset 2px 2px 0 rgba(208, 176, 112, 0.3);
+            border-radius: 4px;
+        }
+
+        .dwarves-next-button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 
+                2px 2px 0 #3a2a1a,
+                inset 2px 2px 0 rgba(208, 176, 112, 0.3);
+            background: linear-gradient(to bottom, #9a7a5a, #6a5a4a);
+        }
+
+        .door-button {
+            background: linear-gradient(to bottom, #2a7a5a, #1a5a3a);
+            border: 4px solid #4aff9a;
+            color: #e0fff0;
+            padding: 12px 40px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            box-shadow: 
+                4px 4px 0 #1a3a2a,
+                0 0 20px rgba(74, 255, 154, 0.4);
+            border-radius: 6px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .door-button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 
+                2px 2px 0 #1a3a2a,
+                0 0 25px rgba(74, 255, 154, 0.6);
+            background: linear-gradient(to bottom, #3a8a6a, #2a6a4a);
+        }
+
+        .door-container {
+            margin-top: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .door-container.visible {
+            display: block;
+        }
+
+        .door-subtitle {
+            margin-top: 10px;
+            font-size: 10px;
+            color: #c0b090;
+        }
+
+        .characters-choice {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .character-option {
+            background: linear-gradient(145deg, rgba(50, 40, 30, 0.9), rgba(30, 20, 10, 0.9));
+            border: 4px solid #7a6a5a;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-height: 110px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .character-option:hover {
+            transform: translateY(-5px);
+            border-color: #d0b070;
+            background: linear-gradient(145deg, rgba(70, 60, 50, 0.9), rgba(50, 40, 30, 0.9));
+            box-shadow: 0 8px 20px rgba(208, 176, 112, 0.4);
+        }
+
+        .character-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .character-name {
+            font-size: 9px;
+            color: #f0e0b0;
+            margin-bottom: 6px;
+        }
+
+        .character-desc {
+            font-size: 7px;
+            color: #c0b090;
+            line-height: 1.3;
+        }
+
+        #puzzle-screen {
+            position: relative;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .puzzle-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .puzzle-title {
+            font-size: 18px;
+            color: #d0b070;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .puzzle-video-container {
+            position: relative;
+            background: #000;
+            border: 6px solid #8a6a4a;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 
+                inset 0 0 30px rgba(80, 60, 40, 0.5),
+                0 8px 0 #5a4a32;
+            height: 320px;
+        }
+
+        .puzzle-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.7) contrast(1.2);
+        }
+
+        .puzzle-video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 40%,
+                rgba(0, 0, 0, 0.6) 80%
+            );
+            pointer-events: none;
+        }
+
+        .puzzle-quote {
+            font-size: 12px;
+            color: #ffd070;
+            text-align: center;
+            margin: 10px 0 15px 0;
+            font-style: italic;
+            text-shadow: 1px 1px 0 #000;
+            padding: 10px;
+            background: rgba(20, 15, 10, 0.6);
+            border-radius: 4px;
+            border-left: 3px solid #d0b070;
+            border-right: 3px solid #d0b070;
+            min-height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .runes-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(20, 15, 10, 0.8);
+            border-radius: 8px;
+            border: 4px solid #7a6a5a;
+            min-height: 100px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .rune-button {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(145deg, rgba(42, 26, 10, 0.9), rgba(26, 10, 0, 0.9));
+            border: 4px solid #7a6a4a;
+            border-radius: 8px;
+            color: #e0d0a0;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 35px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 
+                4px 4px 0 #1a0a00,
+                inset 2px 2px 0 rgba(208, 176, 112, 0.1);
+        }
+
+        .rune-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                6px 6px 0 #1a0a00,
+                inset 2px 2px 0 rgba(208, 176, 112, 0.2);
+            border-color: #9a8a6a;
+        }
+
+        .rune-button.selected {
+            border-color: #ffd070;
+            background: linear-gradient(145deg, rgba(255, 208, 112, 0.3), rgba(208, 176, 80, 0.2));
+            box-shadow: 0 0 20px rgba(255, 208, 112, 0.5);
+            transform: scale(1.1);
+        }
+
+        .rune-button.correct {
+            border-color: #5aff9a;
+            background: linear-gradient(145deg, rgba(90, 255, 154, 0.3), rgba(70, 220, 130, 0.2));
+            box-shadow: 0 0 20px rgba(90, 255, 154, 0.5);
+        }
+
+        .rune-button.incorrect {
+            border-color: #ff5a5a;
+            background: linear-gradient(145deg, rgba(255, 90, 90, 0.3), rgba(220, 70, 70, 0.2));
+            box-shadow: 0 0 20px rgba(255, 90, 90, 0.5);
+        }
+
+        .rune-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .rune-button:disabled:hover {
+            transform: none;
+            box-shadow: 
+                4px 4px 0 #1a0a00,
+                inset 2px 2px 0 rgba(208, 176, 112, 0.1);
+            border-color: #7a6a4a;
+        }
+
+        .puzzle-message {
+            text-align: center;
+            padding: 12px;
+            margin: 12px 0;
+            border-radius: 6px;
+            font-size: 11px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .message-success {
+            background: rgba(90, 255, 154, 0.2);
+            border: 3px solid #5aff9a;
+            color: #8aff8a;
+        }
+
+        .message-fail {
+            background: rgba(255, 90, 90, 0.2);
+            border: 3px solid #ff5a5a;
+            color: #ff8a8a;
+        }
+
+        .message-info {
+            background: rgba(255, 208, 112, 0.2);
+            border: 3px solid #ffd070;
+            color: #ffd070;
+        }
+
+        .puzzle-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .puzzle-button {
+            min-width: 160px;
+            padding: 10px 20px;
+            font-size: 11px;
+        }
+
+        #door-open-screen {
+            position: relative;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .door-open-video-container {
+            flex: 1;
+            position: relative;
+            background: #000;
+            border: 6px solid #2a5a7a;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 
+                inset 0 0 30px rgba(0, 40, 80, 0.5),
+                0 8px 0 #1a3a5a;
+        }
+
+        .door-open-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .door-open-video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 30%,
+                rgba(0, 20, 40, 0.7) 70%,
+                rgba(0, 0, 0, 0.9) 100%
+            );
+            pointer-events: none;
+        }
+
+        #depths-screen {
+            position: relative;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .depths-video-container {
+            flex: 1;
+            position: relative;
+            background: #000;
+            border: 6px solid #8a6a4a;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 
+                inset 0 0 30px rgba(80, 60, 40, 0.5),
+                0 8px 0 #5a4a32;
+        }
+
+        .depths-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .depths-video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 40%,
+                rgba(0, 0, 0, 0.6) 80%
+            );
+            pointer-events: none;
+        }
+
+        #guardian-screen {
+            position: relative;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .guardian-video-container {
+            flex: 1;
+            position: relative;
+            background: #000;
+            border: 6px solid #4a9aff;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 
+                inset 0 0 30px rgba(74, 154, 255, 0.5),
+                0 8px 0 #2a5a7a;
+        }
+
+        .guardian-video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 30%,
+                rgba(0, 20, 40, 0.7) 70%,
+                rgba(0, 0, 0, 0.9) 100%
+            );
+            pointer-events: none;
+        }
+
+        #sword-test-screen {
+            position: relative;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sword-test-video-container {
+            flex: 1;
+            position: relative;
+            background: #000;
+            border: 6px solid #ff5a5a;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 
+                inset 0 0 30px rgba(255, 90, 90, 0.5),
+                0 8px 0 #7a2a2a;
+        }
+
+        .sword-test-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .sword-test-video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 30%,
+                rgba(40, 0, 0, 0.7) 70%,
+                rgba(0, 0, 0, 0.9) 100%
+            );
+            pointer-events: none;
+        }
+
+        .test-choice-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .test-option {
+            background: linear-gradient(145deg, rgba(20, 40, 80, 0.9), rgba(10, 20, 40, 0.9));
+            border: 4px solid #4a7a9a;
+            border-radius: 8px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .test-option:hover {
+            transform: translateY(-5px);
+            border-color: #80ffff;
+            background: linear-gradient(145deg, rgba(40, 60, 100, 0.9), rgba(20, 40, 80, 0.9));
+            box-shadow: 0 8px 20px rgba(128, 255, 255, 0.4);
+        }
+
+        .test-option.selected {
+            border-color: #5aff9a;
+            background: linear-gradient(145deg, rgba(90, 255, 154, 0.3), rgba(70, 220, 130, 0.2));
+            box-shadow: 0 0 20px rgba(90, 255, 154, 0.5);
+        }
+
+        .test-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .test-title {
+            font-size: 12px;
+            color: #a0d0ff;
+            margin-bottom: 10px;
+        }
+
+        .test-desc {
+            font-size: 9px;
+            color: #c0d0e0;
+            line-height: 1.4;
+        }
+
+        .test-message {
+            text-align: center;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-size: 12px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            background: rgba(20, 40, 80, 0.6);
+            border: 3px solid #80ffff;
+            color: #a0ffff;
+        }
+
+        .test-message.correct {
+            background: rgba(90, 255, 154, 0.2);
+            border: 3px solid #5aff9a;
+            color: #8aff8a;
+        }
+
+        .test-message.incorrect {
+            background: rgba(255, 90, 90, 0.2);
+            border: 3px solid #ff5a5a;
+            color: #ff8a8a;
+        }
+
+        .audio-element {
+            display: none;
+        }
+
+        .combat-screen {
+            position: relative;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .combat-video-container {
+            flex: 1;
+            position: relative;
+            background: #000;
+            border: 6px solid #ff5a5a;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 
+                inset 0 0 30px rgba(255, 90, 90, 0.5),
+                0 8px 0 #7a2a2a;
+        }
+
+        .combat-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.8) contrast(1.4) saturate(1.3);
+        }
+
+        .combat-video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 30%,
+                rgba(40, 0, 0, 0.7) 70%,
+                rgba(0, 0, 0, 0.9) 100%
+            );
+            pointer-events: none;
+        }
+
+        .combat-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(40, 0, 0, 0.6);
+            border: 4px solid #ff5a5a;
+            border-radius: 8px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #ff8a8a;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .health-bar {
+            width: 200px;
+            height: 20px;
+            background: rgba(255, 90, 90, 0.3);
+            border: 2px solid #ff5a5a;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 5px auto;
+        }
+
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(to right, #ff5a5a, #ff8a8a);
+            transition: width 0.5s;
+        }
+
+        .combat-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .combat-button {
+            background: linear-gradient(to bottom, #ff5a5a, #7a2a2a);
+            border: 4px solid #ff8a8a;
+            color: #fff;
+            padding: 12px 30px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 11px;
+            cursor: pointer;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 0 #000;
+            transition: all 0.1s;
+            box-shadow: 
+                4px 4px 0 #5a2a2a,
+                inset 2px 2px 0 rgba(255, 140, 140, 0.3);
+            border-radius: 4px;
+        }
+
+        .combat-button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 
+                2px 2px 0 #5a2a2a,
+                inset 2px 2px 0 rgba(255, 140, 140, 0.3);
+            background: linear-gradient(to bottom, #ff6a6a, #8a3a3a);
+        }
+
+        .combat-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .combat-button:disabled:hover {
+            transform: none;
+            box-shadow: 
+                4px 4px 0 #5a2a2a,
+                inset 2px 2px 0 rgba(255, 140, 140, 0.3);
+        }
+
+        .combat-message {
+            text-align: center;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            font-size: 12px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            background: rgba(40, 0, 0, 0.6);
+            border: 3px solid #ff5a5a;
+            color: #ff8a8a;
+        }
+
+        .combat-message.player-turn {
+            background: rgba(0, 40, 0, 0.6);
+            border: 3px solid #5aff9a;
+            color: #8aff8a;
+        }
+
+        .combat-message.enemy-turn {
+            background: rgba(40, 0, 0, 0.6);
+            border: 3px solid #ff5a5a;
+            color: #ff8a8a;
+        }
+
+        .victory-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .victory-window {
+            background: linear-gradient(rgba(10, 40, 80, 0.95), rgba(0, 20, 40, 0.9));
+            border: 6px solid #4a9aff;
+            border-radius: 12px;
+            padding: 20px;
+            width: 800px;
+            max-width: 90%;
+            color: #a0ffff;
+            box-shadow: 
+                0 0 50px rgba(74, 154, 255, 0.6),
+                inset 0 0 30px rgba(100, 200, 255, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .victory-title {
+            color: #4affff;
+            margin-bottom: 10px;
+            font-size: 22px;
+            text-shadow: 0 0 15px rgba(74, 255, 255, 0.7);
+            text-align: center;
+        }
+
+        .victory-video-container {
+            position: relative;
+            background: #000;
+            border: 4px solid #4affff;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 10px 0;
+            height: 300px;
+        }
+
+        .victory-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .victory-video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 40%,
+                rgba(0, 20, 40, 0.7) 70%,
+                rgba(0, 0, 0, 0.9) 100%
+            );
+            pointer-events: none;
+        }
+
+        .victory-message {
+            margin: 15px 0;
+            line-height: 1.6;
+            font-size: 12px;
+            color: #c0ffff;
+            text-align: center;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: rgba(0, 40, 80, 0.4);
+            border-radius: 6px;
+            border: 2px solid #4affff;
+        }
+
+        .victory-button {
+            background: linear-gradient(to bottom, #4a9aff, #2a5a7a);
+            border: 4px solid #80ffff;
+            color: #ffffff;
+            padding: 15px 40px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            cursor: pointer;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 0 #000;
+            transition: all 0.1s;
+            box-shadow: 
+                4px 4px 0 #2a5a7a,
+                inset 2px 2px 0 rgba(140, 220, 255, 0.3);
+            border-radius: 4px;
+            margin-top: 10px;
+            align-self: center;
+        }
+
+        .victory-button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 
+                2px 2px 0 #2a5a7a,
+                inset 2px 2px 0 rgba(140, 220, 255, 0.3);
+            background: linear-gradient(to bottom, #5aaaff, #3a6a8a);
+        }
+
+        .defeat-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .defeat-window {
+            background: linear-gradient(rgba(40, 0, 0, 0.95), rgba(20, 0, 0, 0.9));
+            border: 6px solid #ff5a5a;
+            border-radius: 12px;
+            padding: 30px;
+            width: 700px;
+            max-width: 90%;
+            color: #ff8a8a;
+            text-align: center;
+            box-shadow: 
+                0 0 50px rgba(255, 90, 90, 0.5),
+                inset 0 0 30px rgba(255, 140, 140, 0.2);
+        }
+
+        .defeat-title {
+            color: #ff5a5a;
+            margin-bottom: 20px;
+            font-size: 18px;
+            text-shadow: 0 0 10px rgba(255, 90, 90, 0.5);
+        }
+
+        .defeat-message {
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-size: 12px;
+            color: #ffb0b0;
+            white-space: pre-line;
+        }
+
+        .defeat-button {
+            background: linear-gradient(to bottom, #ff5a5a, #7a2a2a);
+            border: 4px solid #ff8a8a;
+            color: #fff;
+            padding: 15px 40px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 11px;
+            cursor: pointer;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 0 #000;
+            transition: all 0.1s;
+            box-shadow: 
+                4px 4px 0 #5a2a2a,
+                inset 2px 2px 0 rgba(255, 140, 140, 0.3);
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .defeat-button:hover {
+            transform: translate(2px, 2px);
+            box-shadow: 
+                2px 2px 0 #5a2a2a,
+                inset 2px 2px 0 rgba(255, 140, 140, 0.3);
+            background: linear-gradient(to bottom, #ff6a6a, #8a3a3a);
+        }
+
+        #completion-screen {
+            position: relative;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .completion-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .completion-title {
+            font-size: 32px;
+            color: #4affff;
+            text-shadow: 
+                2px 2px 0 #2a5a7a,
+                4px 4px 0 #1a3a5a,
+                0 0 30px rgba(74, 255, 255, 0.7);
+            margin-bottom: 30px;
+            animation: titleGlow 4s infinite alternate;
+        }
+
+        .completion-message {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #c0ffff;
+            margin-bottom: 30px;
+            max-width: 800px;
+            background: rgba(10, 30, 60, 0.6);
+            padding: 25px;
+            border-radius: 12px;
+            border: 4px solid #4affff;
+            box-shadow: 
+                0 0 30px rgba(74, 255, 255, 0.3),
+                inset 0 0 20px rgba(100, 200, 255, 0.1);
+        }
+
+        .completion-reward {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(20, 40, 80, 0.5);
+            border-radius: 10px;
+            border: 3px solid #ffd070;
+        }
+
+        .reward-icon {
+            font-size: 40px;
+            color: #ffd070;
+        }
+
+        .reward-text {
+            font-size: 16px;
+            color: #ffd070;
+        }
+
+        .completion-map {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(10, 30, 60, 0.7);
+            border-radius: 10px;
+            border: 3px solid #80ffff;
+            font-size: 12px;
+            color: #a0ffff;
+            max-width: 600px;
+        }
+
+        .completion-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .completion-button {
+            min-width: 250px;
+            padding: 15px 30px;
+            font-size: 14px;
+        }
+
+        /* СТИЛИ ДЛЯ АУДИО КОНТРОЛЕЙ */
+        .audio-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 20, 40, 0.85);
+            border: 3px solid #4a7a9a;
+            border-radius: 10px;
+            padding: 15px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 220px;
+            box-shadow: 
+                0 0 20px rgba(0, 0, 0, 0.7),
+                inset 0 0 10px rgba(74, 122, 154, 0.3);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .audio-controls:hover {
+            background: rgba(0, 25, 50, 0.9);
+            border-color: #5a9aff;
+            box-shadow: 
+                0 0 25px rgba(0, 0, 0, 0.8),
+                inset 0 0 15px rgba(74, 154, 255, 0.4);
+        }
+
+        .audio-title {
+            font-size: 10px;
+            color: #a0d0ff;
+            text-align: center;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 10px rgba(160, 208, 255, 0.5);
+        }
+
+        .volume-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            background: rgba(10, 30, 60, 0.5);
+            border-radius: 6px;
+            border: 2px solid #4a7a9a;
+        }
+
+        .volume-icon {
+            color: #80e0ff;
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+            text-shadow: 0 0 8px rgba(128, 224, 255, 0.7);
+        }
+
+        .volume-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 10px;
+            background: linear-gradient(to right, #1a3a5a, #4a7a9a);
+            border-radius: 5px;
+            outline: none;
+            border: 1px solid #2a5a7a;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: linear-gradient(to bottom, #4a9aff, #2a5a7a);
+            cursor: pointer;
+            border: 2px solid #80ffff;
+            box-shadow: 
+                0 0 15px rgba(74, 154, 255, 0.7),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            transition: all 0.2s;
+        }
+
+        .volume-slider::-webkit-slider-thumb:hover {
+            background: linear-gradient(to bottom, #5aaaff, #3a6a8a);
+            transform: scale(1.1);
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: linear-gradient(to bottom, #4a9aff, #2a5a7a);
+            cursor: pointer;
+            border: 2px solid #80ffff;
+            box-shadow: 
+                0 0 15px rgba(74, 154, 255, 0.7),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        .volume-value {
+            font-size: 10px;
+            color: #a0d0ff;
+            min-width: 35px;
+            text-align: center;
+            font-family: 'Press Start 2P', cursive;
+            padding: 4px 8px;
+            background: rgba(20, 40, 80, 0.6);
+            border-radius: 4px;
+            border: 1px solid #4a7a9a;
+            text-shadow: 0 0 5px rgba(160, 208, 255, 0.5);
+        }
+
+        .audio-toggle {
+            background: linear-gradient(to bottom, #2a5a7a, #1a3a5a);
+            border: 3px solid #4a9aff;
+            color: #e0f0ff;
+            padding: 10px 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-align: center;
+            text-shadow: 1px 1px 0 #000;
+            box-shadow: 
+                0 4px 0 #1a3a5a,
+                inset 2px 2px 0 rgba(100, 180, 255, 0.3);
+        }
+
+        .audio-toggle:hover {
+            background: linear-gradient(to bottom, #3a6a8a, #2a4a6a);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 0 #1a3a5a,
+                inset 2px 2px 0 rgba(100, 180, 255, 0.3);
+        }
+
+        .audio-toggle:active {
+            transform: translateY(1px);
+            box-shadow: 
+                0 3px 0 #1a3a5a,
+                inset 2px 2px 0 rgba(100, 180, 255, 0.3);
+        }
+
+        /* НОВЫЕ КОНТРОЛЫ ДЛЯ ЗВУКОВ */
+        .sound-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 20, 40, 0.85);
+            border: 3px solid #4a7a9a;
+            border-radius: 10px;
+            padding: 15px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 180px;
+            box-shadow: 
+                0 0 20px rgba(0, 0, 0, 0.7),
+                inset 0 0 10px rgba(74, 122, 154, 0.3);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .sound-controls:hover {
+            background: rgba(0, 25, 50, 0.9);
+            border-color: #5a9aff;
+            box-shadow: 
+                0 0 25px rgba(0, 0, 0, 0.8),
+                inset 0 0 15px rgba(74, 154, 255, 0.4);
+        }
+
+        .sound-title {
+            font-size: 10px;
+            color: #a0d0ff;
+            text-align: center;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 10px rgba(160, 208, 255, 0.5);
+        }
+
+        .sound-toggle {
+            background: linear-gradient(to bottom, #2a5a7a, #1a3a5a);
+            border: 3px solid #4a9aff;
+            color: #e0f0ff;
+            padding: 10px 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 10px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-align: center;
+            text-shadow: 1px 1px 0 #000;
+            box-shadow: 
+                0 4px 0 #1a3a5a,
+                inset 2px 2px 0 rgba(100, 180, 255, 0.3);
+        }
+
+        .sound-toggle:hover {
+            background: linear-gradient(to bottom, #3a6a8a, #2a4a6a);
+            transform: translateY(-2px);
+            box-shadow: 
+                0 6px 0 #1a3a5a,
+                inset 2px 2px 0 rgba(100, 180, 255, 0.3);
+        }
+
+        .sound-toggle:active {
+            transform: translateY(1px);
+            box-shadow: 
+                0 3px 0 #1a3a5a,
+                inset 2px 2px 0 rgba(100, 180, 255, 0.3);
+        }
+
+        @keyframes titleFadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { 
+                text-shadow: 
+                    3px 3px 0 #2a5a7a,
+                    6px 6px 0 #1a3a5a,
+                    0 0 30px rgba(160, 208, 255, 0.7);
+            }
+            50% { 
+                text-shadow: 
+                    3px 3px 0 #2a5a7a,
+                    6px 6px 0 #1a3a5a,
+                    0 0 50px rgba(160, 208, 255, 0.9),
+                    0 0 80px rgba(160, 208, 255, 0.3);
+            }
+        }
+
+        @keyframes buttonPulse {
+            0%, 100% { 
+                box-shadow: 
+                    6px 6px 0 #1a3a5a,
+                    0 0 20px rgba(74, 154, 255, 0.5),
+                    inset 2px 2px 0 rgba(100, 180, 255, 0.3);
+            }
+            50% { 
+                box-shadow: 
+                    6px 6px 0 #1a5a7a,
+                    0 0 30px rgba(74, 154, 255, 0.8),
+                    inset 2px 2px 0 rgba(100, 180, 255, 0.3);
+            }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        @keyframes iceGlow {
+            0%, 100% { 
+                box-shadow: 0 0 3px rgba(160, 220, 255, 0.2);
+            }
+            50% { 
+                box-shadow: 0 0 10px rgba(160, 220, 255, 0.3);
+            }
+        }
+
+        @media (max-width: 1050px) {
+            #game-container {
+                width: 95vw;
+                height: 95vh;
+            }
+            
+            .main-title { font-size: 24px; }
+            .subtitle { font-size: 14px; }
+            .game-title { font-size: 16px; }
+            .dialogue-text, .dwarves-dialogue { font-size: 11px; }
+            
+            .puzzle-video-container { height: 250px; }
+            .rune-button { width: 55px; height: 55px; font-size: 28px; }
+            .puzzle-button { min-width: 130px; padding: 8px 15px; font-size: 10px; }
+            
+            .test-choice-container { grid-template-columns: 1fr; }
+            .test-option { min-height: 120px; }
+            
+            .victory-window, .defeat-window { width: 90%; padding: 20px; }
+            .victory-title { font-size: 18px; }
+            .victory-video-container { height: 200px; }
+            .defeat-title { font-size: 16px; }
+            .defeat-message { font-size: 11px; }
+            
+            .completion-title { font-size: 24px; }
+            .completion-message { font-size: 12px; padding: 15px; }
+            .completion-buttons { flex-direction: column; }
+            .completion-button { min-width: 200px; }
+            
+            .audio-controls,
+            .sound-controls {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+                padding: 12px;
+            }
+            
+            .audio-toggle,
+            .sound-toggle {
+                padding: 8px 12px;
+                font-size: 9px;
+            }
+            
+            .volume-container {
+                padding: 6px 8px;
+            }
+        }
+
+        @media (max-height: 750px) {
+            #game-container { height: 95vh; }
+            .puzzle-video-container { height: 220px; }
+            .rune-button { width: 50px; height: 50px; font-size: 25px; }
+            .test-option { min-height: 100px; }
+            .victory-video-container { height: 180px; }
+            
+            .audio-controls,
+            .sound-controls {
+                bottom: 5px;
+                right: 5px;
+                left: 5px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Контроли аудио -->
+    <div class="audio-controls">
+        <div class="audio-title">🎵 Фоновый эмбиент</div>
+        <div class="volume-container">
+            <div class="volume-icon">🔈</div>
+            <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="50">
+            <div class="volume-value" id="volume-value">50%</div>
+        </div>
+        <button class="audio-toggle" id="audio-toggle">🔊 ВКЛЮЧИТЬ</button>
+    </div>
+
+    <!-- Контроли звуковых эффектов -->
+    <div class="sound-controls">
+        <div class="sound-title">🎮 Звуковые эффекты</div>
+        <button class="sound-toggle" id="sound-toggle">🔊 ВКЛ</button>
+    </div>
+
+    <div id="game-container">
+        <div class="ice-border"></div>
+        
+        <!-- Аудио элементы -->
+        <audio id="click-sound" class="audio-element">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="button-sound" class="audio-element">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-plastic-bubble-click-1124.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="select-sound" class="audio-element">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-game-ball-tap-2073.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="door-sound" class="audio-element">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-creaky-door-opening-2330.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="success-sound" class="audio-element">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="fail-sound" class="audio-element">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="ice-sound" class="audio-element">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-ice-cracking-1250.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="combat-sound" class="audio-element">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-sword-clash-2781.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="victory-sound" class="audio-element">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-victory-fanfare-2015.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="hover-sound" class="audio-element">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="menu-click-sound" class="audio-element">
+            <source src="https://assets.mixkit.co/sfx/preview/mixkit-video-game-mystery-alert-234.mp3" type="audio/mpeg">
+        </audio>
+        
+        <!-- Фоновый эмбиент с автоповтором -->
+        <audio id="ambient-music" class="audio-element" loop>
+            <source src="audio/Floating Thru Space (Ambient Music For Sleep) - An Angel's Caress [audiovk.com].mp3" type="audio/mpeg">
+            Ваш браузер не поддерживает аудио.
+        </audio>
+        
+        <!-- Экраны игры -->
+        <div id="title-screen" class="game-screen">
+            <div class="title-container">
+                <h1 class="main-title">ГЛУБОКАЯ ШАХТА</h1>
+                <div class="subtitle">ВЕЧНАЯ МЕРЗЛОТА</div>
+                <div class="day-counter">ДЕНЬ 3 ЭКСПЕДИЦИИ</div>
+                <div class="quote">
+                    "Глубоко в недрах горы, где время замерло в ледяных объятиях,<br>
+                    хранятся секреты древних стражей. Тех, кто помнит эпоху,<br>
+                    когда камни говорили, а свет ещё не был пленён факелом.<br>
+                    Каждый шаг вглубь — это шаг в прошлое. Каждый вдох —<br>
+                    встреча с эхо тысячелетий."
+                </div>
+                <button id="start-game" class="start-button">НАЧАТЬ ИССЛЕДОВАНИЕ</button>
+            </div>
+        </div>
+
+        <!-- Остальные экраны -->
+        <div id="entrance-screen" class="game-screen hidden">
+            <div class="game-header">
+                <div class="game-title">ГЛУБОКАЯ ШАХТА</div>
+                <div class="location-label">ВХОД В ШАХТУ</div>
+            </div>
+            
+            <div class="video-container">
+                <video id="entrance-video" class="scene-video" autoplay muted loop playsinline>
+                    <source src="video/Shahta vhod.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+                <div class="video-overlay"></div>
+            </div>
+            
+            <div class="text-panel">
+                <div id="entrance-text" class="dialogue-text"></div>
+                <div class="button-container">
+                    <button id="entrance-next" class="game-button">ДАЛЕЕ</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="descent-screen" class="game-screen hidden">
+            <div class="game-header">
+                <div class="game-title">ГЛУБОКАЯ ШАХТА</div>
+                <div class="location-label">СПУСК В ГЛУБИНЫ</div>
+            </div>
+            
+            <div class="video-container">
+                <video id="descent-video" class="scene-video" autoplay muted loop playsinline>
+                    <source src="video/Shahta vnytri.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+                <div class="video-overlay"></div>
+            </div>
+            
+            <div class="text-panel">
+                <div id="descent-text" class="dialogue-text"></div>
+                <div class="button-container">
+                    <button id="descent-next" class="game-button">ДАЛЕЕ</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="dwarves-screen" class="game-screen hidden">
+            <div class="game-header">
+                <div class="game-title">ГЛУБОКАЯ ШАХТА</div>
+                <div class="location-label">ЗАЛ СТРАЖЕЙ</div>
+            </div>
+            
+            <div class="dwarves-video-container">
+                <video id="dwarves-video" class="dwarves-video" autoplay muted loop playsinline>
+                    <source src="video/Gnomy y kostra.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+                <video id="gnome-pickaxe-video" class="dwarves-video hidden" autoplay muted loop playsinline>
+                    <source src="video/Gnom s kirkoy.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+                <video id="gnome-beard-video" class="dwarves-video hidden" autoplay muted loop playsinline>
+                    <source src="video/Gnom s borodoy.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+                <video id="gnome-stones-video" class="dwarves-video hidden" autoplay muted loop playsinline>
+                    <source src="video/Gnom s kamnyamy.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+                <div class="dwarves-video-overlay"></div>
+            </div>
+            
+            <div class="dwarves-panel">
+                <div id="dwarves-text" class="dwarves-dialogue"></div>
+                
+                <div id="characters-choice" class="characters-choice hidden">
+                    <div class="character-option" data-character="pickaxe">
+                        <div class="character-icon">⛏️</div>
+                        <div class="character-name">ГНОМ С КИРКОЙ</div>
+                        <div class="character-desc">Спросить о руне силы и оружия</div>
+                    </div>
+                    
+                    <div class="character-option" data-character="fire">
+                        <div class="character-icon">🔥</div>
+                        <div class="character-name">ГНОМ С БОРОДОЙ</div>
+                        <div class="character-desc">Узнать о значении света и огня</div>
+                    </div>
+                    
+                    <div class="character-option" data-character="stones">
+                        <div class="character-icon">🪨</div>
+                        <div class="character-name">ГНОМ С КАМНЯМИ</div>
+                        <div class="character-desc">Расспросить о наследии и доме</div>
+                    </div>
+                    
+                    <div class="character-option" data-character="mouse">
+                        <div class="character-icon">🐭</div>
+                        <div class="character-name">ЮМИ</div>
+                        <div class="character-desc">Послушать догадки мышки</div>
+                    </div>
+                </div>
+                
+                <div id="dwarves-button-container" class="dwarves-button-container">
+                    <button id="dwarves-next" class="dwarves-next-button">ДАЛЕЕ</button>
+                </div>
+            </div>
+            
+            <div id="door-container" class="door-container">
+                <button id="inspect-door-always" class="door-button">ОСМОТРЕТЬ ДВЕРЬ</button>
+                <div class="door-subtitle">
+                    Когда будете готовы попробовать открыть дверь
+                </div>
+            </div>
+        </div>
+
+        <div id="puzzle-screen" class="game-screen hidden">
+            <div class="game-header">
+                <div class="game-title">ГЛУБОКАЯ ШАХТА</div>
+                <div class="location-label">ДРЕВНЯЯ ДВЕРЬ С РУНАМИ</div>
+            </div>
+            
+            <div class="puzzle-video-container">
+                <video id="door-video" class="puzzle-video" autoplay muted loop playsinline>
+                    <source src="video/Dvery i ryni.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+                <div class="puzzle-video-overlay"></div>
+            </div>
+            
+            <div class="puzzle-quote" id="puzzle-quote">
+                "Только достойный пройдет дальше. Древние руны хранят секрет пути."
+            </div>
+            
+            <div class="runes-container" id="runes-container"></div>
+            
+            <div id="puzzle-message" class="puzzle-message message-info">
+                Нажмите на руны в правильной последовательности
+            </div>
+            
+            <div class="puzzle-buttons">
+                <button id="back-to-dwarves" class="game-button puzzle-button">НАЗАД</button>
+                <button id="check-solution" class="game-button puzzle-button">ПРОВЕРИТЬ</button>
+                <button id="reset-puzzle" class="game-button puzzle-button">СБРОСИТЬ</button>
+            </div>
+        </div>
+
+        <!-- ЭКРАН С ОТКРЫТОЙ ДВЕРЬЮ -->
+        <div id="door-open-screen" class="game-screen hidden">
+            <div class="game-header">
+                <div class="game-title">ГЛУБОКАЯ ШАХТА</div>
+                <div class="location-label">ПРОХОД ОТКРЫТ</div>
+            </div>
+            
+            <div class="door-open-video-container">
+                <video id="door-open-video" class="door-open-video" autoplay muted loop playsinline>
+                    <source src="video/Dver otkrita.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+                <div class="door-open-video-overlay"></div>
+            </div>
+            
+            <div class="text-panel">
+                <div id="door-open-text" class="dialogue-text">
+                    <div class="text-line">НИК: (смотрит на открытый проход) Дверь открыта... но что там?</div>
+                    <div class="text-line">ЮМИ: Чувствую ледяной ветер... и что-то ещё. Как будто кто-то ждал.</div>
+                </div>
+                <div class="button-container">
+                    <button id="continue-adventure" class="game-button">ПРОДОЛЖИТЬ ПУТЕШЕСТВИЕ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ЭКРАН ПРОХОДА В ГЛУБИНЫ -->
+        <div id="depths-screen" class="game-screen hidden">
+            <div class="game-header">
+                <div class="game-title">ГЛУБОКАЯ ШАХТА</div>
+                <div class="location-label">ПРОХОД В ГЛУБИНЫ</div>
+            </div>
+            
+            <div class="depths-video-container">
+                <video id="depths-video" class="depths-video" autoplay muted loop playsinline>
+                    <source src="video/Gnomy yvajaut.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+                <div class="depths-video-overlay"></div>
+            </div>
+            
+            <div class="dwarves-panel">
+                <div id="depths-text" class="dwarves-dialogue"></div>
+                <div id="depths-button-container" class="dwarves-button-container">
+                    <button id="depths-next" class="dwarves-next-button">ДАЛЕЕ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ЭКРАН ЛЕДЯНОГО ХРАНИТЕЛЯ -->
+        <div id="guardian-screen" class="game-screen hidden">
+            <div class="game-header">
+                <div class="game-title">ГЛУБОКАЯ ШАХТА</div>
+                <div class="location-label">ЛЕДЯНОЙ ХРАНИТЕЛЬ</div>
+            </div>
+            
+            <div class="guardian-video-container">
+                <video id="guardian-video" class="guardian-video" autoplay muted loop playsinline>
+                    <source src="video/Strajnik.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+                <div class="guardian-video-overlay"></div>
+            </div>
+            
+            <div class="text-panel">
+                <div id="guardian-text" class="dialogue-text"></div>
+                <div id="guardian-button-container" class="button-container">
+                    <button id="guardian-next" class="game-button">ДАЛЕЕ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ЭКРАН ИСПЫТАНИЯ МЕЧОМ -->
+        <div id="sword-test-screen" class="game-screen hidden">
+            <div class="game-header">
+                <div class="game-title">ГЛУБОКАЯ ШАХТА</div>
+                <div class="location-label">ИСПЫТАНИЕ МЕЧОМ</div>
+            </div>
+            
+            <div class="sword-test-video-container">
+                <video id="sword-test-video" class="sword-test-video" autoplay muted loop playsinline>
+                    <source src="video/Strajnik mech.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+                <div class="sword-test-video-overlay"></div>
+            </div>
+            
+            <div class="text-panel">
+                <div id="sword-test-text" class="dialogue-text"></div>
+                
+                <div id="test-choice-container" class="test-choice-container hidden">
+                    <div class="test-option" data-test="sword">
+                        <div class="test-icon">⚔️</div>
+                        <div class="test-title">ВЗЯТЬ МЕЧ</div>
+                        <div class="test-desc">Принять вызов и взять оружие. Показать, что готов сражаться.</div>
+                    </div>
+                    
+                    <div class="test-option" data-test="refuse">
+                        <div class="test-icon">🕊️</div>
+                        <div class="test-title">ОТКАЗАТЬСЯ</div>
+                        <div class="test-desc">Помнить урок гномов: оружие должно быть последним аргументом.</div>
+                    </div>
+                </div>
+                
+                <div id="test-message" class="test-message">
+                    Что выберет НИК? Вспомните уроки гномов...
+                </div>
+                
+                <div id="sword-test-button-container" class="button-container">
+                    <button id="sword-test-next" class="game-button">ПРОДОЛЖИТЬ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ЭКРАН БОЯ -->
+        <div id="combat-screen" class="game-screen hidden">
+            <div class="game-header">
+                <div class="game-title">ГЛУБОКАЯ ШАХТА</div>
+                <div class="location-label">БИТВА С ХРАНИТЕЛЕМ</div>
+            </div>
+            
+            <div class="combat-video-container">
+                <video id="combat-video" class="combat-video" autoplay muted loop playsinline>
+                    <source src="video/Mashet mechom.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+                <div class="combat-video-overlay"></div>
+            </div>
+            
+            <div class="combat-stats">
+                <div class="stat">
+                    <div class="stat-label">НИК</div>
+                    <div class="stat-value" id="player-health">100</div>
+                    <div class="health-bar">
+                        <div id="player-health-bar" class="health-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+                
+                <div class="stat">
+                    <div class="stat-label">ХРАНИТЕЛЬ</div>
+                    <div class="stat-value" id="enemy-health">150</div>
+                    <div class="health-bar">
+                        <div id="enemy-health-bar" class="health-fill" style="width: 100%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-panel">
+                <div id="combat-text" class="dialogue-text"></div>
+                
+                <div id="combat-message" class="combat-message">
+                    ХРАНИТЕЛЬ ГОТОВИТСЯ К АТАКЕ! ВЫБЕРИ ДЕЙСТВИЕ!
+                </div>
+                
+                <div class="combat-actions" id="combat-actions">
+                    <button class="combat-button" data-action="attack">АТАКОВАТЬ</button>
+                    <button class="combat-button" data-action="defend">ЗАЩИЩАТЬСЯ</button>
+                    <button class="combat-button" data-action="dodge">УВЕРНУТЬСЯ</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ЭКРАН ЗАВЕРШЕНИЯ ДНЯ 3 -->
+        <div id="completion-screen" class="game-screen hidden">
+            <div class="game-header">
+                <div class="game-title">ГЛУБОКАЯ ШАХТА</div>
+                <div class="location-label">ЗАВЕРШЕНИЕ ДНЯ 3</div>
+            </div>
+            
+            <div class="door-open-video-container">
+                <video id="completion-video" class="door-open-video" autoplay muted loop playsinline>
+                    <source src="video/Dver otkrita.mp4" type="video/mp4">
+                    Ваш браузер не поддерживает видео.
+                </video>
+                <div class="door-open-video-overlay"></div>
+            </div>
+            
+            <div class="text-panel">
+                <div id="completion-text" class="dialogue-text">
+                    <div class="text-line" style="color: #4affff; text-align: center; margin-bottom: 15px; font-size: 16px;">
+                        🎉 ДЕНЬ 3 УСПЕШНО ЗАВЕРШЁН!
+                    </div>
+                    <div class="text-line">
+                        <span class="speaker-nick">НИК:</span> Мы прошли испытание! Мы поняли мудрость древних стражей...
+                    </div>
+                    <div class="text-line">
+                        <span class="speaker-yumi">ЮМИ:</span> И доказали, что сила — не главное! Мудрость важнее оружия!
+                    </div>
+                    <div class="text-line" style="margin-top: 20px; color: #80ffff;">
+                        <strong>НАГРАДА:</strong> Вы получили <span style="color: #ffd070;">СЕРДЦЕ ГЛУБОКОЙ ШАХТЫ</span> — древний артефакт, излучающий тёплый свет.
+                    </div>
+                    <div class="text-line" style="margin-top: 15px; color: #a0ffff;">
+                        <strong>СЛЕДУЮЩАЯ ЦЕЛЬ:</strong> Карта указывает путь к <span style="color: #4affff;">АЛТАРЮ ВЕЧНОЙ МЕРЗЛОТЫ</span>, где спит Древний.
+                    </div>
+                    <div class="text-line" style="margin-top: 10px; font-size: 11px; color: #c0ffff; text-align: center;">
+                        [Местоположение: Глубина -2,500м | Координаты: 67°24' с.ш., 26°44' в.д.]
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button id="return-to-menu" class="game-button" style="background: linear-gradient(to bottom, #4a7a9a, #2a5a7a); border-color: #80ffff;">
+                        ВЕРНУТЬСЯ В ГЛАВНОЕ МЕНЮ
+                    </button>
+                    <button id="continue-to-altar" class="game-button">
+                        ПРОДОЛЖИТЬ К АЛТАРЮ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+class DeepMineGame {
+    constructor() {
+        this.state = {
+            currentScene: 'title',
+            scenePart: 0,
+            talkedTo: {
+                pickaxe: 0,
+                fire: 0,
+                stones: 0,
+                mouse: 0
+            },
+            dwarvesIntroductionShown: 0,
+            currentCharacter: null,
+            currentDialoguePart: 0,
+            puzzleAttempts: 0,
+            hintsUnlocked: false,
+            isReturningFromPuzzle: false,
+            returnDialogueIndex: 0,
+            hasTalkedToAnyGnome: false,
+            depthsScenePart: 0,
+            guardianScenePart: 0,
+            swordTestStage: 'intro',
+            swordTestPart: 0,
+            selectedTest: null,
+            testCompleted: false,
+            autoScrollEnabled: false,
+            combatState: 'player-turn',
+            combatTurn: 0,
+            lastAction: null,
+            lastDamage: 0,
+            combatDefeated: false,
+            isTyping: false,
+            currentTypingTimeout: null,
+            victoryPart: 0,
+            testResultPart: 0,
+            finalScenePart: 0,
+            combatIntroPart: 0,
+            wiseVictory: false,
+            // Параметры для аудио
+            isAudioPlaying: false,
+            volume: 0.5,
+            soundEnabled: true
+        };
+
+        this.correctSequence = ['ᚲ', 'ᛟ', 'ᛏ'];
+        this.currentSequence = [];
+        this.runeButtons = [];
+
+        this.scenes = {
+            entrance: [
+                "НИК: Вот мы и стоим перед входом в Глубокую Шахту.",
+                "ЮМИ: Вечная мерзлота... чувствуешь этот холод? Даже моя шёрстка дыбом встаёт.",
+                "НИК: Легенды говорят, что здесь замерли во времени древние стражи. Те, кто охранял секреты горы.",
+                "ЮМИ: Секреты? Надеюсь, там есть хоть немного сыра... или орехов.",
+                "НИК: Шутки в сторону, Юми. Этот вход... он как будто дышит холодом тысячелетий.",
+                "Свет факела дрожит на ледяных сталактитах. Воздух густой от древней пыли и мороза.",
+                "НИК: Пора. Лестница вниз ждёт нас. Кто знает, что скрывает эта вечная мерзлота..."
+            ],
+
+            descent: [
+                "НИК: Каждый шаг глубже — шаг в прошлое. Эти ступени вырублены ещё до нашей эры.",
+                "ЮМИ: Температура падает с каждым метром! Мне уже кажется, что мои усы вот-вот отвалятся.",
+                "НИК: Смотри на стены — это не просто лёд. В нём застыли отпечатки древних растений.",
+                "ЮМИ: Кажется, я слышу эхо... или это чьи-то шаги?",
+                "НИК: Это эхо нашей истории, Юми. Шахта помнит каждого, кто спускался сюда.",
+                "Воздух становится тяжелее. Свет факела отражается в ледяных кристаллах, создавая тысячи бликов.",
+                "НИК: Мы почти у цели. Чувствуешь? Здесь внизу... есть жизнь. Или то, что от неё осталось."
+            ],
+
+            dwarvesIntroduction: [
+                "НИК: Боги мои... Они действительно здесь.",
+                "ЮМИ: Трое... сидят у костра.",
+                "ЮМИ: Они двигаются! Что-то обсуждают...",
+                "НИК: Да, они живые. После тысячелетий бдения...",
+                "ЮМИ: Смотри! Тот с киркой что-то шепчет...",
+                "НИК: Легенда была правдой. Стражи Глубокой Шахты.",
+                "ЮМИ: Они нас видят? Они знают, что мы здесь?",
+                "НИК: Они всё знают, Юми. Тысячи лет они ждали.",
+                "НИК: Ждали того, кто поймёт их мудрость.",
+                "ЮМИ: А я-то думала, мы ищем сокровища!",
+                "НИК: Сокровища здесь другие, Юми. Не золото, а знания.",
+                "НИК: Надо подойти поговорить с ними. Каждый что-то знает."
+            ],
+
+            returnDialogue: [
+                "НИК: Мы вернулись... Дверь не открылась.",
+                "ЮМИ: Гномы смотрят на нас как на неудачников...",
+                "НИК: Надо снова попросить у них помощи. Но они выглядят... недовольными.",
+                "ЮМИ: Пойдём поговорим. Может, они сжалятся над нами?"
+            ],
+
+            dwarvesDialogues: {
+                pickaxe: {
+                    first: [
+                        "ГНОМ С КИРКОЙ: (медленно поворачивает голову) Видишь эту руну? ᛏ — Тейваз.",
+                        "ГНОМ С КИРКОЙ: (поглаживает кирку) Она означает битву, оружие, силу. Но шахта не любит сражений.",
+                        "ГНОМ С КИРКОЙ: Здесь сталь — последнее, к чему нужно прибегать.",
+                        "НИК: Что ты хочешь сказать?",
+                        "ГНОМ С КИРКОЙ: (кивает) Помни: оружие должно быть последним в твоих руках, но первым в твоём уме.",
+                        "ГНОМ С КИРКОЙ: Кто знает путь — тому не нужен меч.",
+                        "ГНОМ С КИРКОЙ: Орудие должно быть последним в твоих руках, но первым в твоём уме."
+                    ],
+                    second: [
+                        "ГНОМ С КИРКОЙ: (недовольно ворчит) Опять пришли?",
+                        "НИК: Нам нужна помощь с дверью...",
+                        "ГНОМ С КИРКОЙ: Я уже всё сказал. ᛏ — последняя. Пойми сам.",
+                        "ЮМИ: Он стал сердитым...",
+                        "ГНОМ С КИРКОЙ: Тысячу лет мы храним секреты, а вы за два раза понять не можете!",
+                        "ГНОМ С КИРКОЙ: Сначала свет, потом дом, потом защита. Больше не буду повторять."
+                    ],
+                    hint: [
+                        "ГНОМ С КИРКОЙ: (вздыхает) Ладно... Послушай внимательно.",
+                        "ГНОМ С КИРКОЙ: Руна ᛏ — это сила и защита. Но сила должна приходить последней.",
+                        "ГНОМ С КИРКОЙ: Тот, кто начинает с силы — начинает с конца.",
+                        "ГНОМ С КИРКОЙ: Сначала должен быть свет, чтобы видеть путь.",
+                        "ГНОМ С КИРКОЙ: Потом дом, чтобы знать, куда идти.",
+                        "ГНОМ С КИРКОЙ: И только потом... только потом защита для того, что дорого."
+                    ]
+                },
+                
+                fire: {
+                    first: [
+                        "ГНОМ С БОРОДОЙ: (шевелит пальцами над воображаемым пламенем) ᚲ — Кано. Факел, огонь, свет.",
+                        "ГНОМ С БОРОДОЙ: Первый учитель человечества, что вывел нас из тьмы пещер.",
+                        "ЮМИ: Он что, рисует на пепле?",
+                        "ГНОМ С БОРОДОЙ: (улыбается) Пламя опасно. Оно показывает дорогу, но скрывает ловушки.",
+                        "ГНОМ С БОРОДОЙ: Начинай с факела... но не заканчивай им.",
+                        "ГНОМ С БОРОДОЙ: Свет нужен, чтобы видеть, а не чтобы слепить.",
+                        "ГНОМ С БОРОДОЙ: Истинный путь начинается с огня, но ведёт за его пределы."
+                    ],
+                    second: [
+                        "ГНОМ С БОРОДОЙ: (не поднимая глаз от огня) Вы вернулись.",
+                        "НИК: Дверь не открывается...",
+                        "ГНОМ С БОРОДОЙ: Потому что смотрите, но не видите. ᚲ — начало всего.",
+                        "ГНОМ С БОРОДОЙ: Без света нет пути. Без пути нет дома. Без дома — нечего защищать.",
+                        "ГНОМ С БОРОДОЙ: Всё просто, если не усложнять.",
+                        "НИК: Спасибо, я постараюсь запомнить.",
+                        "ГНОМ С БОРОДОЙ: (махнул рукой) Идите. Не мешайте созерцать огонь."
+                    ],
+                    hint: [
+                        "ГНОМ С БОРОДОЙ: (смотрит в огонь) Кано... ᚲ...",
+                        "ГНОМ С БОРОДОЙ: Это первая руна. Начало всего.",
+                        "ГНОМ С БОРОДОЙ: Без факела в темноте не сделаешь и шага.",
+                        "ГНОМ С БОРОДОЙ: Но помни: огонь освещает, но и обжигает.",
+                        "ГНОМ С БОРОДОЙ: Начни со света. Всегда начинай со света.",
+                        "ГНОМ С БОРОДОЙ: А что будет потом... ты уже слышал от других."
+                    ]
+                },
+                
+                stones: {
+                    first: [
+                        "ГНОМ С КАМНЯМИ: (перебирает камни в руках) ᛟ — Одал. Наследие. Дом.",
+                        "ГНОМ С КАМНЯМИ: Самый важный символ для тех, кто помнит свои корни.",
+                        "НИК: Он выложил её из камешков...",
+                        "ГНОМ С КАМНЯМИ: (показывает на каменный пол) Эта руна — сама шахта. Наш дом. Наша память.",
+                        "ГНОМ С КАМНЯМИ: Она не в начале и не в конце. Она — середина всего.",
+                        "ГНОМ С КАМНЯМИ: Наследие скрыто между светом и сталью.",
+                        "ГНОМ С КАМНЯМИ: Ищи его в тишине."
+                    ],
+                    second: [
+                        "ГНОМ С КАМНЯМИ: (тяжело вздыхает) Опять вы.",
+                        "ЮМИ: Мы немного запутались...",
+                        "ГНОМ С КАМНЯМИ: Я говорил: ᛟ — середина. Не первая, не последняя.",
+                        "ГНОМ С КАМНЯМИ: Что сложного? Всё как в жизни: приходишь в дом после дороги.",
+                        "ГНОМ С КАМНЯМИ: А защищаешь его потом. Логично же!",
+                        "ГНОМ С КАМНЯМИ: (возвращается к камням) Больше не отвлекайте."
+                    ],
+                    hint: [
+                        "ГНОМ С КАМНЯМИ: (перебирает камни) Одал... ᛟ...",
+                        "ГНОМ С КАМНЯМИ: Это середина пути. Не начало, не конец.",
+                        "ГНОМ С КАМНЯМИ: Сначала ты зажигаешь факел, чтобы видеть.",
+                        "ГНОМ С КАмНЯМИ: Потом ищешь дом — место, где можно отдохнуть.",
+                        "ГНОМ С КАМНЯМИ: И только найдя дом, ты думаешь о его защите.",
+                        "ГНОМ С КАМНЯМИ: Порядок важен. Порядок — это всё."
+                    ]
+                },
+                
+                mouse: {
+                    first: [
+                        "ЮМИ: Эй, я тоже кое-что знаю! Слушай внимательно!",
+                        "ЮМИ: Я видела, как они сидят. Тот, что с киркой — всегда смотрит на дверь.",
+                        "ЮМИ: Тот с бородой у огня — трогает пепел определённым образом.",
+                        "ЮМИ: А с камнями... он постоянно перебирает их, как будто считает.",
+                        "НИК: И что это значит, Юми?",
+                        "ЮМИ: Они не просто показывают руны! Они показывают порядок!",
+                        "ЮМИ: Сначала тот, кто указывает путь (факел), потом дом (камни), потом защита (кирка)!",
+                        "ЮМИ: Ну, так мне кажется. Может, я и ошибаюсь..."
+                    ],
+                    second: [
+                        "ЮМИ: Я же говорила! Свет → Дом → Защита!",
+                        "НИК: Но дверь не открылась...",
+                        "ЮМИ: Может, ты неправильно перетащил руны? Или не в том порядке?",
+                        "ЮМИ: Слушай, я уверена в своей догадке! Просто сделай как я сказала!",
+                        "ЮМИ: ᚲ, потом ᛟ, потом ᛏ. Три руны. Больше не нужно.",
+                        "ЮМИ: И не таскай лишние! Эти гномы такие зануды, они не любят, когда их не слушают."
+                    ],
+                    hint: [
+                        "ЮМИ: (шепчет) Слушай, я видела, как они переглядываются!",
+                        "ЮМИ: Тот с киркой смотрит на руну ᛏ, когда говорит 'последняя'.",
+                        "ЮМИ: А тот с бородой всегда начинает с ᚲ, когда говорит о начале.",
+                        "ЮМИ: И камни... он всегда кладёт ᛟ между другими камнями!",
+                        "ЮМИ: Это так очевидно! ᚲ → ᛟ → ᛏ!",
+                        "ЮМИ: Просто нажми в этом порядке и всё!"
+                    ]
+                }
+            },
+
+            puzzleMessages: {
+                success: [
+                    "✅ МОЛОДЕЦ! Ты разгадал секрет древних рун!",
+                    "Дверь содрогается, и древние механизмы приходят в движение...",
+                    "Руны светятся мягким золотым светом, признавая твою мудрость.",
+                    "Путь вперед открыт. Ты достоин пройти дальше."
+                ],
+                fail: [
+                    "❌ НЕ ПОЛУЧИЛОСЬ... Руны остаются холодными и безмолвными.",
+                    "Дверь не реагирует на твою попытку. Порядок имеет значение.",
+                    "Может быть, стоит прислушаться к мудрости стражей?",
+                    "Попробуй еще раз или спроси совета у гномов."
+                ],
+                partial: [
+                    "Продолжай... но помни, что порядок важен.",
+                    "Ты на правильном пути, но это еще не все.",
+                    "Каждая руна должна быть на своем месте."
+                ]
+            },
+
+            depthsPassage: [
+                "НИК: (грохот от открывающейся двери эхом разносится по пещере)",
+                "ЮМИ: Бррр... оттуда дует такой холодный ветер! И это эхо...",
+                "ГНОМ С КИРКОЙ: (медленно встаёт) Ты прошёл испытание рун.",
+                "ГНОМ С БОРОДОЙ: (поднимает взгляд от огня) Не многие доходили до этого момента.",
+                "ГНОМ С КАМНЯМИ: (кладёт последний камень) Теперь ты понимаешь нашу мудрость.",
+                "ЮМИ: Смотри! Они все встали... и смотрят на нас.",
+                "НИК: (чувствует уважение в их взглядах) Что дальше?",
+                "ГНОМ С КИРКОЙ: (подходит ближе) Путь в глубины открыт.",
+                "ГНОМ С БОРОДОЙ: Но помни: там, куда ты идёшь, не было никого тысячелетия.",
+                "ГНОМ С КАМНЯМИ: (серьёзно) Древний спит. Не разбуди его.",
+                "ГНОМ С КИРКОЙ: (кивает) Это наше последнее предупреждение.",
+                "НИК: Я понимаю. Мы будем осторожны.",
+                "ЮМИ: Спасибо вам... за всё.",
+                "ГНОМ С БОРОДОЙ: (машет рукой) Идите. Ваше путешествие только начинается.",
+                "НИК: (кидает и поворачивается к проходу) Пойдём, Юми. Вперёд, в глубины.",
+                "ЮМИ: (взволнованно) Вперёд! К новым приключениям!"
+            ],
+
+            guardianEncounter: [
+                "НИК: Пещера расширяется... и становится ещё холоднее.",
+                "ЮМИ: Смотри! Что это за массивная фигура?",
+                "НИК: (приближается) Боги... это лёд. Древний лёд, вмёрзший в стену.",
+                "ЮМИ: Он... он движется? Или это мне кажется?",
+                "(лёд начинает трещать, фигура медленно оживает)",
+                "ГОЛОС ИЗ ЛЬДА: Ты... прошёл... ворота...",
+                "НИК: Кто ты?",
+                "ГОЛОС ИЗ ЛЬДА: Я... Хранитель... проверяю... понимание...",
+                "ЮМИ: Он проверяет, поняли ли мы уроки гномов!",
+                "ГОЛОС ИЗ ЛЬДА: Да... мудрость... или сила... что важнее?",
+                "НИК: Что ты хочешь?",
+                "ГОЛОС ИЗ ЛЬДА: Испытание... последнее... перед Алтарём...",
+                "(изо льда появляется сияющий меч)",
+                "ГОЛОС ИЗ ЛЬДА: Возьми... если смеешь... или откажись... если мудр..."
+            ],
+
+            swordTestIntro: [
+                "НИК: Меч... он светится холодным синим светом.",
+                "ЮМИ: Не трогай его! Помни, что говорил гном с киркой!",
+                "НИК: (смотрит на меч) 'Оружие должно быть последним в твоих руках...'",
+                "ГОЛОС ИЗ ЛЬДА: Выбирай... сила сейчас... или мудрость на потом...",
+                "НИК: Это не просто меч... это испытание.",
+                "ЮМИ: Да! Он проверяет, запомнили ли мы уроки!",
+                "ГОЛОС ИЗ ЛЬДА: Решай... время идёт... лед не ждёт..."
+            ],
+
+            swordTestResults: {
+                sword: [
+                    "НИК: (решительно берёт меч) Иногда сила нужна, чтобы защитить то, что дорого.",
+                    "ЮМИ: Нет! Ты же слышал гномов!",
+                    "(меч мгновенно покрывается инеем и рассыпается в прах)",
+                    "ГОЛОС ИЗ ЛЬДА: Ошибка... сила без мудрости... хрупка как лёд...",
+                    "НИК: (смотрит на пустые руки) Что...",
+                    "ГОЛОС ИЗ ЛЬДА: Ты не понял... урок не усвоен...",
+                    "ЮМИ: Я же говорила! Он проверял не твою силу, а понимание!",
+                    "ГОЛОС ИЗ ЛЬДА: Возвращайся... учись снова..."
+                ],
+                refuse: [
+                    "НИК: (отступает от меч) Нет. Я не возьму его.",
+                    "ЮМИ: Умно! Ты помнишь урок!",
+                    "НИК: Оружие — последний аргумент. Сначала нужно понять, за что сражаться.",
+                    "(меч начинает светиться ярче, затем превращается в ледяной кристалл)",
+                    "ГОЛОС ИЗ ЛЬДА: Верно... мудрость... выше силы...",
+                    "НИК: Что это?",
+                    "ГОЛОС ИЗ ЛЬДА: Награда... за понимание... ключ... к Алтарю...",
+                    "ЮМИ: Кристалл! Он прекрасен!",
+                    "ГОЛОС ИЗ ЛЬДА: Иди... теперь ты готов... встречать... Древнего..."
+                ]
+            },
+
+            // БОЕВАЯ СИСТЕМА
+            combat: {
+                intro: [
+                    "НИК: (поднимает меч) Если нужно сражаться — я готов!",
+                    "ЮМИ: Осторожно! Он огромный!",
+                    "ХРАНИТЕЛЬ: (встаёт во весь рост) ТЫ... ВЫБРАЛ... СИЛУ...",
+                    "ХРАНИТЕЛЬ: ПОКАЖИ... СВОЮ... ДОБЛЕСТЬ...",
+                    "(Ледяной Хранитель готовится к атаке)"
+                ],
+                
+                playerTurn: [
+                    "ХРАНИТЕЛЬ ждёт твоего хода!",
+                    "Выбирай действие быстро!",
+                    "Твой ход! Решай!"
+                ],
+                
+                enemyTurn: [
+                    "ХРАНИТЕЛЬ готовится атаковать!",
+                    "Приготовься к удару!",
+                    "ХРАНИТЕЛЬ нападает!"
+                ],
+                
+                playerAttacks: [
+                    "НИК атакует мечом! Удар попадает!",
+                    "НИК наносит точный удар по ледяной броне!",
+                    "Меч Ника пронзает ледяную оболочку Хранителя!"
+                ],
+                
+                playerDefends: [
+                    "НИК поднимает щит! Атака отражена!",
+                    "НИК умело парирует удар Хранителя!",
+                    "Защитная стойка Ника снижает урон!"
+                ],
+                
+                playerDodges: [
+                    "НИК уворачивается в последний момент!",
+                    "Проворный прыжок спасает Ника от атаки!",
+                    "НИК использует ловкость, чтобы избежать удара!"
+                ],
+                
+                enemyAttacks: [
+                    "ХРАНИТЕЛЬ бьёт ледяной рукой!",
+                    "Мощный удар ледяной булавой!",
+                    "ХРАНИТЕЛЬ создает ледяные шипы!"
+                ],
+                
+                victory: [
+                    "ХРАНИТЕЛЬ: (с трудом поднимается) ТЫ... СИЛЬЕН...",
+                    "НИК: (опускает меч) Я просто защищался.",
+                    "ХРАНИТЕЛЬ: СИЛА... БЕЗ... МУДРОСТИ... ПУСТА...",
+                    "ЮМИ: Ты победил! Но...",
+                    "ХРАНИТЕЛЬ: (тая) ТЫ ПРОШЁЛ... НО НЕ ПОНЯЛ...",
+                    "Ледяной Хранитель рассыпается в прах, оставляя лишь холодный пепел."
+                ],
+                
+                defeat: [
+                    "НИК: (падает на колени) Я не могу...",
+                    "ХРАНИТЕЛЬ: СИЛА... БЕЗ... МУДРОСТИ... СЛАБА...",
+                    "ЮМИ: Ник! Держись!",
+                    "ХРАНИТЕЛЬ: ВОЗВРАЩАЙСЯ... КОГДА... ПОНЯЛ...",
+                    "НИК: Прости... я ошибся.",
+                    "Ледяной Хранитель замирает, возвращаясь в неподвижное состояние."
+                ]
+            },
+
+            victoryAfterCombat: [
+                "НИК: (опускает меч, тяжело дыша) Это... было нелегко.",
+                "ЮМИ: Ты победил! Но посмотри...",
+                "(Ледяной Хранитель медленно рассыпается в пыль)",
+                "ХРАНИТЕЛЬ: (последний шепот) ТЫ... СИЛЬЕН... НО... ПУСТ...",
+                "НИК: Что он имел в виду?",
+                "ЮМИ: Кажется... он превратился в этот пепел.",
+                "(На месте Хранителя остаётся лишь горсть ледяной пыли)",
+                "НИК: (подходит ближе) В этой пыли что-то блестит...",
+                "ЮМИ: Смотри! Это маленький ледяной кристалл!",
+                "НИК: (берёт кристалл) Он холодный... но внутри что-то светится.",
+                "ЮМИ: Может быть, это ключ? Но не такой, как должен был быть...",
+                "НИК: Голос из льда говорил о понимании... Я победил силой, но не понял урока.",
+                "ЮМИ: Этот кристалл... он не такой яркий, как должен был быть.",
+                "НИК: (вздыхает) Я выбрал неправильный путь. Сила без мудрости пуста.",
+                "ЮМИ: Но мы прошли дальше! Смотри, за ним открывается проход!",
+                "НИК: Да... но это не настоящая победа. Я доказал только свою силу, не свою мудрость.",
+                "ЮМИ: Может быть, впереди ещё будет шанс всё исправить?",
+                "НИК: Надеюсь. Пойдём дальше, Юми. День 3 ещё не закончен."
+            ],
+
+            guardianFinal: {
+                combat: [
+                    "НИК: Я сделал свой выбор. Теперь придётся сражаться.",
+                    "ЮМИ: Будь осторожен! Помни уроки гномов даже в бою!",
+                    "ХРАНИТЕЛЬ: ТВОЙ... ВЫБОР... ВЕДЁТ... К БИТВЕ..."
+                ],
+                fail: [
+                    "НИК: (опускает голову) Я ошибся...",
+                    "ЮМИ: Не расстраивайся. Мы вернёмся и поговорим с гномами снова.",
+                    "ГОЛОС ИЗ ЛЬДА: Возвращайся... когда поймёшь...",
+                    "(лёд снова застывает, возвращаясь в неподвижное состояние)",
+                    "НИК: Прости... я подвёл нас.",
+                    "ЮМИ: Ничего. Мы учимся. Это и есть приключение!"
+                ],
+                success: [
+                    "НИК: (берёт кристалл) Он тёплый...",
+                    "ЮМИ: И светится изнутри! Как живой!",
+                    "ГОЛОС ИЗ ЛЬДА: Ты доказал... достоин... иди к Алтарю...",
+                    "(лёд начинает медленно таять, открывая проход дальше)",
+                    "НИК: Спасибо... Хранитель.",
+                    "ГОЛОС ИЗ ЛЬДА: Будь осторожен... Древний... может проснуться...",
+                    "ЮМИ: Пойдём! Вперёд, к Алтарю!"
+                ]
+            },
+
+            victoryByForce: [
+                "НИК: (тяжело дыша, опускает меч) Он побеждён...",
+                "ЮМИ: Ты победил, Ник! Но... чувствуешь?",
+                "ХРАНИТЕЛЬ: (рассыпаясь) ТЫ... ПОБЕДИЛ... СИЛОЙ... НО НЕ... МУДРОСТЬЮ...",
+                "НИК: Что он имеет в виду?",
+                "ЮМИ: Ты выбрал меч, а не урок гномов...",
+                "(Из останков Хранителя появляется тусклый кристалл)",
+                "НИК: Что это?",
+                "ЮМИ: Ключ... но не настоящий. Он холодный и почти не светится.",
+                "НИК: Значит... я прошёл испытание, но не так, как нужно?",
+                "ЮМИ: Ты доказал свою силу, но не мудрость. Мы можем идти дальше, но...",
+                "НИК: Но что-то не так. Я чувствую это."
+            ]
+        };
+
+        // СТАТЫ БОЯ
+        this.combatStats = {
+            player: {
+                health: 100,
+                maxHealth: 100,
+                minAttack: 15,
+                maxAttack: 22,
+                defense: 5,
+                dodgeChance: 0.3,
+                defenseMultiplier: 1
+            },
+            enemy: {
+                health: 150,
+                maxHealth: 150,
+                minAttack: 10,
+                maxAttack: 17,
+                defense: 3,
+                dodgeChance: 0.1
+            }
+        };
+
+        this.init();
+    }
+
+    init() {
+        this.elements = {
+            screens: {
+                title: document.getElementById('title-screen'),
+                entrance: document.getElementById('entrance-screen'),
+                descent: document.getElementById('descent-screen'),
+                dwarves: document.getElementById('dwarves-screen'),
+                puzzle: document.getElementById('puzzle-screen'),
+                doorOpen: document.getElementById('door-open-screen'),
+                depths: document.getElementById('depths-screen'),
+                guardian: document.getElementById('guardian-screen'),
+                swordTest: document.getElementById('sword-test-screen'),
+                combat: document.getElementById('combat-screen'),
+                completion: document.getElementById('completion-screen')
+            },
+            texts: {
+                entrance: document.getElementById('entrance-text'),
+                descent: document.getElementById('descent-text'),
+                dwarves: document.getElementById('dwarves-text'),
+                doorOpen: document.getElementById('door-open-text'),
+                depths: document.getElementById('depths-text'),
+                guardian: document.getElementById('guardian-text'),
+                swordTest: document.getElementById('sword-test-text'),
+                combat: document.getElementById('combat-text'),
+                completion: document.getElementById('completion-text')
+            },
+            buttons: {
+                startGame: document.getElementById('start-game'),
+                entranceNext: document.getElementById('entrance-next'),
+                descentNext: document.getElementById('descent-next'),
+                dwarvesNext: document.getElementById('dwarves-next'),
+                backToDwarves: document.getElementById('back-to-dwarves'),
+                checkSolution: document.getElementById('check-solution'),
+                resetPuzzle: document.getElementById('reset-puzzle'),
+                inspectDoorAlways: document.getElementById('inspect-door-always'),
+                continueAdventure: document.getElementById('continue-adventure'),
+                depthsNext: document.getElementById('depths-next'),
+                guardianNext: document.getElementById('guardian-next'),
+                swordTestNext: document.getElementById('sword-test-next'),
+                returnToMenu: document.getElementById('return-to-menu'),
+                continueToAltar: document.getElementById('continue-to-altar')
+            },
+            videos: {
+                entrance: document.getElementById('entrance-video'),
+                descent: document.getElementById('descent-video'),
+                dwarves: document.getElementById('dwarves-video'),
+                door: document.getElementById('door-video'),
+                gnomePickaxe: document.getElementById('gnome-pickaxe-video'),
+                gnomeBeard: document.getElementById('gnome-beard-video'),
+                gnomeStones: document.getElementById('gnome-stones-video'),
+                doorOpen: document.getElementById('door-open-video'),
+                depths: document.getElementById('depths-video'),
+                guardian: document.getElementById('guardian-video'),
+                swordTest: document.getElementById('sword-test-video'),
+                combat: document.getElementById('combat-video'),
+                completion: document.getElementById('completion-video')
+            },
+            audio: {
+                click: document.getElementById('click-sound'),
+                button: document.getElementById('button-sound'),
+                select: document.getElementById('select-sound'),
+                door: document.getElementById('door-sound'),
+                success: document.getElementById('success-sound'),
+                fail: document.getElementById('fail-sound'),
+                ice: document.getElementById('ice-sound'),
+                combat: document.getElementById('combat-sound'),
+                victory: document.getElementById('victory-sound'),
+                hover: document.getElementById('hover-sound'),
+                menuClick: document.getElementById('menu-click-sound'),
+                ambient: document.getElementById('ambient-music')
+            },
+            puzzle: {
+                quote: document.getElementById('puzzle-quote'),
+                container: document.getElementById('runes-container'),
+                message: document.getElementById('puzzle-message')
+            },
+            dwarvesElements: {
+                charactersChoice: document.getElementById('characters-choice'),
+                buttonContainer: document.getElementById('dwarves-button-container'),
+                doorContainer: document.getElementById('door-container')
+            },
+            swordTestElements: {
+                choiceContainer: document.getElementById('test-choice-container'),
+                message: document.getElementById('test-message'),
+                buttonContainer: document.getElementById('sword-test-button-container')
+            },
+            combatElements: {
+                playerHealth: document.getElementById('player-health'),
+                playerHealthBar: document.getElementById('player-health-bar'),
+                enemyHealth: document.getElementById('enemy-health'),
+                enemyHealthBar: document.getElementById('enemy-health-bar'),
+                actions: document.getElementById('combat-actions'),
+                message: document.getElementById('combat-message')
+            },
+            audioControls: {
+                slider: document.getElementById('volume-slider'),
+                value: document.getElementById('volume-value'),
+                toggle: document.getElementById('audio-toggle')
+            },
+            soundControls: {
+                toggle: document.getElementById('sound-toggle')
+            }
+        };
+
+        this.setupEventListeners();
+        this.setupAudioControls();
+        this.setupHoverSounds();
+        this.startGame();
+    }
+
+    setupEventListeners() {
+        this.elements.buttons.startGame.addEventListener('click', () => {
+            this.playSound('menuClick');
+            this.startAdventure();
+        });
+        
+        this.elements.buttons.entranceNext.addEventListener('click', () => {
+            this.playSound('click');
+            this.nextScene();
+        });
+        
+        this.elements.buttons.descentNext.addEventListener('click', () => {
+            this.playSound('click');
+            this.nextScene();
+        });
+        
+        this.elements.buttons.dwarvesNext.addEventListener('click', () => {
+            this.playSound('click');
+            this.nextDwarvesAction();
+        });
+        
+        this.elements.buttons.backToDwarves.addEventListener('click', () => {
+            this.playSound('click');
+            this.backToDwarves();
+        });
+        
+        this.elements.buttons.checkSolution.addEventListener('click', () => {
+            this.playSound('door');
+            this.checkPuzzleSolution();
+        });
+        
+        this.elements.buttons.resetPuzzle.addEventListener('click', () => {
+            this.playSound('click');
+            this.resetPuzzle();
+        });
+        
+        this.elements.buttons.inspectDoorAlways.addEventListener('click', () => {
+            this.playSound('door');
+            this.showPuzzle();
+        });
+        
+        this.elements.buttons.continueAdventure.addEventListener('click', () => {
+            this.playSound('button');
+            this.showDepthsPassage();
+        });
+        
+        this.elements.buttons.depthsNext.addEventListener('click', () => {
+            this.playSound('click');
+            this.nextDepthsAction();
+        });
+        
+        this.elements.buttons.guardianNext.addEventListener('click', () => {
+            this.playSound('click');
+            this.nextGuardianAction();
+        });
+        
+        this.elements.buttons.swordTestNext.addEventListener('click', () => {
+            this.playSound('click');
+            this.nextSwordTestAction();
+        });
+        
+        this.elements.buttons.returnToMenu.addEventListener('click', () => {
+            this.playSound('button');
+            this.returnToMainMenu();
+        });
+        
+        this.elements.buttons.continueToAltar.addEventListener('click', () => {
+            this.playSound('button');
+            this.continueToAltar();
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.character-option')) {
+                this.playSound('select');
+                const character = e.target.closest('.character-option').dataset.character;
+                this.startDwarfDialogue(character);
+            }
+            
+            if (e.target.closest('.test-option') && this.state.swordTestStage === 'choice') {
+                this.playSound('select');
+                const test = e.target.closest('.test-option').dataset.test;
+                this.selectTest(test);
+            }
+            
+            if (e.target.closest('.combat-button') && this.state.currentScene === 'combat') {
+                const action = e.target.closest('.combat-button').dataset.action;
+                this.combatAction(action);
+            }
+            
+            // Клик по тексту для ускорения печати
+            if (e.target.closest('.dialogue-text, .dwarves-dialogue')) {
+                if (this.state.isTyping) {
+                    this.skipTyping();
+                }
+            }
+        });
+
+        // Отключение автоматической прокрутки текста при диалоге с Хранителем
+        const guardianText = this.elements.texts.guardian;
+        if (guardianText) {
+            guardianText.addEventListener('wheel', (e) => {
+                e.stopPropagation();
+            });
+            guardianText.addEventListener('touchmove', (e) => {
+                e.stopPropagation();
+            });
+        }
+    }
+
+    setupHoverSounds() {
+        // Добавляем звуки при наведении на все кнопки
+        const buttons = [
+            this.elements.buttons.startGame,
+            this.elements.buttons.entranceNext,
+            this.elements.buttons.descentNext,
+            this.elements.buttons.dwarvesNext,
+            this.elements.buttons.backToDwarves,
+            this.elements.buttons.checkSolution,
+            this.elements.buttons.resetPuzzle,
+            this.elements.buttons.inspectDoorAlways,
+            this.elements.buttons.continueAdventure,
+            this.elements.buttons.depthsNext,
+            this.elements.buttons.guardianNext,
+            this.elements.buttons.swordTestNext,
+            this.elements.buttons.returnToMenu,
+            this.elements.buttons.continueToAltar,
+            this.elements.audioControls.toggle,
+            this.elements.soundControls.toggle
+        ];
+
+        buttons.forEach(button => {
+            if (button) {
+                button.addEventListener('mouseenter', () => {
+                    this.playSound('hover');
+                });
+            }
+        });
+
+        // Добавляем звуки при наведении на персонажей
+        const characterOptions = document.querySelectorAll('.character-option');
+        characterOptions.forEach(option => {
+            option.addEventListener('mouseenter', () => {
+                this.playSound('hover');
+            });
+        });
+
+        // Добавляем звуки при наведении на руны
+        const runeButtons = document.querySelectorAll('.rune-button');
+        runeButtons.forEach(button => {
+            button.addEventListener('mouseenter', () => {
+                this.playSound('hover');
+            });
+        });
+
+        // Добавляем звуки при наведении на выбор испытания
+        const testOptions = document.querySelectorAll('.test-option');
+        testOptions.forEach(option => {
+            option.addEventListener('mouseenter', () => {
+                this.playSound('hover');
+            });
+        });
+
+        // Добавляем звуки при наведении на кнопки боя
+        const combatButtons = document.querySelectorAll('.combat-button');
+        combatButtons.forEach(button => {
+            button.addEventListener('mouseenter', () => {
+                this.playSound('hover');
+            });
+        });
+    }
+
+    setupAudioControls() {
+        // Устанавливаем начальную громкость
+        this.elements.audio.ambient.volume = this.state.volume;
+        this.elements.audioControls.slider.value = this.state.volume * 100;
+        this.elements.audioControls.value.textContent = `${Math.round(this.state.volume * 100)}%`;
+
+        // Событие изменения громкости
+        this.elements.audioControls.slider.addEventListener('input', (e) => {
+            this.state.volume = e.target.value / 100;
+            this.elements.audio.ambient.volume = this.state.volume;
+            this.elements.audioControls.value.textContent = `${Math.round(this.state.volume * 100)}%`;
+            
+            // Обновляем громкость для всех звуковых эффектов
+            Object.values(this.elements.audio).forEach(audio => {
+                if (audio && audio !== this.elements.audio.ambient) {
+                    audio.volume = this.state.volume;
+                }
+            });
+        });
+
+        // Событие переключения музыки
+        this.elements.audioControls.toggle.addEventListener('click', () => {
+            this.toggleAmbientMusic();
+        });
+
+        // Событие переключения звуковых эффектов
+        this.elements.soundControls.toggle.addEventListener('click', () => {
+            this.toggleSoundEffects();
+        });
+
+        // Автоматический перезапуск музыки при окончании
+        this.elements.audio.ambient.addEventListener('ended', () => {
+            if (this.state.isAudioPlaying) {
+                this.elements.audio.ambient.currentTime = 0;
+                this.elements.audio.ambient.play().catch(e => {
+                    console.log("Ошибка автоповтора музыки:", e);
+                });
+            }
+        });
+
+        // Автозапуск музыки при начале игры
+        document.addEventListener('click', () => {
+            if (!this.state.isAudioPlaying) {
+                this.toggleAmbientMusic();
+            }
+        }, { once: true });
+    }
+
+    toggleAmbientMusic() {
+        if (this.state.isAudioPlaying) {
+            this.elements.audio.ambient.pause();
+            this.elements.audioControls.toggle.textContent = '🔊 ВКЛЮЧИТЬ';
+            this.state.isAudioPlaying = false;
+        } else {
+            this.elements.audio.ambient.volume = this.state.volume;
+            this.elements.audio.ambient.play().then(() => {
+                this.elements.audioControls.toggle.textContent = '🔇 ВЫКЛЮЧИТЬ';
+                this.state.isAudioPlaying = true;
+            }).catch(e => {
+                console.log("Ошибка воспроизведения музыки:", e);
+                this.elements.audioControls.toggle.textContent = '🔇 НАЖМИ ДЛЯ ВКЛЮЧЕНИЯ';
+                this.elements.audioControls.toggle.style.background = 'linear-gradient(to bottom, #7a2a2a, #5a1a1a)';
+                this.elements.audioControls.toggle.style.borderColor = '#ff5a5a';
+            });
+        }
+        this.playSound('click');
+    }
+
+    toggleSoundEffects() {
+        this.state.soundEnabled = !this.state.soundEnabled;
+        this.elements.soundControls.toggle.textContent = this.state.soundEnabled ? '🔊 ВКЛ' : '🔇 ВЫКЛ';
+        this.elements.soundControls.toggle.style.background = this.state.soundEnabled ? 
+            'linear-gradient(to bottom, #2a5a7a, #1a3a5a)' : 
+            'linear-gradient(to bottom, #7a2a2a, #5a1a1a)';
+        this.elements.soundControls.toggle.style.borderColor = this.state.soundEnabled ? 
+            '#4a9aff' : '#ff5a5a';
+        
+        if (this.state.soundEnabled) {
+            this.playSound('click');
+        }
+    }
+
+    playSound(soundType) {
+        if (!this.state.soundEnabled) return;
+        
+        try {
+            const audio = this.elements.audio[soundType];
+            if (audio) {
+                audio.volume = this.state.volume;
+                audio.currentTime = 0;
+                audio.play().catch(e => {
+                    console.log(`Аудио ${soundType} не может воспроизвестись:`, e);
+                });
+            }
+        } catch (e) {
+            console.log("Ошибка воспроизведения звука:", e);
+        }
+    }
+
+    startGame() {
+        this.state.currentScene = 'title';
+        this.showScene();
+    }
+
+    startAdventure() {
+        this.state.currentScene = 'entrance';
+        this.state.scenePart = 0;
+        this.showScene();
+        this.showSceneText();
+        
+        // Автоматически включаем музыку при начале игры, если она ещё не играет
+        if (!this.state.isAudioPlaying) {
+            setTimeout(() => {
+                this.toggleAmbientMusic();
+            }, 1000);
+        }
+    }
+
+    showScene() {
+        Object.values(this.elements.screens).forEach(screen => {
+            screen.classList.add('hidden');
+        });
+        this.elements.screens[this.state.currentScene].classList.remove('hidden');
+    }
+
+    showSceneText() {
+        const scene = this.scenes[this.state.currentScene];
+        const textElement = this.elements.texts[this.state.currentScene];
+        
+        if (!scene || !textElement) return;
+        
+        if (this.state.scenePart < scene.length) {
+            this.typeText(textElement, scene[this.state.scenePart]);
+        } else {
+            this.nextScene();
+        }
+    }
+
+    typeText(element, text) {
+        // Останавливаем предыдущую печать если была
+        if (this.state.isTyping && this.state.currentTypingTimeout) {
+            clearTimeout(this.state.currentTypingTimeout);
+        }
+        
+        element.innerHTML = '';
+        this.state.isTyping = true;
+        
+        const words = text.split(' ');
+        let index = 0;
+        
+        const typeNext = () => {
+            if (index < words.length && this.state.isTyping) {
+                if (words[index].endsWith(':')) {
+                    const speakerSpan = document.createElement('span');
+                    if (words[index].startsWith('НИК')) {
+                        speakerSpan.className = 'speaker-nick';
+                    } else if (words[index].startsWith('ЮМИ')) {
+                        speakerSpan.className = 'speaker-yumi';
+                    } else if (words[index].startsWith('ГНОМ')) {
+                        speakerSpan.className = 'speaker-dwarf';
+                    } else if (words[index].startsWith('ГОЛОС') || words[index].startsWith('ХРАНИТЕЛЬ')) {
+                        speakerSpan.className = 'speaker-guardian';
+                    }
+                    speakerSpan.textContent = words[index] + ' ';
+                    element.appendChild(speakerSpan);
+                } else {
+                    element.innerHTML += words[index] + ' ';
+                }
+                
+                index++;
+                
+                // Прокрутка вниз
+                element.scrollTop = element.scrollHeight;
+                
+                // Сохраняем timeout для возможности остановки
+                this.state.currentTypingTimeout = setTimeout(typeNext, 80);
+            } else {
+                this.state.isTyping = false;
+                this.state.currentTypingTimeout = null;
+            }
+        };
+        
+        typeNext();
+    }
+
+    skipTyping() {
+        if (this.state.isTyping && this.state.currentTypingTimeout) {
+            clearTimeout(this.state.currentTypingTimeout);
+            this.state.isTyping = false;
+            this.state.currentTypingTimeout = null;
+            
+            // Показываем весь текст сразу
+            const scene = this.scenes[this.state.currentScene];
+            const textElement = this.elements.texts[this.state.currentScene];
+            
+            if (scene && textElement && this.state.scenePart < scene.length) {
+                const text = scene[this.state.scenePart];
+                textElement.innerHTML = '';
+                
+                const words = text.split(' ');
+                let fullText = '';
+                
+                words.forEach(word => {
+                    if (word.endsWith(':')) {
+                        let className = '';
+                        if (word.startsWith('НИК')) {
+                            className = 'speaker-nick';
+                        } else if (word.startsWith('ЮМИ')) {
+                            className = 'speaker-yumi';
+                        } else if (word.startsWith('ГНОМ')) {
+                            className = 'speaker-dwarf';
+                        } else if (word.startsWith('ГОЛОС') || word.startsWith('ХРАНИТЕЛЬ')) {
+                            className = 'speaker-guardian';
+                        }
+                        
+                        fullText += `<span class="${className}">${word} </span>`;
+                    } else {
+                        fullText += word + ' ';
+                    }
+                });
+                
+                textElement.innerHTML = fullText;
+                textElement.scrollTop = textElement.scrollHeight;
+            }
+        }
+    }
+
+    nextScene() {
+        this.state.scenePart++;
+        
+        if (this.state.scenePart >= this.scenes[this.state.currentScene].length) {
+            if (this.state.currentScene === 'entrance') {
+                this.state.currentScene = 'descent';
+                this.state.scenePart = 0;
+                this.showScene();
+                this.showSceneText();
+            } else if (this.state.currentScene === 'descent') {
+                this.state.currentScene = 'dwarves';
+                this.state.scenePart = 0;
+                this.state.dwarvesIntroductionShown = 0;
+                this.showScene();
+                this.showDwarvesIntroduction();
+            }
+        } else {
+            this.showSceneText();
+        }
+    }
+
+    showDwarvesIntroduction() {
+        this.elements.videos.gnomePickaxe.classList.add('hidden');
+        this.elements.videos.gnomeBeard.classList.add('hidden');
+        this.elements.videos.gnomeStones.classList.add('hidden');
+        this.elements.videos.dwarves.classList.remove('hidden');
+        
+        if (this.elements.videos.dwarves.paused) {
+            this.elements.videos.dwarves.play().catch(e => {
+                console.log("Ошибка воспроизведения видео при вступлении:", e);
+            });
+        }
+        
+        this.elements.texts.dwarves.innerHTML = '';
+        this.elements.dwarvesElements.charactersChoice.classList.add('hidden');
+        this.elements.dwarvesElements.buttonContainer.classList.remove('hidden');
+        this.elements.dwarvesElements.doorContainer.classList.remove('visible');
+        
+        if (this.state.dwarvesIntroductionShown < this.scenes.dwarvesIntroduction.length) {
+            this.typeDwarvesText(this.elements.texts.dwarves, 
+                this.scenes.dwarvesIntroduction[this.state.dwarvesIntroductionShown]);
+        }
+    }
+
+    typeDwarvesText(element, text) {
+        // Останавливаем предыдущую печать если была
+        if (this.state.isTyping && this.state.currentTypingTimeout) {
+            clearTimeout(this.state.currentTypingTimeout);
+        }
+        
+        element.innerHTML = '';
+        this.state.isTyping = true;
+        
+        const line = document.createElement('div');
+        line.className = 'dwarves-line';
+        element.appendChild(line);
+        
+        const words = text.split(' ');
+        let index = 0;
+        
+        const typeNext = () => {
+            if (index < words.length && this.state.isTyping) {
+                if (words[index].endsWith(':')) {
+                    const speakerSpan = document.createElement('span');
+                    if (words[index].startsWith('НИК')) {
+                        speakerSpan.className = 'speaker-nick';
+                    } else if (words[index].startsWith('ЮМИ')) {
+                        speakerSpan.className = 'speaker-yumi';
+                    } else if (words[index].startsWith('ГНОМ')) {
+                        speakerSpan.className = 'speaker-dwarf';
+                    } else if (words[index].startsWith('ГОЛОС') || words[index].startsWith('ХРАНИТЕЛЬ')) {
+                        speakerSpan.className = 'speaker-guardian';
+                    }
+                    speakerSpan.textContent = words[index] + ' ';
+                    line.appendChild(speakerSpan);
+                } else {
+                    line.textContent += words[index] + ' ';
+                }
+                
+                index++;
+                
+                // Сохраняем timeout для возможности остановки
+                this.state.currentTypingTimeout = setTimeout(typeNext, 80);
+            } else {
+                this.state.isTyping = false;
+                this.state.currentTypingTimeout = null;
+            }
+        };
+        
+        typeNext();
+    }
+
+    nextDwarvesAction() {
+        // Если текст печатается, пропускаем его
+        if (this.state.isTyping) {
+            this.skipTyping();
+            return;
+        }
+        
+        if (this.state.isReturningFromPuzzle) {
+            this.continueReturnDialogue();
+        } else if (this.state.currentCharacter) {
+            this.continueDwarfDialogue();
+        } else {
+            if (this.state.dwarvesIntroductionShown < this.scenes.dwarvesIntroduction.length) {
+                this.state.dwarvesIntroductionShown++;
+                if (this.state.dwarvesIntroductionShown < this.scenes.dwarvesIntroduction.length) {
+                    this.showDwarvesIntroduction();
+                } else {
+                    this.showCharacterSelection();
+                }
+            } else {
+                this.showCharacterSelection();
+            }
+        }
+    }
+
+    showReturnToDwarves() {
+        this.elements.texts.dwarves.innerHTML = '';
+        this.elements.dwarvesElements.charactersChoice.classList.add('hidden');
+        this.elements.dwarvesElements.buttonContainer.classList.remove('hidden');
+        this.elements.dwarvesElements.doorContainer.classList.add('visible');
+        
+        this.state.isReturningFromPuzzle = true;
+        this.state.returnDialogueIndex = 0;
+        
+        this.continueReturnDialogue();
+    }
+
+    continueReturnDialogue() {
+        // Если текст печатается, пропускаем его
+        if (this.state.isTyping) {
+            this.skipTyping();
+            return;
+        }
+        
+        if (this.state.returnDialogueIndex < this.scenes.returnDialogue.length) {
+            this.typeDwarvesText(this.elements.texts.dwarves, 
+                this.scenes.returnDialogue[this.state.returnDialogueIndex]);
+            this.state.returnDialogueIndex++;
+        } else {
+            this.state.isReturningFromPuzzle = false;
+            this.state.returnDialogueIndex = 0;
+            this.showCharacterSelection();
+        }
+    }
+
+    showCharacterSelection() {
+        this.elements.videos.gnomePickaxe.classList.add('hidden');
+        this.elements.videos.gnomeBeard.classList.add('hidden');
+        this.elements.videos.gnomeStones.classList.add('hidden');
+        this.elements.videos.dwarves.classList.remove('hidden');
+        
+        this.elements.dwarvesElements.buttonContainer.classList.add('hidden');
+        this.elements.dwarvesElements.charactersChoice.classList.remove('hidden');
+        
+        if (this.state.hasTalkedToAnyGnome) {
+            this.elements.dwarvesElements.doorContainer.classList.add('visible');
+        } else {
+            this.elements.dwarvesElements.doorContainer.classList.remove('visible');
+        }
+        
+        this.elements.texts.dwarves.innerHTML = '';
+        const instruction = document.createElement('div');
+        instruction.className = 'dwarves-line';
+        instruction.style.color = this.state.puzzleAttempts > 0 ? '#ff8a8a' : '#ffd070';
+        instruction.style.marginBottom = '15px';
+        
+        if (this.state.puzzleAttempts > 0) {
+            instruction.textContent = 'Гномы выглядят раздражёнными... Кого будем уговаривать дать подсказку?';
+        } else {
+            if (this.state.hasTalkedToAnyGnome) {
+                instruction.textContent = 'Выберите, с кем хотите поговорить. Теперь вы можете попробовать открыть дверь.';
+            } else {
+                instruction.textContent = 'Выберите, с кем хотите поговорить:';
+            }
+        }
+        
+        this.elements.texts.dwarves.appendChild(instruction);
+        
+        if (this.state.puzzleAttempts > 0) {
+            const characterOptions = document.querySelectorAll('.character-option');
+            characterOptions.forEach(option => {
+                const character = option.dataset.character;
+                const desc = option.querySelector('.character-desc');
+                if (this.state.talkedTo[character] >= 2) {
+                    desc.textContent = 'Уговорить дать подсказку';
+                    desc.style.color = '#ffd070';
+                }
+            });
+        }
+    }
+
+    startDwarfDialogue(character) {
+        this.state.currentCharacter = character;
+        this.state.currentDialoguePart = 0;
+        this.elements.dwarvesElements.charactersChoice.classList.add('hidden');
+        this.elements.dwarvesElements.buttonContainer.classList.remove('hidden');
+        this.elements.dwarvesElements.doorContainer.classList.remove('visible');
+        
+        let dialogueType = 'first';
+        if (this.state.talkedTo[character] >= 2) {
+            dialogueType = 'hint';
+        } else if (this.state.talkedTo[character] >= 1) {
+            dialogueType = 'second';
+        }
+        
+        this.showGnomeVideo(character);
+        this.showDwarfDialogue(dialogueType);
+    }
+
+    showGnomeVideo(character) {
+        this.elements.videos.gnomePickaxe.classList.add('hidden');
+        this.elements.videos.gnomeBeard.classList.add('hidden');
+        this.elements.videos.gnomeStones.classList.add('hidden');
+        this.elements.videos.dwarves.classList.add('hidden');
+        
+        switch(character) {
+            case 'pickaxe':
+                this.elements.videos.gnomePickaxe.classList.remove('hidden');
+                if (this.elements.videos.gnomePickaxe.paused) {
+                    this.elements.videos.gnomePickaxe.play().catch(e => {
+                        console.log("Ошибка воспроизведения видео pickaxe:", e);
+                    });
+                }
+                break;
+            case 'fire':
+                this.elements.videos.gnomeBeard.classList.remove('hidden');
+                if (this.elements.videos.gnomeBeard.paused) {
+                    this.elements.videos.gnomeBeard.play().catch(e => {
+                        console.log("Ошибка воспроизведения видео beard:", e);
+                    });
+                }
+                break;
+            case 'stones':
+                this.elements.videos.gnomeStones.classList.remove('hidden');
+                if (this.elements.videos.gnomeStones.paused) {
+                    this.elements.videos.gnomeStones.play().catch(e => {
+                        console.log("Ошибка воспроизведения видео stones:", e);
+                    });
+                }
+                break;
+            case 'mouse':
+                this.elements.videos.dwarves.classList.remove('hidden');
+                if (this.elements.videos.dwarves.paused) {
+                    this.elements.videos.dwarves.play().catch(e => {
+                        console.log("Ошибка воспроизведения общего видео:", e);
+                    });
+                }
+                break;
+        }
+    }
+
+    showDwarfDialogue(dialogueType = 'first') {
+        const dialogue = this.scenes.dwarvesDialogues[this.state.currentCharacter][dialogueType];
+        
+        if (this.state.currentDialoguePart < dialogue.length) {
+            this.typeDwarvesText(this.elements.texts.dwarves, 
+                dialogue[this.state.currentDialoguePart]);
+        }
+    }
+
+    continueDwarfDialogue() {
+        // Если текст печатается, пропускаем его
+        if (this.state.isTyping) {
+            this.skipTyping();
+            return;
+        }
+        
+        let dialogueType = 'first';
+        if (this.state.talkedTo[this.state.currentCharacter] >= 2) {
+            dialogueType = 'hint';
+        } else if (this.state.talkedTo[this.state.currentCharacter] >= 1) {
+            dialogueType = 'second';
+        }
+        
+        const dialogue = this.scenes.dwarvesDialogues[this.state.currentCharacter][dialogueType];
+        
+        this.state.currentDialoguePart++;
+        
+        if (this.state.currentDialoguePart < dialogue.length) {
+            this.showDwarfDialogue(dialogueType);
+        } else {
+            this.finishDwarfDialogue(dialogueType);
+        }
+    }
+
+    finishDwarfDialogue(dialogueType) {
+        this.state.talkedTo[this.state.currentCharacter]++;
+        
+        if (!this.state.hasTalkedToAnyGnome) {
+            this.state.hasTalkedToAnyGnome = true;
+        }
+        
+        this.state.currentCharacter = null;
+        this.state.currentDialoguePart = 0;
+        
+        this.elements.videos.gnomePickaxe.pause();
+        this.elements.videos.gnomeBeard.pause();
+        this.elements.videos.gnomeStones.pause();
+        
+        this.elements.videos.gnomePickaxe.classList.add('hidden');
+        this.elements.videos.gnomeBeard.classList.add('hidden');
+        this.elements.videos.gnomeStones.classList.add('hidden');
+        this.elements.videos.dwarves.classList.remove('hidden');
+        
+        this.elements.videos.dwarves.currentTime = 0;
+        this.elements.videos.dwarves.play().catch(e => {
+            console.log("Ошибка воспроизведения видео после диалога:", e);
+        });
+        
+        if (dialogueType === 'hint') {
+            this.state.hintsUnlocked = true;
+        }
+        
+        this.showCharacterSelection();
+    }
+
+    showPuzzle() {
+        this.elements.screens.dwarves.classList.add('hidden');
+        this.elements.screens.puzzle.classList.remove('hidden');
+        
+        this.createRunes();
+        this.updatePuzzleMessage('Нажмите на руны в правильной последовательности', 'info');
+        
+        if (this.elements.videos.door.paused) {
+            this.elements.videos.door.play().catch(e => {
+                console.log("Ошибка воспроизведения видео двери:", e);
+            });
+        }
+    }
+
+    createRunes() {
+        this.elements.puzzle.container.innerHTML = '';
+        this.runeButtons = [];
+        this.currentSequence = [];
+        
+        const runes = ['ᚲ', 'ᛟ', 'ᛏ', 'ᚱ', 'ᚦ'];
+        const shuffledRunes = [...runes].sort(() => Math.random() - 0.5);
+        
+        shuffledRunes.forEach((rune, index) => {
+            const runeButton = document.createElement('button');
+            runeButton.className = 'rune-button';
+            runeButton.textContent = rune;
+            runeButton.dataset.rune = rune;
+            runeButton.dataset.index = index;
+            
+            runeButton.addEventListener('click', () => {
+                this.selectRune(runeButton);
+            });
+            
+            this.elements.puzzle.container.appendChild(runeButton);
+            this.runeButtons.push(runeButton);
+        });
+    }
+
+    selectRune(runeButton) {
+        this.playSound('select');
+        
+        if (runeButton.classList.contains('selected')) {
+            return;
+        }
+        
+        this.currentSequence.push(runeButton.dataset.rune);
+        runeButton.classList.add('selected');
+        
+        this.checkCurrentSequence();
+    }
+
+    checkCurrentSequence() {
+        for (let i = 0; i < this.currentSequence.length; i++) {
+            if (this.currentSequence[i] !== this.correctSequence[i]) {
+                this.updatePuzzleMessage('Порядок нарушен. Попробуйте снова.', 'fail');
+                this.highlightIncorrectRune();
+                return;
+            }
+        }
+        
+        if (this.currentSequence.length === this.correctSequence.length) {
+            this.checkPuzzleSolution();
+        } else {
+            const messages = this.scenes.puzzleMessages.partial;
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            this.updatePuzzleMessage(randomMessage, 'info');
+        }
+    }
+
+    highlightIncorrectRune() {
+        const lastRune = this.currentSequence[this.currentSequence.length - 1];
+        const runeButton = this.runeButtons.find(btn => btn.dataset.rune === lastRune);
+        
+        if (runeButton) {
+            runeButton.classList.remove('selected');
+            runeButton.classList.add('incorrect');
+            
+            setTimeout(() => {
+                runeButton.classList.remove('incorrect');
+                this.currentSequence.pop();
+            }, 1000);
+        }
+    }
+
+    checkPuzzleSolution() {
+        this.state.puzzleAttempts++;
+        
+        const isCorrect = JSON.stringify(this.currentSequence) === JSON.stringify(this.correctSequence);
+        
+        if (isCorrect) {
+            this.playSound('success');
+            const messages = this.scenes.puzzleMessages.success;
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            this.updatePuzzleMessage(randomMessage, 'success');
+            
+            this.runeButtons.forEach(btn => {
+                if (this.correctSequence.includes(btn.dataset.rune)) {
+                    btn.classList.add('correct');
+                }
+            });
+            
+            this.runeButtons.forEach(btn => {
+                btn.disabled = true;
+            });
+            
+            setTimeout(() => {
+                this.showDoorOpenScreen();
+            }, 2000);
+            
+        } else {
+            this.playSound('fail');
+            const messages = this.scenes.puzzleMessages.fail;
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            this.updatePuzzleMessage(randomMessage, 'fail');
+            
+            this.runeButtons.forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            this.currentSequence = [];
+        }
+    }
+
+    updatePuzzleMessage(text, type) {
+        const messageElement = this.elements.puzzle.message;
+        messageElement.textContent = text;
+        messageElement.className = 'puzzle-message';
+        
+        switch(type) {
+            case 'success':
+                messageElement.classList.add('message-success');
+                break;
+            case 'fail':
+                messageElement.classList.add('message-fail');
+                break;
+            default:
+                messageElement.classList.add('message-info');
+        }
+    }
+
+    resetPuzzle() {
+        this.playSound('click');
+        this.currentSequence = [];
+        
+        this.runeButtons.forEach(btn => {
+            btn.classList.remove('selected', 'correct', 'incorrect');
+            btn.disabled = false;
+        });
+        
+        this.updatePuzzleMessage('Последовательность сброшена. Попробуйте снова.', 'info');
+    }
+
+    backToDwarves() {
+        this.playSound('click');
+        this.elements.screens.puzzle.classList.add('hidden');
+        this.elements.screens.dwarves.classList.remove('hidden');
+        
+        if (this.state.puzzleAttempts > 0) {
+            this.showReturnToDwarves();
+        } else {
+            this.showCharacterSelection();
+        }
+    }
+
+    showDoorOpenScreen() {
+        this.elements.screens.puzzle.classList.add('hidden');
+        this.elements.screens.doorOpen.classList.remove('hidden');
+        
+        if (this.elements.videos.doorOpen.paused) {
+            this.elements.videos.doorOpen.play().catch(e => {
+                console.log("Ошибка воспроизведения видео открытой двери:", e);
+            });
+        }
+    }
+
+    showDepthsPassage() {
+        this.elements.screens.doorOpen.classList.add('hidden');
+        this.elements.screens.depths.classList.remove('hidden');
+        
+        this.state.currentScene = 'depths';
+        this.state.depthsScenePart = 0;
+        
+        if (this.elements.videos.depths.paused) {
+            this.elements.videos.depths.play().catch(e => {
+                console.log("Ошибка воспроизведения видео depths:", e);
+            });
+        }
+        
+        this.showDepthsText();
+    }
+
+    showDepthsText() {
+        const scene = this.scenes.depthsPassage;
+        const textElement = this.elements.texts.depths;
+        
+        if (this.state.depthsScenePart < scene.length) {
+            this.typeDwarvesText(textElement, scene[this.state.depthsScenePart]);
+        }
+    }
+
+    nextDepthsAction() {
+        // Если текст печатается, пропускаем его
+        if (this.state.isTyping) {
+            this.skipTyping();
+            return;
+        }
+        
+        this.state.depthsScenePart++;
+        
+        if (this.state.depthsScenePart < this.scenes.depthsPassage.length) {
+            this.showDepthsText();
+        } else {
+            this.showGuardianEncounter();
+        }
+    }
+
+    showGuardianEncounter() {
+        this.elements.screens.depths.classList.add('hidden');
+        this.elements.screens.guardian.classList.remove('hidden');
+        
+        this.state.currentScene = 'guardian';
+        this.state.guardianScenePart = 0;
+        
+        if (this.elements.videos.guardian.paused) {
+            this.elements.videos.guardian.play().catch(e => {
+                console.log("Ошибка воспроизведения видео хранителя:", e);
+            });
+        }
+        
+        this.showGuardianText();
+    }
+
+    showGuardianText() {
+        const scene = this.scenes.guardianEncounter;
+        const textElement = this.elements.texts.guardian;
+        
+        if (this.state.guardianScenePart < scene.length) {
+            this.typeText(textElement, scene[this.state.guardianScenePart]);
+        }
+    }
+
+    nextGuardianAction() {
+        // Если текст печатается, пропускаем его
+        if (this.state.isTyping) {
+            this.skipTyping();
+            return;
+        }
+        
+        this.state.guardianScenePart++;
+        
+        if (this.state.guardianScenePart < this.scenes.guardianEncounter.length) {
+            this.showGuardianText();
+        } else {
+            this.showSwordTest();
+        }
+    }
+
+    showSwordTest() {
+        this.elements.screens.guardian.classList.add('hidden');
+        this.elements.screens.swordTest.classList.remove('hidden');
+        
+        this.state.currentScene = 'swordTest';
+        this.state.swordTestStage = 'intro';
+        this.state.swordTestPart = 0;
+        
+        if (this.elements.videos.swordTest.paused) {
+            this.elements.videos.swordTest.play().catch(e => {
+                console.log("Ошибка воспроизведения видео испытания:", e);
+            });
+        }
+        
+        this.showSwordTestIntro();
+    }
+
+    showSwordTestIntro() {
+        const scene = this.scenes.swordTestIntro;
+        const textElement = this.elements.texts.swordTest;
+        
+        if (this.state.swordTestStage === 'intro') {
+            textElement.innerHTML = '';
+            
+            // Показываем первую строку и ждём нажатия кнопки
+            this.typeText(textElement, scene[0]);
+            this.state.swordTestPart = 0;
+        }
+    }
+
+    nextSwordTestAction() {
+        // Если текст печатается, пропускаем его
+        if (this.state.isTyping) {
+            this.skipTyping();
+            return;
+        }
+        
+        if (this.state.swordTestStage === 'intro') {
+            const scene = this.scenes.swordTestIntro;
+            this.state.swordTestPart++;
+            
+            if (this.state.swordTestPart < scene.length) {
+                const textElement = this.elements.texts.swordTest;
+                this.typeText(textElement, scene[this.state.swordTestPart]);
+            } else {
+                this.state.swordTestStage = 'choice';
+                this.showTestChoice();
+            }
+        } else if (this.state.swordTestStage === 'choice') {
+            if (!this.state.selectedTest) {
+                this.elements.swordTestElements.message.textContent = 'Сначала сделайте выбор!';
+                return;
+            }
+            
+            if (this.state.selectedTest === 'sword') {
+                this.startCombat();
+            } else {
+                this.state.swordTestStage = 'result';
+                this.state.testResultPart = 0;
+                this.showTestResult();
+            }
+        } else if (this.state.swordTestStage === 'result') {
+            const result = this.state.selectedTest === 'sword' 
+                ? this.scenes.swordTestResults.sword 
+                : this.scenes.swordTestResults.refuse;
+            
+            this.state.testResultPart++;
+            
+            if (this.state.testResultPart < result.length) {
+                const textElement = this.elements.texts.swordTest;
+                this.typeText(textElement, result[this.state.testResultPart]);
+            } else {
+                this.state.wiseVictory = (this.state.selectedTest === 'refuse');
+                this.showCompletionScreen();
+            }
+        } else if (this.state.swordTestStage === 'victory') {
+            // Обработка сцены после победы в бою
+            this.state.victoryPart++;
+            
+            if (this.state.victoryPart < this.scenes.victoryAfterCombat.length) {
+                const textElement = this.elements.texts.swordTest;
+                this.typeText(textElement, this.scenes.victoryAfterCombat[this.state.victoryPart]);
+            } else {
+                this.state.wiseVictory = false;
+                this.showCompletionScreen();
+            }
+        } else if (this.state.swordTestStage === 'final') {
+            const finalScene = this.state.selectedTest === 'sword' 
+                ? this.scenes.guardianFinal.fail 
+                : this.scenes.guardianFinal.success;
+            
+            this.state.finalScenePart++;
+            
+            if (this.state.finalScenePart < finalScene.length) {
+                const textElement = this.elements.texts.swordTest;
+                this.typeText(textElement, finalScene[this.state.finalScenePart]);
+            } else {
+                this.state.wiseVictory = (this.state.selectedTest === 'refuse');
+                this.showCompletionScreen();
+            }
+        }
+    }
+
+    showTestChoice() {
+        this.elements.swordTestElements.choiceContainer.classList.remove('hidden');
+        this.elements.swordTestElements.message.textContent = 'Что выберет НИК? Вспомните уроки гномов...';
+        this.elements.buttons.swordTestNext.textContent = 'ПОДТВЕРДИТЬ ВЫБОР';
+    }
+
+    selectTest(test) {
+        this.state.selectedTest = test;
+        
+        document.querySelectorAll('.test-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        const selectedOption = document.querySelector(`.test-option[data-test="${test}"]`);
+        if (selectedOption) {
+            selectedOption.classList.add('selected');
+        }
+        
+        if (test === 'refuse') {
+            this.elements.swordTestElements.message.textContent = 'Правильный выбор! Помните урок гнома с киркой: "Оружие должно быть последним..."';
+            this.elements.swordTestElements.message.className = 'test-message correct';
+        } else {
+            this.elements.swordTestElements.message.textContent = 'Опасный выбор! Гном с киркой предупреждал об этом...';
+            this.elements.swordTestElements.message.className = 'test-message incorrect';
+        }
+    }
+
+    startCombat() {
+        this.elements.screens.swordTest.classList.add('hidden');
+        this.elements.screens.combat.classList.remove('hidden');
+        
+        this.state.currentScene = 'combat';
+        this.state.combatState = 'player-turn';
+        this.state.combatTurn = 0;
+        
+        // Устанавливаем начальные значения здоровья
+        this.combatStats.player.health = 100;
+        this.combatStats.enemy.health = 150;
+        
+        this.combatStats.player.defenseMultiplier = 1;
+        
+        // Обновляем UI
+        this.updateCombatUI();
+        
+        // Обновляем текст в интерфейсе
+        this.elements.combatElements.enemyHealth.textContent = '150';
+        this.elements.combatElements.enemyHealthBar.style.width = '100%';
+        
+        if (this.elements.videos.combat.paused) {
+            this.elements.videos.combat.play().catch(e => {
+                console.log("Ошибка воспроизведения видео боя:", e);
+            });
+        }
+        
+        this.showCombatIntro();
+    }
+
+    showCombatIntro() {
+        const textElement = this.elements.texts.combat;
+        textElement.innerHTML = '';
+        
+        // Показываем первую строку интро
+        this.typeText(textElement, this.scenes.combat.intro[0]);
+        this.state.combatIntroPart = 0;
+    }
+
+    startPlayerTurn() {
+        this.state.combatState = 'player-turn';
+        this.state.combatTurn++;
+        
+        // Включаем кнопки для игрока
+        document.querySelectorAll('.combat-button').forEach(btn => {
+            btn.disabled = false;
+        });
+        
+        // Показываем сообщение о ходе игрока
+        const messages = this.scenes.combat.playerTurn;
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        this.elements.combatElements.message.textContent = randomMessage;
+        this.elements.combatElements.message.className = 'combat-message player-turn';
+        
+        this.updateCombatUI();
+    }
+
+    updateCombatUI() {
+        const playerHealthPercent = (this.combatStats.player.health / this.combatStats.player.maxHealth) * 100;
+        const enemyHealthPercent = (this.combatStats.enemy.health / this.combatStats.enemy.maxHealth) * 100;
+        
+        // Обновляем текст с количеством HP
+        this.elements.combatElements.playerHealth.textContent = this.combatStats.player.health;
+        this.elements.combatElements.playerHealthBar.style.width = playerHealthPercent + '%';
+        
+        this.elements.combatElements.enemyHealth.textContent = this.combatStats.enemy.health;
+        this.elements.combatElements.enemyHealthBar.style.width = enemyHealthPercent + '%';
+        
+        // Изменяем цвет полосы здоровья в зависимости от процентов
+        if (playerHealthPercent < 30) {
+            this.elements.combatElements.playerHealthBar.style.background = 'linear-gradient(to right, #ff0000, #ff5a5a)';
+        } else if (playerHealthPercent < 60) {
+            this.elements.combatElements.playerHealthBar.style.background = 'linear-gradient(to right, #ff8a00, #ffb870)';
+        } else {
+            this.elements.combatElements.playerHealthBar.style.background = 'linear-gradient(to right, #ff5a5a, #ff8a8a)';
+        }
+        
+        if (enemyHealthPercent < 30) {
+            this.elements.combatElements.enemyHealthBar.style.background = 'linear-gradient(to right, #00aaff, #80ffff)';
+        } else if (enemyHealthPercent < 60) {
+            this.elements.combatElements.enemyHealthBar.style.background = 'linear-gradient(to right, #0088ff, #4a9aff)';
+        } else {
+            this.elements.combatElements.enemyHealthBar.style.background = 'linear-gradient(to right, #0066ff, #4a7aff)';
+        }
+    }
+
+    combatAction(action) {
+        if (this.state.combatState !== 'player-turn') return;
+        
+        this.playSound('combat');
+        this.state.lastAction = action;
+        
+        // Отключаем кнопки во время обработки хода
+        document.querySelectorAll('.combat-button').forEach(btn => {
+            btn.disabled = true;
+        });
+        
+        this.state.combatState = 'result';
+        
+        let playerResult = '';
+        let playerDamage = 0;
+        
+        // Обработка действия игрока с увеличенным уроном для баланса с 150 HP врага
+        switch(action) {
+            case 'attack':
+                playerResult = this.scenes.combat.playerAttacks[
+                    Math.floor(Math.random() * this.scenes.combat.playerAttacks.length)
+                ];
+                // Урон от 20 до 30 (увеличено для баланса с 150 HP врага)
+                playerDamage = Math.floor(Math.random() * 
+                    (this.combatStats.player.maxAttack - this.combatStats.player.minAttack + 1)) + 
+                    this.combatStats.player.minAttack;
+                    
+                // Учитываем защиту врага, но гарантируем минимум 15 урона
+                playerDamage = Math.max(15, playerDamage - this.combatStats.enemy.defense);
+                
+                this.combatStats.enemy.health -= playerDamage;
+                this.state.lastDamage = playerDamage;
+                playerResult += ` Нанесено ${playerDamage} урона!`;
+                break;
+                
+            case 'defend':
+                playerResult = this.scenes.combat.playerDefends[
+                    Math.floor(Math.random() * this.scenes.combat.playerDefends.length)
+                ];
+                this.combatStats.player.defenseMultiplier = 2;
+                playerResult += " Защита увеличена вдвое!";
+                break;
+                
+            case 'dodge':
+                playerResult = this.scenes.combat.playerDodges[
+                    Math.floor(Math.random() * this.scenes.combat.playerDodges.length)
+                ];
+                if (Math.random() < this.combatStats.player.dodgeChance) {
+                    playerResult += ' Уклонение успешно!';
+                } else {
+                    playerResult += ' Не удалось уклониться!';
+                }
+                break;
+        }
+        
+        // Показываем результат действия игрока
+        const textElement = this.elements.texts.combat;
+        textElement.innerHTML = '';
+        this.typeText(textElement, playerResult, false);
+        
+        this.updateCombatUI();
+        
+        // Проверяем, не побежден ли враг
+        if (this.combatStats.enemy.health <= 0) {
+            setTimeout(() => {
+                this.showVictoryScreen();
+            }, 2000);
+            return;
+        }
+        
+        // Переход к ходу врага
+        setTimeout(() => {
+            this.startEnemyTurn();
+        }, 2000);
+    }
+
+    startEnemyTurn() {
+        this.state.combatState = 'enemy-turn';
+        
+        // Показываем сообщение о ходе врага
+        const messages = this.scenes.combat.enemyTurn;
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        this.elements.combatElements.message.textContent = randomMessage;
+        this.elements.combatElements.message.className = 'combat-message enemy-turn';
+        
+        setTimeout(() => {
+            this.enemyAttack();
+        }, 1500);
+    }
+
+    enemyAttack() {
+        this.state.combatState = 'enemy-attack';
+        
+        let enemyResult = this.scenes.combat.enemyAttacks[
+            Math.floor(Math.random() * this.scenes.combat.enemyAttacks.length)
+        ];
+        
+        // Урон от 10 до 20
+        let enemyDamage = Math.floor(Math.random() * 
+            (this.combatStats.enemy.maxAttack - this.combatStats.enemy.minAttack + 1)) + 
+            this.combatStats.enemy.minAttack;
+        
+        // Учитываем защиту игрока
+        enemyDamage = Math.max(1, enemyDamage - 
+            (this.combatStats.player.defense * this.combatStats.player.defenseMultiplier));
+        
+        // Если игрок защищался в предыдущем ходу
+        if (this.state.lastAction === 'defend') {
+            enemyDamage = Math.floor(enemyDamage * 0.5);
+        }
+        
+        // Если игрок уклонился
+        if (this.state.lastAction === 'dodge' && Math.random() < this.combatStats.player.dodgeChance) {
+            enemyDamage = 0;
+            enemyResult += ' НИК успешно уклонился!';
+        } else if (this.state.lastAction === 'dodge') {
+            enemyResult += ' НИК не смог уклониться!';
+        }
+        
+        this.combatStats.player.health -= enemyDamage;
+        
+        // Сбрасываем множитель защиты
+        this.combatStats.player.defenseMultiplier = 1;
+        
+        // Показываем результат атаки врага
+        const textElement = this.elements.texts.combat;
+        textElement.innerHTML = '';
+        this.typeText(textElement, `${enemyResult} Получено ${enemyDamage} урона!`, false);
+        
+        this.updateCombatUI();
+        
+        // Проверяем, не побежден ли игрок
+        if (this.combatStats.player.health <= 0) {
+            setTimeout(() => {
+                this.endCombat(false);
+            }, 2000);
+            return;
+        }
+        
+        // Возвращаемся к ходу игрока
+        setTimeout(() => {
+            this.startPlayerTurn();
+        }, 2000);
+    }
+
+    // ОКНО ПОБЕДЫ
+    showVictoryScreen() {
+        this.playSound('victory');
+        
+        // Создаем overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'victory-overlay';
+        
+        // Создаем окно победы
+        const victoryWindow = document.createElement('div');
+        victoryWindow.className = 'victory-window';
+        
+        // Заголовок
+        const titleEl = document.createElement('h2');
+        titleEl.className = 'victory-title';
+        titleEl.textContent = '🎉 ПОБЕДА НАД СТРАЖНИКОМ!';
+        
+        // Контейнер для видео
+        const videoContainer = document.createElement('div');
+        videoContainer.className = 'victory-video-container';
+        
+        // Видео победы
+        const video = document.createElement('video');
+        video.className = 'victory-video';
+        video.autoplay = true;
+        video.muted = true;
+        video.loop = false;
+        video.playsInline = true;
+        
+        // Загружаем видео
+        const source = document.createElement('source');
+        source.src = 'video/Strajnik pobeda v bou.mp4';
+        source.type = 'video/mp4';
+        video.appendChild(source);
+        video.innerHTML += 'Ваш браузер не поддерживает видео.';
+        
+        // Оверлей для видео
+        const videoOverlay = document.createElement('div');
+        videoOverlay.className = 'victory-video-overlay';
+        
+        videoContainer.appendChild(video);
+        videoContainer.appendChild(videoOverlay);
+        
+        // Сообщение
+        const messageEl = document.createElement('div');
+        messageEl.className = 'victory-message';
+        messageEl.textContent = 'Ник победил Ледяного Хранителя! Но это была победа силой, а не мудростью...';
+        
+        // Кнопка продолжения
+        const continueButton = document.createElement('button');
+        continueButton.className = 'victory-button';
+        continueButton.textContent = 'ПРОДОЛЖИТЬ ПУТЕШЕСТВИЕ';
+        
+        continueButton.onmouseover = () => {
+            continueButton.style.transform = 'translate(2px, 2px)';
+            continueButton.style.boxShadow = '2px 2px 0 #2a5a7a, inset 2px 2px 0 rgba(140, 220, 255, 0.3)';
+            continueButton.style.background = 'linear-gradient(to bottom, #5aaaff, #3a6a8a)';
+        };
+        
+        continueButton.onmouseout = () => {
+            continueButton.style.transform = 'none';
+            continueButton.style.boxShadow = '4px 4px 0 #2a5a7a, inset 2px 2px 0 rgba(140, 220, 255, 0.3)';
+            continueButton.style.background = 'linear-gradient(to bottom, #4a9aff, #2a5a7a)';
+        };
+        
+        continueButton.onclick = () => {
+            this.playSound('button');
+            document.body.removeChild(overlay);
+            
+            // Переходим к следующей сцене
+            this.elements.screens.combat.classList.add('hidden');
+            this.elements.screens.swordTest.classList.remove('hidden');
+            
+            // Устанавливаем состояние для сцены после победы
+            this.state.swordTestStage = 'victory';
+            this.state.victoryPart = 0;
+            
+            // Показываем первую строку истории после победы
+            const swordTestText = this.elements.texts.swordTest;
+            swordTestText.innerHTML = '';
+            
+            this.typeText(swordTestText, this.scenes.victoryAfterCombat[0]);
+            this.elements.buttons.swordTestNext.textContent = 'ДАЛЕЕ';
+        };
+        
+        // Собираем окно
+        victoryWindow.appendChild(titleEl);
+        victoryWindow.appendChild(videoContainer);
+        victoryWindow.appendChild(messageEl);
+        victoryWindow.appendChild(continueButton);
+        overlay.appendChild(victoryWindow);
+        document.body.appendChild(overlay);
+        
+        // Автоматическое воспроизведение видео
+        setTimeout(() => {
+            video.play().catch(e => {
+                console.log("Ошибка воспроизведения видео победы:", e);
+                // Если видео не загрузилось, показываем альтернативный текст
+                messageEl.textContent = 'Ник победил Ледяного Хранителя! Хранитель рассыпается в ледяную пыль... Но это была победа силой, а не мудростью...';
+            });
+        }, 500);
+    }
+
+    endCombat(victory) {
+        if (!victory) {
+            // Поражение
+            this.state.combatDefeated = true;
+            const textElement = this.elements.texts.combat;
+            textElement.innerHTML = '';
+            
+            this.scenes.combat.defeat.forEach((line, index) => {
+                setTimeout(() => {
+                    this.typeText(textElement, line, false);
+                }, index * 2000);
+            });
+            
+            setTimeout(() => {
+                this.completeDay3(false);
+            }, this.scenes.combat.defeat.length * 2000 + 1000);
+        }
+        // Победа обрабатывается в showVictoryScreen()
+    }
+
+    showTestResult() {
+        this.elements.screens.combat.classList.add('hidden');
+        this.elements.screens.swordTest.classList.remove('hidden');
+        
+        const result = this.state.selectedTest === 'sword' 
+            ? this.scenes.swordTestResults.sword 
+            : this.scenes.swordTestResults.refuse;
+        
+        const textElement = this.elements.texts.swordTest;
+        
+        textElement.innerHTML = '';
+        this.elements.swordTestElements.choiceContainer.classList.add('hidden');
+        this.elements.swordTestElements.message.classList.add('hidden');
+        
+        this.typeText(textElement, result[0]);
+        
+        this.elements.buttons.swordTestNext.textContent = 'ДАЛЕЕ';
+        
+        if (this.state.selectedTest === 'sword') {
+            this.playSound('fail');
+        } else {
+            this.playSound('success');
+        }
+    }
+
+    // ПОКАЗ ЭКРАНА ЗАВЕРШЕНИЯ
+    showCompletionScreen() {
+        this.playSound('victory');
+        
+        this.elements.screens.swordTest.classList.add('hidden');
+        this.elements.screens.combat.classList.add('hidden');
+        this.elements.screens.completion.classList.remove('hidden');
+        
+        this.state.currentScene = 'completion';
+        
+        // Настраиваем текст в зависимости от типа победы
+        const textElement = this.elements.texts.completion;
+        if (textElement) {
+            if (this.state.wiseVictory) {
+                // Победа через мудрость (отказ от меча)
+                textElement.innerHTML = `
+                    <div class="text-line" style="color: #4affff; text-align: center; margin-bottom: 15px; font-size: 16px;">
+                        🎉 ДЕНЬ 3 УСПЕШНО ЗАВЕРШЁН!
+                    </div>
+                    <div class="text-line">
+                        <span class="speaker-nick">НИК:</span> Мы прошли испытание! Мы поняли мудрость древних стражей...
+                    </div>
+                    <div class="text-line">
+                        <span class="speaker-yumi">ЮМИ:</span> И доказали, что сила — не главное! Мудрость важнее оружия!
+                    </div>
+                    <div class="text-line" style="margin-top: 20px; color: #80ffff;">
+                        <strong>НАГРАДА:</strong> Вы получили <span style="color: #ffd070;">СЕРДЦЕ ГЛУБОКОЙ ШАХТЫ</span> — древний артефакт, излучающий тёплый свет.
+                    </div>
+                    <div class="text-line" style="margin-top: 15px; color: #a0ffff;">
+                        <strong>СЛЕДУЮЩАЯ ЦЕЛЬ:</strong> Карта указывает путь к <span style="color: #4affff;">АЛТАРЮ ВЕЧНОЙ МЕРЗЛОТЫ</span>, где спит Древний.
+                    </div>
+                    <div class="text-line" style="margin-top: 10px; font-size: 11px; color: #c0ffff; text-align: center;">
+                        [Местоположение: Глубина -2,500м | Координаты: 67°24' с.ш., 26°44' в.д.]
+                    </div>
+                `;
+            } else {
+                // Победа силой (через бой)
+                textElement.innerHTML = `
+                    <div class="text-line" style="color: #ffd070; text-align: center; margin-bottom: 15px; font-size: 16px;">
+                        ⚔️ ДЕНЬ 3 ЗАВЕРШЁН
+                    </div>
+                    <div class="text-line">
+                        <span class="speaker-nick">НИК:</span> Мы прошли... но ценой силы, а не мудрости.
+                    </div>
+                    <div class="text-line">
+                        <span class="speaker-yumi">ЮМИ:</span> Ты победил Хранителя, но не понял его урок...
+                    </div>
+                    <div class="text-line" style="margin-top: 20px; color: #80ffff;">
+                        <strong>НАГРАДА:</strong> Вы получили <span style="color: #a0a0ff;">ЛЕДЯНОЙ ОСКОЛОК</span> — тусклый кристалл, напоминающий о силе без мудрости.
+                    </div>
+                    <div class="text-line" style="margin-top: 15px; color: #a0ffff;">
+                        <strong>СЛЕДУЮЩАЯ ЦЕЛЬ:</strong> Карта указывает путь к <span style="color: #4affff;">АЛТАРЮ ВЕЧНОЙ МЕРЗЛОТЫ</span>, но путь будет труднее.
+                    </div>
+                    <div class="text-line" style="margin-top: 10px; font-size: 11px; color: #c0ffff; text-align: center;">
+                        [Местоположение: Глубина -2,500м | Координаты: 67°24' с.ш., 26°44' в.д.]
+                    </div>
+                `;
+            }
+        }
+        
+        if (this.elements.videos.completion.paused) {
+            this.elements.videos.completion.play().catch(e => {
+                console.log("Ошибка воспроизведения видео завершения:", e);
+            });
+        }
+    }
+
+    returnToMainMenu() {
+        // Возврат на главную страницу
+        window.location.href = "index1.html";
+    }
+
+    continueToAltar() {
+        // Переход к следующему дню (День 4: Алтарь Вечной Мерзлоты)
+        alert("ДЕНЬ 4: АЛТАРЬ ВЕЧНОЙ МЕРЗЛОТЫ\n\nВы получили " + 
+              (this.state.wiseVictory ? "СЕРДЦЕ ГЛУБОКОЙ ШАХТЫ" : "ЛЕДЯНОЙ ОСКОЛОК") + 
+              " и карту к Алтарю.\n\nПродолжение следует...");
+        
+        // Здесь можно добавить переход на следующую страницу игры
+        // window.location.href = "day4.html";
+    }
+
+    completeDay3(success) {
+        if (!success) {
+            this.playSound('fail');
+            
+            // Разные сообщения в зависимости от причины поражения
+            let message = '';
+            let title = '❌ ИСПЫТАНИЕ НЕ ПРОЙДЕНО';
+            
+            if (this.state.selectedTest === 'sword' && !this.state.combatDefeated) {
+                message = 'Вы выбрали силу вместо мудрости. Помните уроки гномов!\n\n' +
+                         '«Оружие должно быть последним в твоих руках, но первым в твоём уме.»\n\n' +
+                         'Вернитесь и поговорите с гномами ещё раз, чтобы лучше понять их мудрость.';
+                
+                this.state.currentScene = 'dwarves';
+                this.state.puzzleAttempts = 0;
+                this.showScene();
+                this.showCharacterSelection();
+                
+            } else if (this.state.combatDefeated) {
+                message = 'В бою с Хранителем вы потерпели поражение.\n\n' +
+                         '«Сила без мудрости слаба!»\n\n' +
+                         'Вернитесь и выберите другой путь.';
+                
+                this.showDefeatScreen(title, message);
+            }
+            
+        } else {
+            // Успешное завершение
+            this.showCompletionScreen();
+        }
+    }
+
+    // Метод для показа окна поражения
+    showDefeatScreen(title, message) {
+        // Создаем overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'defeat-overlay';
+        
+        // Создаем окно поражения
+        const defeatWindow = document.createElement('div');
+        defeatWindow.className = 'defeat-window';
+        
+        // Заголовок
+        const titleEl = document.createElement('h2');
+        titleEl.className = 'defeat-title';
+        titleEl.textContent = title;
+        
+        // Сообщение
+        const messageEl = document.createElement('div');
+        messageEl.className = 'defeat-message';
+        messageEl.textContent = message;
+        
+        // Кнопка возврата
+        const returnButton = document.createElement('button');
+        returnButton.className = 'defeat-button';
+        returnButton.textContent = 'ВЕРНУТЬСЯ К ВЫБОРУ';
+        
+        returnButton.onmouseover = () => {
+            returnButton.style.transform = 'translate(2px, 2px)';
+            returnButton.style.boxShadow = '2px 2px 0 #5a2a2a, inset 2px 2px 0 rgba(255, 140, 140, 0.3)';
+            returnButton.style.background = 'linear-gradient(to bottom, #ff6a6a, #8a3a3a)';
+        };
+        
+        returnButton.onmouseout = () => {
+            returnButton.style.transform = 'none';
+            returnButton.style.boxShadow = '4px 4px 0 #5a2a2a, inset 2px 2px 0 rgba(255, 140, 140, 0.3)';
+            returnButton.style.background = 'linear-gradient(to bottom, #ff5a5a, #7a2a2a)';
+        };
+        
+        returnButton.onclick = () => {
+            this.playSound('button');
+            document.body.removeChild(overlay);
+            
+            // Сбрасываем состояние боя
+            this.state.combatDefeated = false;
+            this.state.combatState = 'player-turn';
+            this.state.combatTurn = 0;
+            this.combatStats.player.health = 100;
+            this.combatStats.enemy.health = 150;
+            this.combatStats.player.defenseMultiplier = 1;
+            
+            // Возвращаемся к экрану выбора (меч или отказ)
+            this.elements.screens.combat.classList.add('hidden');
+            this.elements.screens.swordTest.classList.remove('hidden');
+            
+            this.state.currentScene = 'swordTest';
+            this.state.swordTestStage = 'choice';
+            
+            // Сбрасываем выбор
+            this.state.selectedTest = null;
+            document.querySelectorAll('.test-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            this.elements.swordTestElements.message.textContent = 'Что выберет НИК? Вспомните уроки гномов...';
+            this.elements.swordTestElements.message.className = 'test-message';
+            this.elements.swordTestElements.choiceContainer.classList.remove('hidden');
+            this.elements.buttons.swordTestNext.textContent = 'ПОДТВЕРДИТЬ ВЫБОР';
+        };
+        
+        // Собираем окно
+        defeatWindow.appendChild(titleEl);
+        defeatWindow.appendChild(messageEl);
+        defeatWindow.appendChild(returnButton);
+        overlay.appendChild(defeatWindow);
+        document.body.appendChild(overlay);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.game = new DeepMineGame();
+    console.log('Игра загружена! Фоновый эмбиент добавлен. У Стражника 150 HP. Урон Ника: 15-22.');
+});
+    </script>
+</body>
+</html>

@@ -1,0 +1,3398 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>День 4. Поиски алтаря</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        /* ===================== СБРОС И БАЗОВЫЕ СТИЛИ ===================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            color: #e8d8b6;
+            font-family: 'Press Start 2P', cursive;
+            line-height: 1.8;
+            height: 100vh;
+            padding: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            transition: background-image 0.5s ease;
+        }
+
+        /* ===================== ФОНОВЫЕ КЛАССЫ ДЛЯ BODY ===================== */
+        body.default-bg {
+            background-image: url('img/Fon day 4 perviy.png');
+            background-color: #2a1a0a;
+        }
+
+        body.shadow-world-bg {
+            background-image: url('img/Fon mir Teny.png');
+            background-color: #1a0a2a;
+        }
+
+        /* Темный оверлей поверх фона */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(20, 10, 0, 0.4);
+            z-index: -1;
+        }
+
+        body.shadow-world-bg::before {
+            background: rgba(30, 0, 50, 0.3);
+        }
+
+        /* ===================== ПАНЕЛЬ УПРАВЛЕНИЯ ЗВУКОМ ===================== */
+        .audio-controls {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(42, 32, 20, 0.8);
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 4px solid #8b6b36;
+        }
+
+        .audio-btn {
+            background: #8b6b36;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #ffd700;
+            font-size: 24px;
+            transition: all 0.3s;
+        }
+
+        .audio-btn:hover {
+            background: #9b7b46;
+            transform: scale(1.1);
+        }
+
+        .volume-slider {
+            width: 120px;
+            -webkit-appearance: none;
+            height: 10px;
+            background: #5a4a2a;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #ffd700;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid #8b6b36;
+        }
+
+        /* ===================== ОСНОВНОЙ КОНТЕЙНЕР ===================== */
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            overflow-y: auto;
+            max-height: 100vh;
+            padding: 15px 0;
+        }
+
+        /* ===================== ЗАГОЛОВКИ ===================== */
+        .title {
+            background: rgba(139, 107, 54, 0.9);
+            color: #ffd700;
+            padding: 20px 40px;
+            font-size: 22px;
+            border: 8px solid #8b6b36;
+            margin-bottom: 40px;
+            display: inline-block;
+            text-shadow: 3px 3px 0 #5a4a2a;
+            position: relative;
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.5), 0 10px 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .procrastinatus-title {
+            background: rgba(147, 112, 219, 0.9);
+            color: #e6d5ff;
+            border: 8px solid #8A2BE2;
+            text-shadow: 3px 3px 0 #4B0082;
+            margin: 30px auto 40px auto;
+            text-align: center;
+            display: block;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* ===================== ТЕКСТОВЫЕ КОНТЕЙНЕРЫ ===================== */
+        .text-container {
+            background: rgba(139, 107, 54, 0.85);
+            border: 8px solid #8b6b36;
+            padding: 35px 30px;
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.4), 0 12px 25px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            font-size: 16px;
+            position: relative;
+            margin-bottom: 40px;
+            color: #f5f0e6;
+            text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.5);
+            font-weight: normal;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* ===================== КНОПКИ ===================== */
+        .pixel-button {
+            background: linear-gradient(to bottom, #cd7f32, #8b5a2b);
+            color: #ffd700;
+            border: none;
+            padding: 20px 40px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 16px;
+            cursor: pointer;
+            border: 5px solid #5a3a2a;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0 #3a2a1a;
+            position: relative;
+            box-shadow: 0 8px 0 #3a2a1a, 0 15px 25px rgba(0, 0, 0, 0.4);
+            margin: 15px 10px;
+            text-align: center;
+        }
+
+        .pixel-button:hover {
+            background: linear-gradient(to bottom, #d88f42, #9b6a3b);
+            box-shadow: 0 10px 0 #3a2a1a, 0 20px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.3);
+            transform: translateY(-3px);
+        }
+
+        /* ===================== ВИДЕО ЭКРАН ===================== */
+        .video-screen {
+            display: none;
+        }
+
+        .video-container {
+            background: rgba(42, 32, 20, 0.8);
+            border: 10px solid #8b6b36;
+            padding: 15px;
+            box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.6), 0 10px 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .video-player {
+            width: 100%;
+            height: 350px;
+            background-color: #1a100a;
+            position: relative;
+            overflow: hidden;
+            border: 5px solid #5a4a2a;
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.8);
+        }
+
+        .video-player video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ===================== СТОРИ КОНТЕЙНЕР ===================== */
+        .story-container {
+            background: rgba(139, 107, 54, 0.85);
+            border: 8px solid #8b6b36;
+            padding: 25px;
+            box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.4), 0 12px 25px rgba(0, 0, 0, 0.5);
+            font-size: 15px;
+            line-height: 1.8;
+            color: #f5f0e6;
+            text-align: left;
+            position: relative;
+            margin-bottom: 30px;
+            min-height: 200px;
+            text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .story-scene {
+            display: none;
+        }
+
+        .story-scene.active {
+            display: block;
+        }
+
+        /* ===================== АНИМАЦИЯ ТЕКСТА ===================== */
+        .typing-text {
+            display: inline-block;
+            overflow: hidden;
+            white-space: pre-wrap;
+            border-right: 3px solid #ffd700;
+            animation: blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: #ffd700; }
+        }
+
+        /* ===================== КНОПКА "ДАЛЕЕ" ===================== */
+        .next-button-container {
+            text-align: right;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* ===================== ДИАЛОГИ ===================== */
+        .dialogue-container {
+            margin: 20px 0;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .speaker-name {
+            color: #8bc34a;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 12px rgba(139, 195, 74, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .dialogue-text {
+            background: rgba(30, 20, 10, 0.7);
+            border-left: 4px solid #8bc34a;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+            border-radius: 0 8px 8px 0;
+            text-align: left;
+        }
+
+        /* ===================== ОПЦИИ ===================== */
+        .options-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .option-button {
+            background: rgba(70, 50, 30, 0.7);
+            border: 3px solid #8b6b36;
+            padding: 15px 20px;
+            color: #e8d8b6;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s;
+            border-radius: 8px;
+            width: 100%;
+        }
+
+        .option-button:hover {
+            background: rgba(139, 107, 54, 0.7);
+            border-color: #ffd54f;
+            transform: translateX(8px);
+        }
+
+        /* ===================== ВОПРОСЫ ===================== */
+        .questions-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(42, 32, 20, 0.8);
+            border: 4px solid #8b6b36;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .question-item {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(30, 20, 10, 0.5);
+            border-left: 4px solid #ffd54f;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .question-item:hover {
+            background: rgba(139, 107, 54, 0.3);
+            transform: translateX(8px);
+        }
+
+        /* ===================== КНОПКА "НАЗАД" ===================== */
+        .back-button {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(139, 107, 54, 0.7);
+            border: 3px solid #8b6b36;
+            color: #e8d8b6;
+            padding: 10px 15px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 11px;
+            cursor: pointer;
+            border-radius: 8px;
+            z-index: 10;
+        }
+
+        .back-button:hover {
+            background: rgba(205, 127, 50, 0.7);
+            border-color: #ffd54f;
+        }
+
+        /* ===================== МИНИ-ИГРА АКТИВАЦИИ АЛТАРЯ ===================== */
+        .mini-game-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9998;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .mini-game-container.active {
+            display: flex;
+        }
+
+        .mini-game-title {
+            color: #ffd700;
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .altar-game {
+            background: rgba(42, 32, 20, 0.95);
+            border: 10px solid #8b6b36;
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.8), 0 0 45px rgba(139, 107, 54, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .instructions {
+            color: #e8d8b6;
+            font-size: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            padding: 12px;
+            background: rgba(30, 20, 10, 0.5);
+            border-radius: 8px;
+            border: 2px solid #5a4a2a;
+            width: 100%;
+        }
+
+        .voice-hint {
+            color: #8bc34a;
+            font-size: 11px;
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 12px;
+            background: rgba(30, 20, 10, 0.7);
+            border-radius: 8px;
+            border-left: 4px solid #8bc34a;
+            font-style: italic;
+            line-height: 1.5;
+            width: 100%;
+        }
+
+        .runes-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        .rune-item {
+            background: rgba(30, 20, 10, 0.7);
+            border: 4px solid #5a4a2a;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 110px;
+        }
+
+        .rune-item:hover {
+            border-color: #ffd54f;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 213, 79, 0.2);
+        }
+
+        .rune-item.selected {
+            border-color: #8bc34a;
+            background: rgba(139, 195, 74, 0.15);
+            box-shadow: 0 0 20px rgba(139, 195, 74, 0.4);
+        }
+
+        .sequence-container {
+            background: rgba(20, 10, 0, 0.8);
+            border: 5px solid #5a4a2a;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            min-height: 110px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sequence-slots {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .sequence-slot {
+            width: 70px;
+            height: 70px;
+            background: rgba(42, 32, 20, 0.5);
+            border: 3px dashed #8b6b36;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s;
+        }
+
+        .sequence-slot.filled {
+            border: 4px solid #8bc34a;
+            background: rgba(139, 195, 74, 0.1);
+        }
+
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .hint-button {
+            background: linear-gradient(to bottom, #4a6b8b, #2a4a6b);
+            color: #a5d6ff;
+            border: 4px solid #2a4a6b;
+        }
+
+        .reset-button {
+            background: linear-gradient(to bottom, #8b4a4a, #6b2a2a);
+            color: #ffa5a5;
+            border: 4px solid #6b2a2a;
+        }
+
+        .activate-button {
+            background: linear-gradient(to bottom, #4a8b4a, #2a6b2a);
+            color: #a5ffa5;
+            border: 4px solid #2a6b2a;
+        }
+
+        /* ===================== РЕЗУЛЬТАТ ИГРЫ ===================== */
+        .game-result {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 25px;
+            text-align: center;
+            overflow-y: auto;
+        }
+
+        .game-result.active {
+            display: flex;
+        }
+
+        .result-title {
+            color: #ffd700;
+            font-size: 28px;
+            margin-bottom: 25px;
+            text-shadow: 0 0 25px rgba(255, 215, 0, 0.7);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .result-text {
+            color: #e8d8b6;
+            font-size: 14px;
+            line-height: 1.7;
+            max-width: 600px;
+            margin-bottom: 30px;
+            padding: 0 15px;
+        }
+
+        .portal-animation {
+            font-size: 60px;
+            margin: 25px 0;
+            animation: portal-spin 3s infinite linear;
+        }
+
+        @keyframes portal-spin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        /* ===================== ПЕРЕХОДНЫЕ ЭКРАНЫ ===================== */
+        .shadow-transition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shadow-transition.active {
+            display: flex;
+        }
+
+        .transition-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ===================== МИР ПРОКРАСТИНАТУСА ===================== */
+        .procrastinatus-world {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 99999;
+            overflow-y: auto;
+            max-height: 100vh;
+            padding: 25px;
+        }
+
+        .procrastinatus-world.active {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .procrastinatus-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100%;
+        }
+
+        .procrastinatus-scene {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: center;
+        }
+
+        .procrastinatus-scene.active {
+            display: flex;
+        }
+
+        .procrastinatus-video-container {
+            background: rgba(50, 0, 100, 0.8);
+            border: 10px solid #9370DB;
+            margin: 0 auto 35px auto;
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .procrastinatus-video-player {
+            width: 100%;
+            height: 350px;
+            background-color: #1a001a;
+            border: 5px solid #8A2BE2;
+            overflow: hidden;
+        }
+
+        .procrastinatus-video-player video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Пошаговый диалог */
+        .dialogue-step {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(50, 0, 100, 0.9);
+            border: 8px solid #9370DB;
+            border-radius: 12px;
+            color: #e6d5ff;
+            box-shadow: 0 0 25px rgba(147, 112, 219, 0.5);
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .dialogue-step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dialogue-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .dialogue-next {
+            background: linear-gradient(to bottom, #9370DB, #663399);
+            color: #e6d5ff;
+            border: 5px solid #8A2BE2;
+            padding: 15px 35px;
+            font-size: 16px;
+            min-width: 180px;
+        }
+
+        .dialogue-next:hover {
+            background: linear-gradient(to bottom, #a37beb, #7744aa);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+        }
+
+        /* Механика петли времени */
+        .loop-mechanic {
+            width: 100%;
+            max-width: 800px;
+            margin: 25px auto;
+            padding: 25px;
+            background: rgba(50, 0, 100, 0.8);
+            border: 8px solid #9370DB;
+            border-radius: 12px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .loop-mechanic.active {
+            display: block;
+        }
+
+        .stuck-message {
+            color: #ff6b9d;
+            font-size: 16px;
+            text-align: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(50, 0, 50, 0.7);
+            border-radius: 8px;
+            border: 4px solid #ff6b9d;
+            animation: pulse 1.5s infinite;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+        }
+
+        /* ===================== КОМПАКТНАЯ МИНИ-ИГРА: ПЕТЛЯ ВРЕМЕНИ ===================== */
+        .loop-status-compact {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 12px;
+            background: rgba(30, 0, 60, 0.7);
+            border-radius: 10px;
+            border: 4px solid #9370DB;
+        }
+
+        .loop-stat-item {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+        }
+
+        .loop-stat-label {
+            color: #c9a9ff;
+            font-size: 10px;
+            margin-bottom: 5px;
+        }
+
+        .loop-stat-value {
+            color: #ffd54f;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        /* КОМПАКТНАЯ СЦЕНА */
+        .loop-scene-compact {
+            background: rgba(40, 0, 80, 0.8);
+            border: 4px solid #9370DB;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .loop-scene-emoji {
+            font-size: 40px;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .loop-scene-text {
+            font-size: 13px;
+            line-height: 1.5;
+            flex: 1;
+            color: #e6d5ff;
+        }
+
+        /* КОМПАКТНЫЕ КНОПКИ ДЕЙСТВИЙ */
+        .loop-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        @media (max-width: 480px) {
+            .loop-actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loop-action-btn {
+            background: linear-gradient(135deg, #4B0082, #2d0050);
+            color: #c9a9ff;
+            border: 4px solid #8A2BE2;
+            padding: 12px;
+            font-size: 12px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+            min-height: 65px;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .loop-action-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #5b1092, #3d1060);
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+        }
+
+        .loop-action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loop-action-emoji {
+            font-size: 24px;
+            min-width: 40px;
+        }
+
+        .loop-action-text {
+            flex: 1;
+        }
+
+        .loop-action-title {
+            color: #ffd54f;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .loop-action-cost {
+            color: #ff6b9d;
+            font-size: 10px;
+            margin-top: 5px;
+        }
+
+        /* КОМПАКТНАЯ ПАНЕЛЬ ЮМИ */
+        .loop-yumi-compact {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .loop-yumi-hint-box {
+            flex: 3;
+            background: rgba(80, 40, 120, 0.7);
+            border-radius: 10px;
+            padding: 12px;
+            border-left: 4px solid #FFD700;
+            min-height: 65px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .loop-yumi-hint-text {
+            font-size: 11px;
+            line-height: 1.4;
+            color: #ffd54f;
+            text-align: left;
+        }
+
+        .loop-yumi-controls {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .loop-yumi-btn {
+            background: linear-gradient(135deg, #9370DB, #663399);
+            color: #e6d5ff;
+            border: 4px solid #8A2BE2;
+            padding: 10px;
+            font-size: 10px;
+            height: 55px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .loop-yumi-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* КОМПАКТНЫЙ ПРОГРЕСС */
+        .loop-progress-compact {
+            margin: 15px 0;
+        }
+
+        .loop-progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 11px;
+        }
+
+        .loop-progress-label {
+            color: #c9a18e;
+        }
+
+        .loop-progress-percent {
+            color: #ffd54f;
+        }
+
+        .loop-progress-bar {
+            height: 16px;
+            background: rgba(50, 0, 100, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 3px solid #8A2BE2;
+        }
+
+        .loop-progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #8A2BE2, #BA55D3);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 7px;
+        }
+
+        /* КОМПАКТНЫЙ ЛОГ */
+        .loop-log-compact {
+            background: rgba(20, 0, 40, 0.9);
+            border: 4px solid #9370DB;
+            border-radius: 10px;
+            padding: 12px;
+            margin: 15px 0;
+            height: 130px;
+            overflow-y: auto;
+        }
+
+        .loop-log-header {
+            color: #ba55d3;
+            font-size: 11px;
+            margin-bottom: 8px;
+            text-align: left;
+            border-bottom: 3px solid #9370DB;
+            padding-bottom: 5px;
+        }
+
+        .loop-log-entry {
+            font-size: 10px;
+            line-height: 1.4;
+            margin-bottom: 6px;
+            padding: 5px;
+            background: rgba(30, 0, 60, 0.5);
+            border-radius: 5px;
+            border-left: 4px solid #BA55D3;
+            animation: fadeIn 0.3s ease;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .loop-log-yumi {
+            border-left-color: #FFD700;
+            background: rgba(80, 40, 0, 0.3);
+        }
+
+        .loop-log-action {
+            border-left-color: #8bc34a;
+        }
+
+        /* КНОПКА ВЫХОДА */
+        .loop-finish-btn {
+            background: linear-gradient(135deg, #4B0082, #2d0050);
+            color: #c9a9ff;
+            border: 4px solid #8A2BE2;
+            padding: 15px 25px;
+            font-size: 13px;
+            margin: 15px auto;
+            display: none;
+            width: 240px;
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        .loop-finish-btn.active {
+            display: block;
+        }
+
+        /* ===================== МИНИ-ИГРА: БЕЗОПАСНОСТЬ СТАГНАЦИИ ===================== */
+        .stagnation-game-container {
+            background: rgba(50, 0, 100, 0.8);
+            border: 5px solid #9370DB;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            width: 100%;
+            max-width: 800px;
+        }
+        
+        .stagnation-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 480px) {
+            .stagnation-actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .stagnation-action-btn {
+            background: linear-gradient(135deg, #2d0050, #1a0035);
+            color: #c9a9ff;
+            border: 4px solid #4B0082;
+            padding: 15px;
+            font-size: 12px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            min-height: 100px;
+            font-family: 'Press Start 2P', cursive;
+        }
+        
+        .stagnation-action-btn:hover {
+            background: linear-gradient(135deg, #3d1060, #2a0045);
+            border-color: #8A2BE2;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(138, 43, 226, 0.3);
+        }
+        
+        .stagnation-action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .stagnation-action-btn.selected {
+            background: linear-gradient(135deg, #4B0082, #2d0050);
+            border-color: #BA55D3;
+            box-shadow: 0 0 20px rgba(186, 85, 211, 0.5);
+        }
+        
+        .stagnation-action-emoji {
+            font-size: 30px;
+        }
+        
+        .stagnation-action-text {
+            font-size: 11px;
+            line-height: 1.4;
+            color: #e6d5ff;
+        }
+        
+        .stagnation-hint {
+            color: #ffd54f;
+            font-size: 11px;
+            text-align: center;
+            padding: 12px;
+            background: rgba(80, 40, 0, 0.3);
+            border-radius: 10px;
+            border-left: 4px solid #FFD700;
+            margin-top: 15px;
+            font-style: italic;
+        }
+        
+        /* ===================== ЭКРАН ЗАВЕРШЕНИЯ ГЛАВЫ ===================== */
+        .chapter-complete-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 100000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 30px;
+            text-align: center;
+            animation: fadeIn 0.8s ease;
+        }
+        
+        .chapter-complete-screen.active {
+            display: flex;
+        }
+        
+        .completion-container {
+            background: linear-gradient(135deg, rgba(42, 32, 20, 0.95), rgba(30, 20, 10, 0.95));
+            border: 12px solid #8b6b36;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 
+                inset 0 0 40px rgba(0, 0, 0, 0.7),
+                0 0 60px rgba(139, 107, 54, 0.5),
+                0 0 100px rgba(255, 215, 0, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .completion-title {
+            color: #ffd700;
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-shadow: 
+                0 0 15px #ffd700,
+                0 0 30px #ffd700,
+                0 0 45px #ffd700;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 15px #ffd700, 0 0 30px #ffd700, 0 0 45px #ffd700; }
+            to { text-shadow: 0 0 20px #ffd700, 0 0 40px #ffd700, 0 0 60px #ffd700; }
+        }
+        
+        .completion-subtitle {
+            color: #8bc34a;
+            font-size: 18px;
+            margin-bottom: 25px;
+            text-shadow: 0 0 10px rgba(139, 195, 74, 0.5);
+        }
+        
+        .completion-message {
+            color: #e8d8b6;
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(30, 20, 10, 0.5);
+            border-radius: 12px;
+            border: 3px solid #5a4a2a;
+        }
+        
+        .completion-achievements {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        
+        .achievement-item {
+            background: rgba(42, 32, 20, 0.8);
+            border: 4px solid #8b6b36;
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 120px;
+            transition: all 0.3s;
+        }
+        
+        .achievement-item:hover {
+            transform: scale(1.05);
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+        
+        .achievement-emoji {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+        
+        .achievement-text {
+            font-size: 11px;
+            color: #ffd54f;
+        }
+        
+        .completion-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .completion-button {
+            background: linear-gradient(135deg, #cd7f32, #8b5a2b);
+            color: #ffd700;
+            border: 5px solid #5a3a2a;
+            padding: 20px 40px;
+            font-size: 14px;
+            min-width: 200px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0 #3a2a1a;
+            box-shadow: 0 8px 0 #3a2a1a, 0 15px 25px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s;
+            font-family: 'Press Start 2P', cursive;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .completion-button:hover {
+            background: linear-gradient(135deg, #d88f42, #9b6a3b);
+            transform: translateY(-5px);
+            box-shadow: 0 12px 0 #3a2a1a, 0 20px 30px rgba(0, 0, 0, 0.5);
+            color: #ffd700;
+        }
+        
+        .completion-button.menu {
+            background: linear-gradient(135deg, #4a8b4a, #2a6b2a);
+            border-color: #2a6b2a;
+        }
+        
+        .completion-button.restart {
+            background: linear-gradient(135deg, #8b4a4a, #6b2a2a);
+            border-color: #6b2a2a;
+        }
+        
+        /* ===================== АДАПТИВНОСТЬ ===================== */
+        @media (max-width: 768px) {
+            body { padding: 20px; }
+            .title, .procrastinatus-title { 
+                font-size: 18px; 
+                padding: 15px 25px; 
+                margin-bottom: 30px; 
+                max-width: 800px;
+            }
+            .video-player, .procrastinatus-video-player { 
+                height: 300px; 
+            }
+            .pixel-button { 
+                padding: 15px 25px; 
+                font-size: 14px; 
+            }
+            .runes-container { 
+                grid-template-columns: repeat(2, 1fr); 
+            }
+            .text-container, .story-container {
+                max-width: 800px;
+            }
+            .video-container, .procrastinatus-video-container {
+                max-width: 800px;
+            }
+            .audio-controls {
+                top: 15px;
+                right: 15px;
+                padding: 10px 15px;
+            }
+            .completion-container {
+                padding: 25px;
+            }
+            .completion-title {
+                font-size: 26px;
+            }
+            .completion-button {
+                padding: 15px 25px;
+                font-size: 12px;
+                min-width: 160px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body { padding: 15px; }
+            .title, .procrastinatus-title { 
+                font-size: 16px; 
+                padding: 12px 20px; 
+                margin-bottom: 25px; 
+                max-width: 100%;
+            }
+            .video-player, .procrastinatus-video-player { 
+                height: 250px; 
+            }
+            .pixel-button { 
+                padding: 12px 20px; 
+                font-size: 12px; 
+            }
+            .runes-container { 
+                grid-template-columns: 1fr; 
+            }
+            .text-container, .story-container {
+                max-width: 100%;
+                padding: 20px;
+            }
+            .video-container, .procrastinatus-video-container {
+                max-width: 100%;
+            }
+            .mini-game-title {
+                font-size: 20px;
+            }
+            .altar-game {
+                padding: 20px;
+            }
+            .dialogue-step {
+                padding: 15px;
+            }
+            .audio-controls {
+                top: 10px;
+                right: 10px;
+                flex-direction: column;
+                gap: 8px;
+            }
+            .volume-slider {
+                width: 100px;
+            }
+            .completion-container {
+                padding: 20px;
+                margin: 15px;
+            }
+            .completion-title {
+                font-size: 22px;
+            }
+            .completion-subtitle {
+                font-size: 16px;
+            }
+            .completion-message {
+                font-size: 14px;
+                padding: 15px;
+            }
+            .completion-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            .completion-button {
+                width: 100%;
+                max-width: 250px;
+            }
+            .achievement-item {
+                min-width: 100px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body class="default-bg">
+    <!-- АУДИО КОНТРОЛЛЕР -->
+    <div class="audio-controls" id="audioControls">
+        <button class="audio-btn" id="audioToggle">🔊</button>
+        <input type="range" min="0" max="100" value="50" class="volume-slider" id="volumeSlider">
+    </div>
+
+    <!-- АУДИО ДЛЯ ФОНОВОЙ МУЗЫКИ -->
+    <audio id="backgroundMusic" loop>
+        <source src="audio/Floating Thru Space (Ambient Music For Sleep) - Shining Moonlight [audiovk.com].mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- ПЕРЕХОДНОЕ ВИДЕО ТЕЛЕПОРТАЦИИ -->
+    <div class="shadow-transition" id="shadowTransition">
+        <video class="transition-video" id="transitionVideoPlayer" muted autoplay>
+            <source src="video/Vnytri portala.mp4" type="video/mp4">
+            Ваш браузер не поддерживает видео.
+        </video>
+    </div>
+
+    <!-- ЭКРАН ЗАВЕРШЕНИЯ ГЛАВЫ (ТОЛЬКО ЕСЛИ ВЫБРАН НЕПРАВИЛЬНЫЙ ВАРИАНТ) -->
+    <div class="chapter-complete-screen" id="chapterCompleteScreen">
+        <div class="completion-container">
+            <div class="completion-title">⚠️ ВЫ ОСТАЛИСЬ В МИРЕ ПРОКРАСТИНАТУСА! ⚠️</div>
+            <div class="completion-subtitle">"Вы выбрали один из трёх неправильных вариантов"</div>
+            
+            <div class="completion-message">
+                Вы решили заняться бессмысленными делами вместо того, чтобы подумать о побеге.<br>
+                Прокрастинатус доволен - вы остались в его мире навсегда.<br><br>
+                <em>"Завтра подумаешь... или послезавтра..."</em>
+            </div>
+            
+            <div class="completion-achievements">
+                <div class="achievement-item">
+                    <div class="achievement-emoji">💐</div>
+                    <div class="achievement-text">Собрали фиолетовые цветы</div>
+                </div>
+                <div class="achievement-item">
+                    <div class="achievement-emoji">🖌️</div>
+                    <div class="achievement-text">Рисовали на песке</div>
+                </div>
+                <div class="achievement-item">
+                    <div class="achievement-emoji">🌳</div>
+                    <div class="achievement-text">Говорили с деревьями</div>
+                </div>
+                <div class="achievement-item">
+                    <div class="achievement-emoji">😴</div>
+                    <div class="achievement-text">Попались в ловушку</div>
+                </div>
+            </div>
+            
+            <div class="completion-controls">
+                <a href="index1.html" class="pixel-button completion-button menu">
+                    🏠 В МЕНЮ
+                </a>
+                <button class="pixel-button completion-button restart" id="restartChapterButton">
+                    🔄 ПОПРОБОВАТЬ СНОВА
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МИР ПРОКРАСТИНАТУСА -->
+    <div class="procrastinatus-world" id="procrastinatusWorld">
+        <div class="procrastinatus-container">
+            <!-- СЦЕНА 1: Вход в фиолетовый мир -->
+            <div class="procrastinatus-scene active" id="procrastinatusScene1">
+                <div class="title procrastinatus-title">
+                    МИР ТЕНИ: Фиолетовая реальность
+                </div>
+                
+                <div class="procrastinatus-video-container">
+                    <div class="procrastinatus-video-player" id="procrastinatusVideoPlayer1">
+                        <video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+                            <source src="video/Mir Teny.mp4" type="video/mp4">
+                            Ваш браузер не поддерживает видео.
+                        </video>
+                    </div>
+                </div>
+                
+                <!-- Шаг 1 -->
+                <div class="dialogue-step active" id="firstDialogueStep">
+                    <div class="speaker-name">Ник</div>
+                    <div class="dialogue-text">Где мы? Всё... фиолетовое. Воздух густой, как сироп.</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 2 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">Ник</div>
+                    <div class="dialogue-text">Местность похожа на ту, что описана в легендах. Здесь что-то не так. Деревья... они странные.</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- СЦЕНА 2: Рука Прокрастинатуса -->
+            <div class="procrastinatus-scene" id="procrastinatusScene2">
+                <div class="title procrastinatus-title">
+                    ШЁПОТ В ТУМАНЕ
+                </div>
+                
+                <div class="procrastinatus-video-container">
+                    <div class="procrastinatus-video-player" id="procrastinatusVideoPlayer2">
+                        <video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+                            <source src="video/Prokrastinator ryka.mp4" type="video/mp4">
+                            Ваш браузер не поддерживает видео.
+                        </video>
+                    </div>
+                </div>
+                
+                <!-- Шаг 1 -->
+                <div class="dialogue-step active">
+                    <div class="speaker-name">Ник</div>
+                    <div class="dialogue-text">Туман сгущается. Из-за одинокого дерева слышен шёпот...</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 2 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">Ник</div>
+                    <div class="dialogue-text">Кто здесь?</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 3 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">ГОЛОС (эхом)</div>
+                    <div class="dialogue-text">Кто... здесь...</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 4 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">ГОЛОС</div>
+                    <div class="dialogue-text">Ты... идёшь?</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 5 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">Ник</div>
+                    <div class="dialogue-text">В тумане мелькают: Полупрозрачная рука, обвивающая ствол... Два глаза в тумане... Контур высокого сутулого силуэта...</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- СЦЕНА 3: Половина тела Прокрастинатуса -->
+            <div class="procrastinatus-scene" id="procrastinatusScene3">
+                <div class="title procrastinatus-title">
+                    ПРОКРАСТИНАТУС
+                </div>
+                
+                <div class="procrastinatus-video-container">
+                    <div class="procrastinatus-video-player" id="procrastinatusVideoPlayer3">
+                        <video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+                            <source src="video/Prokrastinator polovina tela.mp4" type="video/mp4">
+                            Ваш браузер не поддерживает видео.
+                        </video>
+                    </div>
+                </div>
+                
+                <!-- Шаг 1 -->
+                <div class="dialogue-step active">
+                    <div class="speaker-name">ПРОКРАСТИНАТУС</div>
+                    <div class="dialogue-text">Я... ждал. <span style="opacity: 0.7">(пауза)</span><br>Все ждут. Ждут решения.</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 2 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">ПРОКРАСТИНАТУС</div>
+                    <div class="dialogue-text">А решение... ждёт тебя.</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 3 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">Ник</div>
+                    <div class="dialogue-text">Что ты такое?</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 4 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">ПРОКРАСТИНАТУС</div>
+                    <div class="dialogue-text">Я... то, между. Между "сделать" и "не сделать". Между "идти" и "стоять".</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 5 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">ПРОКРАСТИНАТУС</div>
+                    <div class="dialogue-text">Между "начать" и "отложить".</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 6 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">Юми</div>
+                    <div class="dialogue-text">*шепотом* Существо медленно выходит из тумана, но не полностью. Половина тела остаётся в дымке.</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 7 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">Юми</div>
+                    <div class="dialogue-text">Первое чёткое изображение — но только верхняя часть, ноги в тумане.</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- СЦЕНА 4: Бесконечная дорога -->
+            <div class="procrastinatus-scene" id="procrastinatusScene4">
+                <div class="title procrastinatus-title">
+                    БЕСКОНЕЧНОСТЬ
+                </div>
+                
+                <div class="procrastinatus-video-container">
+                    <div class="procrastinatus-video-player" id="procrastinatusVideoPlayer4">
+                        <video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+                            <source src="video/Mir Teny1.1.mp4" type="video/mp4">
+                            Ваш браузер не поддерживает видео.
+                        </video>
+                    </div>
+                </div>
+                
+                <!-- ДИАЛОГИ -->
+                <!-- Шаг 1 -->
+                <div class="dialogue-step active">
+                    <div class="speaker-name">Ник</div>
+                    <div class="dialogue-text">Он исчез... Пошли, Юми. Надо найти выход из этого места.</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 2 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">Юми</div>
+                    <div class="dialogue-text">*кивает* Давай скорее уйдём отсюда. Этот туман... он кажется живым.</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 3 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">Ник</div>
+                    <div class="dialogue-text">Стоп... Ты заметил? Это дерево... Мы уже проходили здесь.</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 4 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">Ник</div>
+                    <div class="dialogue-text">То самое дерево с обвитой рукой.</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 5 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">Юми</div>
+                    <div class="dialogue-text">*испуганно пищит* И вон тот камень... и тот куст...</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 6 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">Юми</div>
+                    <div class="dialogue-text">Всё то же самое! Мы идём по кругу!</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 7 -->
+                <div class="dialogue-step">
+                    <div class="speaker-name">ГОЛОС (эхом)</div>
+                    <div class="dialogue-text">ВСЁ ПОВТОРЯЕТСЯ. ТЫ В ЛОВУШКЕ ВРЕМЕНИ.</div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Начать попытки</button>
+                    </div>
+                </div>
+                
+                <!-- ========= КОМПАКТНАЯ МИНИ-ИГРА: ПЕТЛЯ ВРЕМЕНИ ========= -->
+                <div class="loop-mechanic" id="loopMechanic">
+                    <div class="stuck-message" style="font-size: 12px; padding: 10px; margin: 0 0 15px 0;">
+                        ⏳ МЫ В ЛОВУШКЕ ВРЕМЕНИ! Выбирай действия, чтобы вырваться.
+                    </div>
+                    
+                    <!-- КОМПАКТНЫЙ СТАТУС-БАР -->
+                    <div class="loop-status-compact">
+                        <div class="loop-stat-item">
+                            <div class="loop-stat-label">ПОПЫТКА</div>
+                            <div class="loop-stat-value" id="loopAttemptCount">1</div>
+                        </div>
+                        <div class="loop-stat-item">
+                            <div class="loop-stat-label">ЭНЕРГИЯ</div>
+                            <div class="loop-stat-value" id="loopEnergyCount">10</div>
+                        </div>
+                        <div class="loop-stat-item">
+                            <div class="loop-stat-label">ПОДСКАЗКИ</div>
+                            <div class="loop-stat-value" id="loopHintCount">3</div>
+                        </div>
+                    </div>
+                    
+                    <!-- ПРОГРЕСС -->
+                    <div class="loop-progress-compact">
+                        <div class="loop-progress-header">
+                            <span class="loop-progress-label">ПРОГРЕСС ВЫХОДА</span>
+                            <span class="loop-progress-percent" id="loopProgressPercent">0%</span>
+                        </div>
+                        <div class="loop-progress-bar">
+                            <div class="loop-progress-fill" id="loopProgressFill"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- СЦЕНА -->
+                    <div class="loop-scene-compact">
+                        <div class="loop-scene-emoji" id="loopSceneEmoji">🔄</div>
+                        <div class="loop-scene-text" id="loopSceneText">
+                            ⏳ Вы застряли в бесконечной петле времени. Вокруг туман, повторяющиеся деревья...
+                        </div>
+                    </div>
+                    
+                    <!-- КНОПКИ ДЕЙСТВИЙ -->
+                    <div class="loop-actions-grid" id="loopActionsContainer">
+                        <!-- Добавятся через JS -->
+                    </div>
+                    
+                    <!-- ПАНЕЛЬ ЮМИ -->
+                    <div class="loop-yumi-compact">
+                        <div class="loop-yumi-hint-box">
+                            <div class="loop-yumi-hint-text" id="loopCurrentHint">
+                                🐭 "Я заметила: дерево с рукой появляется каждые три круга!"
+                            </div>
+                        </div>
+                        <div class="loop-yumi-controls">
+                            <button class="pixel-button loop-yumi-btn" id="loopGetHintBtn" title="1 энергия">
+                                💭<br>Подсказка
+                            </button>
+                            <button class="pixel-button loop-yumi-btn" id="loopAnalyzeBtn">
+                                🔍<br>Анализ
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- ЛОГ -->
+                    <div class="loop-log-compact">
+                        <div class="loop-log-header">📝 СОБЫТИЯ:</div>
+                        <div class="loop-log-entries" id="loopGameLog">
+                            <div class="loop-log-entry">🌟 Мы попали в петлю времени...</div>
+                            <div class="loop-log-entry loop-log-yumi">🐭 Юми: "Ник, всё повторяется!"</div>
+                        </div>
+                    </div>
+                    
+                    <!-- КНОПКА ВЫХОДА -->
+                    <div style="text-align: center;">
+                        <button class="pixel-button loop-finish-btn" id="loopFinishBtn">
+                            🚪 ВЫЙТИ ИЗ ПЕТЛИ
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- СЦЕНА 5: Выбор действий (прокрастинация) -->
+            <div class="procrastinatus-scene" id="procrastinatusScene5">
+                <div class="title procrastinatus-title">ВЫБОР БЕЗ ВЫБОРА</div>
+                
+                <div class="procrastinatus-video-container">
+                    <div class="procrastinatus-video-player" id="procrastinatusVideoPlayer5">
+                        <video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+                            <source src="video/Prokrastinatys vibor.mp4" type="video/mp4">
+                            Ваш браузер не поддерживает видео.
+                        </video>
+                    </div>
+                </div>
+                
+                <!-- Шаг 1: Прокрастинатус предлагает "безопасность" -->
+                <div class="dialogue-step active">
+                    <div class="speaker-name">ПРОКРАСТИНАТУС</div>
+                    <div class="dialogue-text">
+                        Я предлагаю... безопасность.<br>
+                        <em style="color:#ba55d3; font-size:12px;">(одна рука указывает на дорогу)</em><br><br>
+                        Ни шагу вперёд — никаких ошибок.<br>
+                        Ни одного выбора — никакой ответственности.<br>
+                        <em style="color:#ba55d3; font-size:12px;">(другая рука разводит туман, показывая 4 пути)</em><br><br>
+                        А если выберешь... кто знает, что там?
+                    </div>
+                    <div class="dialogue-controls" style="margin-top: 25px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 2: Выбор 4 действий (прокрастинация) -->
+                <div class="dialogue-step" id="choiceGameStep">
+                    <div class="stuck-message" style="font-size: 12px; padding: 10px; margin: 0 0 20px 0;">
+                        ⚠️ ПРОКРАСТИНАТУС ПРЕДЛАГАЕТ ВАМ ЗАНЯТЬСЯ БЕССМЫСЛЕННЫМИ ДЕЛАМИ
+                    </div>
+                    
+                    <div style="color:#e6d5ff; font-size: 13px; text-align: center; margin-bottom: 20px;">
+                        Любой из первых трёх выборов оставит вас в этом мире, а выбор "ПОДУМАТЬ" выведет вас!
+                    </div>
+                    
+                    <div class="stagnation-game-container" id="procrastinationChoiceGame">
+                        <div class="stagnation-actions-grid" id="procrastinationActions">
+                            <!-- Кнопки добавятся через JS -->
+                        </div>
+                        
+                        <div class="stagnation-hint" id="procrastinationHint">
+                            🐭 Юми: *шепчет* "Ник, он хочет чтобы мы бездействовали! Выбери 'ПОДУМАТЬ' чтобы сбежать!"
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Шаг 3: Реакция Прокрастинуса (если выбран 4-й вариант) -->
+                <div class="dialogue-step" id="panicReactionStep">
+                    <div class="procrastinatus-video-container">
+                        <div class="procrastinatus-video-player" id="raspadVideoPlayer">
+                            <video muted playsinline style="width:100%; height:100%; object-fit:cover;">
+                                <source src="video/Raspad.mp4" type="video/mp4">
+                                Ваш браузер не поддерживает видео.
+                            </video>
+                        </div>
+                    </div>
+                    
+                    <div class="dialogue-container">
+                        <div class="speaker-name">ПРОКРАСТИНАТУС</div>
+                        <div class="dialogue-text">
+                            НЕТ! ТЫ ДУМАЕШЬ?!<br>
+                            ДУМАТЬ ОПАСНО! ДУМАТЬ — ЭТО ВЫБИРАТЬ!<br>
+                            <em style="color:#ff6b9d;">(его форма начинает распадаться)</em>
+                        </div>
+                    </div>
+                    <div class="dialogue-controls" style="margin-top: 25px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 4: Финальный диалог Прокрастинуса -->
+                <div class="dialogue-step" id="finalDialogueStep">
+                    <div class="dialogue-container">
+                        <div class="speaker-name">ПРОКРАСТИНАТУС (рассыпаясь)</div>
+                        <div class="dialogue-text">Ты... выбрал думать.<br>
+                            <span style="opacity: 0.8;">(голос становится тише)</span><br>
+                            Помни... я всегда здесь.<br>
+                            В каждом "может быть". В каждом "потом".<br>
+                            <span style="opacity: 0.6; font-size: 12px;">(последний шёпот)</span><br>
+                            Просто... не останавливайся.
+                        </div>
+                    </div>
+                    <div class="dialogue-controls" style="margin-top: 25px;">
+                        <button class="pixel-button dialogue-next">
+                            🚶‍♂️ ВЫЙТИ ИЗ МИРА ТЕНИ
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 5: Неправильный выбор (если выбран 1-3 вариант) -->
+                <div class="dialogue-step" id="wrongChoiceStep">
+                    <div class="dialogue-container">
+                        <div class="speaker-name">ПРОКРАСТИНАТУС (довольный)</div>
+                        <div class="dialogue-text">
+                            Хорошо... очень хорошо...<br>
+                            Отдохни... подожди...<br>
+                            <em style="color:#ba55d3;">(туман сгущается)</em><br>
+                            Завтра подумаешь... или послезавтра...
+                        </div>
+                    </div>
+                    
+                    <div class="stuck-message" style="font-size: 12px; padding: 10px; margin: 20px 0;">
+                        ⚠️ ВЫ ОСТАЛИСЬ В МИРЕ ПРОКРАСТИНАТУСА!
+                    </div>
+                    
+                    <div class="dialogue-controls" style="margin-top: 25px;">
+                        <button class="pixel-button dialogue-next" id="tryAgainButton">
+                            🔄 ПОПРОБОВАТЬ СНОВА
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- СЦЕНА 6: Финальная сцена с лагерем (ТОЛЬКО ЕСЛИ ВЫБРАН ПРАВИЛЬНЫЙ ВАРИАНТ 4) -->
+            <div class="procrastinatus-scene" id="procrastinatusScene6">
+                <div class="title procrastinatus-title">ОТДЫХ В ЛАГЕРЕ</div>
+                
+                <div class="procrastinatus-video-container">
+                    <div class="procrastinatus-video-player" id="lagerVideoPlayer">
+                        <video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+                            <source src="video/Lager.mp4" type="video/mp4">
+                            Ваш браузер не поддерживает видео.
+                        </video>
+                    </div>
+                </div>
+                
+                <!-- Шаг 1 -->
+                <div class="dialogue-step active" id="campStep1">
+                    <div class="dialogue-container">
+                        <div class="speaker-name">Ник</div>
+                        <div class="dialogue-text">Туман рассеивается. Дорога теперь имеет конец.</div>
+                    </div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 2 -->
+                <div class="dialogue-step" id="campStep2">
+                    <div class="text-container" style="margin: 15px 0; background: rgba(50, 0, 100, 0.8); border-color: #9370DB;">
+                        "Ник чувствует необычную лёгкость. Теперь он видит — в реальном мире тоже есть 'между'. Моменты, когда решение висит в воздухе. И он понимает: чтобы выйти из 'между', нужно просто... выбрать."
+                    </div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 3 -->
+                <div class="dialogue-step" id="campStep3">
+                    <div class="dialogue-container">
+                        <div class="speaker-name">Ник</div>
+                        <div class="dialogue-text">Смотри, Юми — заброшенный лагерь. Может, отдохнём здесь?</div>
+                    </div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 4 -->
+                <div class="dialogue-step" id="campStep4">
+                    <div class="dialogue-container">
+                        <div class="speaker-name">Юми</div>
+                        <div class="dialogue-text">*радостно пищит* Да, Ник! Я так устала от этих бесконечных дорог...</div>
+                    </div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 5 -->
+                <div class="dialogue-step" id="campStep5">
+                    <div class="dialogue-container">
+                        <div class="speaker-name">Ник</div>
+                        <div class="dialogue-text">Отлично. Переночуем здесь, а завтра... завтра отправимся к Тени. Но теперь я знаю, как с ней справиться.</div>
+                    </div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 6 -->
+                <div class="dialogue-step" id="campStep6">
+                    <div class="dialogue-container">
+                        <div class="speaker-name">Юми</div>
+                        <div class="dialogue-text">Ты стал другим, Ник. Более... решительным.</div>
+                    </div>
+                    <div class="dialogue-controls" style="margin-top: 15px;">
+                        <button class="pixel-button dialogue-next">Далее</button>
+                    </div>
+                </div>
+                
+                <!-- Шаг 7 -->
+                <div class="dialogue-step" id="campStep7">
+                    <div class="dialogue-container">
+                        <div class="speaker-name">Ник</div>
+                        <div class="dialogue-text">Просто понял, что лучше сделать ошибку, чем оставаться в вечном "между". Давай разведём костёр.</div>
+                    </div>
+                    <div class="dialogue-controls" style="margin-top: 25px;">
+                        <button class="pixel-button dialogue-next" id="finalCampButton">
+                            🏕️ ЗАКОНЧИТЬ ГЛАВУ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- МИНИ-ИГРА АКТИВАЦИИ АЛТАРЯ -->
+    <div class="mini-game-container" id="miniGame">
+        <div class="mini-game-title">⚡ АКТИВАЦИЯ ДРЕВНЕГО АЛТАРЯ ⚡</div>
+        
+        <div class="altar-game">
+            <div class="instructions">
+                <strong>ЗАДАНИЕ:</strong> Вспомни слова Голоса и расположи руны в правильном порядке.<br>
+                <span style="color:#ff6b6b">Время ограничено!</span> Выбери 4 из 6 рун.
+            </div>
+            
+            <div class="voice-hint" id="voiceHint">
+                "Шесть символов видны глазу, но лишь четыре откроют путь. Огонь, который дарит жизнь... Вода, что несёт... Воздух, что шепчет... Свет, что озаряет..."
+            </div>
+            
+            <div class="sequence-container">
+                <div class="sequence-title">ПОСЛЕДОВАТЕЛЬНОСТЬ АКТИВАЦИИ (4 слота)</div>
+                <div class="sequence-slots" id="sequenceSlots">
+                    <div class="sequence-slot" data-slot="1">?</div>
+                    <div class="sequence-slot" data-slot="2">?</div>
+                    <div class="sequence-slot" data-slot="3">?</div>
+                    <div class="sequence-slot" data-slot="4">?</div>
+                </div>
+            </div>
+            
+            <div class="runes-container" id="runesContainer">
+                <!-- Руны будут добавлены через JS -->
+            </div>
+            
+            <div class="game-controls">
+                <button class="pixel-button hint-button" id="hintButton">💭 Подсказка (3 осталось)</button>
+                <button class="pixel-button reset-button" id="resetButton">Начать заново</button>
+                <button class="pixel-button activate-button" id="activateButton">⚡ АКТИВИРОВАТЬ ⚡</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ЭКРАН РЕЗУЛЬТАТА АЛТАРЯ -->
+    <div class="game-result" id="gameResult">
+        <div class="portal-animation">🌀</div>
+        <div class="result-title" id="resultTitle">АЛТАРЬ АКТИВИРОВАН!</div>
+        <div class="result-text" id="resultText">Портал открывается... Древние силы пробуждаются. Шагни внутрь, чтобы продолжить путешествие в неизвестность.</div>
+        <button class="pixel-button" id="enterPortal">ШАГНУТЬ В ПОРТАЛ</button>
+    </div>
+
+    <!-- ОСНОВНОЙ КОНТЕЙНЕР ИГРЫ -->
+    <div class="container">
+        <!-- ПЕРВЫЙ ЭКРАН -->
+        <div id="startScreen">
+            <div class="title">День 4. Поиски алтаря</div>
+            
+            <div class="text-container">
+                Ник и мышка Юми получили древнюю карту, указывающую на местонахождение старинного алтаря, обладающего невероятной силой. Легенды гласят, что тот, кто активирует алтарь сможет перейти в другое пространство.
+            </div>
+            
+            <button class="pixel-button" id="searchButton">Выдвинуться на поиски</button>
+        </div>
+        
+        <!-- ВТОРОЙ ЭКРАН с видео и текстом -->
+        <div class="video-screen" id="videoScreen">
+            <div class="video-container">
+                <div class="video-player" id="videoPlayer">
+                    <video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+                        <source src="video/Idyt po snegy.mp4" type="video/mp4">
+                        Ваш браузер не поддерживает видео.
+                    </video>
+                </div>
+            </div>
+            
+            <div class="story-container">
+                <!-- СЦЕНЫ 1-7: Поиски алтаря -->
+                <div class="story-scene active" id="scene1">
+                    <span class="typing-text" id="typing1"></span>
+                </div>
+                
+                <div class="story-scene" id="scene2">
+                    <span class="typing-text" id="typing2"></span>
+                </div>
+                
+                <div class="story-scene" id="scene3">
+                    <span class="typing-text" id="typing3"></span>
+                </div>
+                
+                <div class="story-scene" id="scene4">
+                    <span class="typing-text" id="typing4"></span>
+                </div>
+                
+                <div class="story-scene" id="scene5">
+                    <span class="typing-text" id="typing5"></span>
+                </div>
+                
+                <div class="story-scene" id="scene6">
+                    <span class="typing-text" id="typing6"></span>
+                </div>
+                
+                <div class="story-scene" id="scene7">
+                    <span class="typing-text" id="typing7"></span>
+                </div>
+                
+                <!-- Сцена 8: Первая реплика голоса -->
+                <div class="story-scene" id="scene8">
+                    <div class="dialogue-container">
+                        <div class="speaker-name">Незнакомый голос</div>
+                        <div class="dialogue-text">Тысячелетия спустя... наконец-то пришли. Камень помнит, камень ждал. Время течет как песок, а вы... вы остановили его бег.</div>
+                    </div>
+                </div>
+                
+                <!-- Сцена 9: Вторая реплика голоса -->
+                <div class="story-scene" id="scene9">
+                    <div class="dialogue-container">
+                        <div class="speaker-name">Незнакомый голос</div>
+                        <div class="dialogue-text">Шесть символов видны глазу, но лишь четыре откроют путь. Огонь, который дарит жизнь и забирает её. Вода, что несёт и топит. Воздух, что шепчет и крушит. Свет, что озаряет и ослепляет.</div>
+                    </div>
+                </div>
+                
+                <!-- Сцена 10: Выбор действий -->
+                <div class="story-scene" id="scene10">
+                    <div class="dialogue-container">
+                        <div class="speaker-name">Незнакомый голос</div>
+                        <div class="dialogue-text">Выбери верный порядок, и врата откроются. Ошибешься... и останешься здесь, как многие до тебя.</div>
+                        
+                        <div class="options-container">
+                            <button class="option-button" id="optionActivate">Начать активацию алтаря</button>
+                            <button class="option-button" id="optionAskMore">Спросить подробнее</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Сцена 11: Диалог с вопросами -->
+                <div class="story-scene" id="scene11">
+                    <button class="back-button" id="backFromQuestions">← Назад</button>
+                    
+                    <div class="dialogue-container">
+                        <div class="speaker-name">Незнакомый голос</div>
+                        <div class="dialogue-text">Задай свои вопросы, странник...</div>
+                    </div>
+                    
+                    <div class="questions-container" id="questionsContainer"></div>
+                    
+                    <div class="dialogue-container" id="answerContainer" style="display: none;">
+                        <div class="speaker-name">Незнакомый голос</div>
+                        <div class="dialogue-text" id="answerText"></div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="pixel-button" id="continueToActivation" style="display: none;">Понятно. Перейти к активации</button>
+                        <button class="pixel-button" id="askMoreQuestions" style="display: none;">Спросить ещё</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="next-button-container">
+                <button class="pixel-button" id="nextButton">Далее</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // ===================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ =====================
+    let currentScene = 0;
+    let isTyping = false;
+    let typingInterval = null;
+    let askedQuestions = new Set();
+    let selectedRunes = [];
+    let currentSlot = 1;
+    let miniGameHints = 3;
+    let currentProcrastinatusScene = 1;
+    let currentVideoElement = null;
+    let currentVideoSrc = '';
+    let isInProcrastinatusWorld = false;
+    let procrastinationChoiceMade = false;
+    let procrastinationChoice = null;
+    
+    // Управление звуком
+    let isSoundEnabled = true;
+    let backgroundMusic = document.getElementById('backgroundMusic');
+    let volumeLevel = 0.5;
+    
+    // Данные для игры петли времени
+    let loopGameState = {
+        attempt: 1,
+        energy: 10,
+        hints: 3,
+        progress: 0,
+        sceneIndex: 0,
+        usedActions: new Set(),
+        lastAction: null
+    };
+    
+    const loopGameData = {
+        maxEnergy: 10,
+        maxHints: 3,
+        actions: [
+            {
+                id: 'analyze',
+                title: '🔍 Исследовать',
+                cost: 2,
+                successRate: 0.7,
+                resultMessages: [
+                    'Ты обнаруживаешь закономерность в движении тумана...',
+                    'Исследование показывает слабые места в петле...',
+                    'Ты замечаешь повторяющиеся символы на деревьях...'
+                ]
+            },
+            {
+                id: 'mark',
+                title: '📍 Метка',
+                cost: 1,
+                successRate: 0.8,
+                resultMessages: [
+                    'Метка помогает отслеживать повторения...',
+                    'Ты оставляешь следы, но они исчезают...',
+                    'Метки показывают, что ты действительно движешься по кругу...'
+                ]
+            },
+            {
+                id: 'memory',
+                title: '🧠 Запомнить',
+                cost: 0,
+                successRate: 0.9,
+                resultMessages: [
+                    'Ты запоминаешь последовательность деревьев...',
+                    'Память подсказывает тебе правильный путь...',
+                    'Ты вспоминаешь, где уже был...'
+                ]
+            },
+            {
+                id: 'run',
+                title: '🏃 Бежать',
+                cost: 3,
+                successRate: 0.5,
+                resultMessages: [
+                    'Ты бежишь изо всех сил, но возвращаешься к началу...',
+                    'Бег истощает силы, но показывает выход...',
+                    'Скорость не помогает, нужна стратегия...'
+                ]
+            }
+        ],
+        scenes: [
+            { emoji: '🔄', text: '⏳ Вы застряли в бесконечной петле времени. Вокруг туман, повторяющиеся деревья...' },
+            { emoji: '🌫️', text: 'Туман сгущается... Фиолетовый свет становится ярче. Деревья шепчут...' },
+            { emoji: '👣', text: 'Твои следы исчезают за спиной. Кажется, ты уже был здесь...' },
+            { emoji: '🌀', text: 'Время закручивается в спираль. Прошлое и будущее смешиваются...' }
+        ],
+        yumiHints: {
+            general: [
+                '🐭 "Я заметила: дерево с рукой появляется каждые три круга!"',
+                '🐭 "Туман реагирует на твои мысли! Думай о выходе!"',
+                '🐭 "Время здесь течёт по спирали, а не по прямой!"',
+                '🐭 "Попробуй идти в противоположном направлении!"',
+                '🐭 "Смотри на тени! Они не меняются со временем!"'
+            ],
+            analyze: '🐭 "Исследуй внимательнее! Я чувствую слабые вибрации в воздухе..."',
+            mark: '🐭 "Метки исчезают, но память остаётся! Запоминай!"',
+            memory: '🐭 "Твоя память - ключ! Вспоминай каждый поворот!"',
+            run: '🐭 "Не беги! Двигайся медленно и осознанно!"'
+        }
+    };
+    
+    // Данные рун для мини-игры
+    const runesData = [
+        { id: 1, name: "ОГОНЬ", symbol: "🔥", correctPosition: 1 },
+        { id: 2, name: "ВОЗДУХ", symbol: "💨", correctPosition: 3 },
+        { id: 3, name: "ВОДА", symbol: "💧", correctPosition: 2 },
+        { id: 4, name: "ЗЕМЛЯ", symbol: "🪨", correctPosition: null },
+        { id: 5, name: "СВЕТ", symbol: "✨", correctPosition: 4 },
+        { id: 6, name: "ТЕНЬ", symbol: "🌑", correctPosition: null }
+    ];
+    
+    const correctSequence = [1, 3, 2, 5];
+    
+    // Тексты сцен
+    const sceneTexts = [
+        "День выдался морозным. Ник и мышка Юми бредут по заснеженному полю, проваливаясь по колено в пушистый снег.",
+        "Карта показывает, что алтарь должен быть где-то посреди этого бескрайнего поля.",
+        "С каждым шагом становится всё холоднее, но Ник и Юми не сдаются.",
+        "Внезапно Юми замечает странное свечение вдалеке.",
+        "Добравшись до источника света, они обнаруживают древний каменный алтарь.",
+        "Юми прыгает на алтарь и указывает на странные символы.",
+        "На алтаре лежат древние предметы: свечи, миски и загадочные ступы."
+    ];
+    
+    // Видео для сцен
+    const sceneVideos = [
+        'video/Idyt po snegy.mp4',
+        'video/Idyt po snegy.mp4',
+        'video/Idyt po snegy.mp4',
+        'video/Idyt po snegy.mp4',
+        'video/Obnaryjen altar.mp4',
+        'video/Altar blige.mp4',
+        'video/Altar blige.mp4',
+        'video/Altar 3.mp4',
+        'video/Altar 3.mp4',
+        'video/Altar 3.mp4',
+        'video/Altar 3.mp4'
+    ];
+    
+    // Вопросы для диалога
+    const questionsData = [
+        { id: 1, question: "Что произойдет, если я ошибся?", answer: "Ошибешься - и останешься здесь навсегда." },
+        { id: 2, question: "Какая руна идет первой?", answer: "Первое - то, что начинается с искры." },
+        { id: 3, question: "Что означают эти символы?", answer: "Это не просто элементы. Это фундаменты бытия." }
+    ];
+
+    // ИСПРАВЛЕННЫЕ ДАННЫЕ ДЛЯ ВЫБОРА ДЕЙСТВИЙ
+    const procrastinationActions = [
+        {
+            id: 1,
+            title: "СОБРАТЬ ФИОЛЕТОВЫЕ ЦВЕТЫ",
+            emoji: "💐",
+            description: "Собрать букет странных фиолетовых цветов, растущих здесь",
+            isCorrect: false
+        },
+        {
+            id: 2,
+            title: "НАРИСОВАТЬ НА ПЕСКЕ",
+            emoji: "🖌️",
+            description: "Нарисовать что-нибудь на песке, который тут же исчезает",
+            isCorrect: false
+        },
+        {
+            id: 3,
+            title: "ПОГОВОРИТЬ С ДЕРЕВЬЯМИ",
+            emoji: "🌳",
+            description: "Попытаться заговорить с деревьями-призраками",
+            isCorrect: false
+        },
+        {
+            id: 4,
+            title: "ПОДУМАТЬ КАК ВЫБРАТЬСЯ",
+            emoji: "🧠",
+            description: "Сосредоточиться и подумать о способе побега из этого мира",
+            isCorrect: true
+        }
+    ];
+
+    // ===================== ФУНКЦИИ СМЕНЫ ФОНА =====================
+    
+    function setBackground(type) {
+        const body = document.body;
+        
+        if (type === 'default') {
+            body.classList.remove('shadow-world-bg');
+            body.classList.add('default-bg');
+        } else if (type === 'shadow-world') {
+            body.classList.remove('default-bg');
+            body.classList.add('shadow-world-bg');
+        }
+    }
+
+    // ===================== УПРАВЛЕНИЕ ЗВУКОМ =====================
+    
+    function initAudio() {
+        backgroundMusic.volume = volumeLevel;
+        
+        function playMusic() {
+            backgroundMusic.play().then(() => {
+                console.log("🎵 Фоновая музыка успешно воспроизводится");
+            }).catch(error => {
+                console.log("⚠️ Автовоспроизведение заблокировано браузером. Звук включится после взаимодействия пользователя.");
+                console.log("Сообщение об ошибке:", error.message);
+                
+                document.addEventListener('click', function enableMusic() {
+                    if (isSoundEnabled && backgroundMusic.paused) {
+                        backgroundMusic.play().then(() => {
+                            console.log("🎵 Музыка включена после взаимодействия пользователя");
+                        }).catch(e => {
+                            console.log("❌ Ошибка при воспроизведении:", e.message);
+                        });
+                    }
+                    document.removeEventListener('click', enableMusic);
+                }, { once: true });
+            });
+        }
+        
+        playMusic();
+        
+        document.getElementById('audioToggle').addEventListener('click', toggleSound);
+        
+        document.getElementById('volumeSlider').addEventListener('input', function(e) {
+            volumeLevel = e.target.value / 100;
+            if (isSoundEnabled) {
+                backgroundMusic.volume = volumeLevel;
+            }
+        });
+    }
+    
+    function toggleSound() {
+        isSoundEnabled = !isSoundEnabled;
+        const audioBtn = document.getElementById('audioToggle');
+        
+        if (isSoundEnabled) {
+            backgroundMusic.volume = volumeLevel;
+            backgroundMusic.play().catch(e => {
+                console.log("Ошибка при включении звука:", e.message);
+            });
+            audioBtn.textContent = '🔊';
+        } else {
+            backgroundMusic.volume = 0;
+            audioBtn.textContent = '🔇';
+        }
+    }
+    
+    // ===================== ОСНОВНЫЕ ФУНКЦИИ ИГРЫ =====================
+    
+    function showScene(sceneIndex) {
+        currentScene = sceneIndex;
+        
+        const scenes = document.querySelectorAll('.story-scene');
+        scenes.forEach(scene => scene.classList.remove('active'));
+        
+        if (sceneIndex < scenes.length) {
+            scenes[sceneIndex].classList.add('active');
+        }
+        
+        updateVideo(sceneIndex);
+        updateNextButton(sceneIndex);
+        
+        if (sceneIndex < 7) {
+            const textElement = document.getElementById(`typing${sceneIndex + 1}`);
+            if (textElement && sceneTexts[sceneIndex]) {
+                typeText(textElement, sceneTexts[sceneIndex], 40);
+            }
+        }
+        
+        if (sceneIndex === 10) {
+            initQuestionsScene();
+        }
+    }
+    
+    function updateVideo(sceneIndex) {
+        const videoPlayer = document.getElementById('videoPlayer');
+        
+        if (sceneIndex < sceneVideos.length) {
+            const videoSrc = sceneVideos[sceneIndex];
+            
+            if (currentVideoSrc !== videoSrc) {
+                if (currentVideoElement) {
+                    currentVideoElement.pause();
+                    currentVideoElement.currentTime = 0;
+                }
+                
+                videoPlayer.innerHTML = `
+                    <video autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover;">
+                        <source src="${videoSrc}" type="video/mp4">
+                        Ваш браузер не поддерживает видео.
+                    </video>
+                `;
+                
+                currentVideoElement = videoPlayer.querySelector('video');
+                currentVideoSrc = videoSrc;
+                
+                if (currentVideoElement) {
+                    currentVideoElement.play().catch(e => {
+                        console.log("Ошибка воспроизведения видео:", e.message);
+                    });
+                }
+            } else {
+                if (currentVideoElement) {
+                    if (currentVideoElement.paused) {
+                        currentVideoElement.play().catch(e => {
+                            console.log("Ошибка возобновления видео:", e.message);
+                        });
+                    }
+                }
+            }
+        }
+    }
+    
+    function updateNextButton(sceneIndex) {
+        const nextButton = document.getElementById('nextButton');
+        
+        if (sceneIndex === 9 || sceneIndex === 10) {
+            nextButton.style.display = 'none';
+        } else {
+            nextButton.style.display = 'block';
+        }
+    }
+    
+    function typeText(element, text, speed = 40) {
+        isTyping = true;
+        element.innerHTML = '';
+        let i = 0;
+        
+        typingInterval = setInterval(() => {
+            if (i < text.length) {
+                element.innerHTML += text.charAt(i);
+                i++;
+            } else {
+                clearInterval(typingInterval);
+                isTyping = false;
+            }
+        }, speed);
+    }
+    
+    function stopTyping() {
+        if (typingInterval) {
+            clearInterval(typingInterval);
+            isTyping = false;
+        }
+    }
+    
+    function showFullText() {
+        if (currentScene < 7) {
+            const textElement = document.getElementById(`typing${currentScene + 1}`);
+            if (textElement && sceneTexts[currentScene]) {
+                textElement.innerHTML = sceneTexts[currentScene];
+            }
+        }
+    }
+    
+    // ===================== ФУНКЦИИ ВОПРОСОВ АЛТАРЯ =====================
+    
+    function initQuestionsScene() {
+        const questionsContainer = document.getElementById('questionsContainer');
+        questionsContainer.innerHTML = '';
+        
+        const unansweredQuestions = questionsData.filter(q => !askedQuestions.has(q.id));
+        
+        if (unansweredQuestions.length > 0) {
+            unansweredQuestions.forEach(question => {
+                const questionElement = document.createElement('div');
+                questionElement.className = 'question-item';
+                questionElement.innerHTML = question.question;
+                questionElement.addEventListener('click', () => showAnswer(question));
+                questionsContainer.appendChild(questionElement);
+            });
+        } else {
+            const message = document.createElement('div');
+            message.className = 'question-item';
+            message.innerHTML = "Вы задали все возможные вопросы. Теперь можно перейти к активации алтаря.";
+            questionsContainer.appendChild(message);
+        }
+        
+        const continueBtn = document.getElementById('continueToActivation');
+        const askMoreBtn = document.getElementById('askMoreQuestions');
+        
+        if (askedQuestions.size >= questionsData.length) {
+            continueBtn.style.display = 'inline-block';
+            askMoreBtn.style.display = 'none';
+        } else {
+            askMoreBtn.style.display = 'inline-block';
+        }
+    }
+    
+    function showAnswer(question) {
+        askedQuestions.add(question.id);
+        
+        document.getElementById('answerText').textContent = question.answer;
+        document.getElementById('answerContainer').style.display = 'block';
+        document.getElementById('questionsContainer').style.display = 'none';
+        
+        document.getElementById('continueToActivation').style.display = 'inline-block';
+        document.getElementById('askMoreQuestions').style.display = 'inline-block';
+    }
+    
+    function resetQuestionsView() {
+        document.getElementById('answerContainer').style.display = 'none';
+        document.getElementById('questionsContainer').style.display = 'block';
+        document.getElementById('continueToActivation').style.display = 'none';
+        document.getElementById('askMoreQuestions').style.display = 'none';
+        
+        initQuestionsScene();
+    }
+    
+    // ===================== МИНИ-ИГРА АЛТАРЯ =====================
+    
+    function startMiniGame() {
+        document.getElementById('videoScreen').style.display = 'none';
+        document.getElementById('miniGame').classList.add('active');
+        
+        initRunes();
+        resetSequence();
+        miniGameHints = 3;
+        document.getElementById('hintButton').textContent = '💭 Подсказка (3 осталось)';
+        document.getElementById('hintButton').disabled = false;
+    }
+    
+    function initRunes() {
+        const runesContainer = document.getElementById('runesContainer');
+        runesContainer.innerHTML = '';
+        
+        runesData.forEach(rune => {
+            const runeElement = document.createElement('div');
+            runeElement.className = 'rune-item';
+            runeElement.innerHTML = `
+                <div style="font-size: 30px; margin-bottom: 8px;">${rune.symbol}</div>
+                <div style="font-size: 11px; color: #ffd54f;">${rune.name}</div>
+            `;
+            
+            runeElement.addEventListener('click', () => {
+                selectRune(rune);
+            });
+            
+            runesContainer.appendChild(runeElement);
+        });
+    }
+    
+    function selectRune(rune) {
+        if (selectedRunes.length >= 4) return;
+        
+        if (selectedRunes.find(r => r.id === rune.id)) return;
+        
+        selectedRunes.push(rune);
+        
+        const slot = document.querySelector(`.sequence-slot[data-slot="${currentSlot}"]`);
+        slot.textContent = rune.symbol;
+        slot.classList.add('filled');
+        
+        currentSlot++;
+        
+        if (selectedRunes.length === 4) {
+            document.getElementById('activateButton').disabled = false;
+        }
+    }
+    
+    function resetSequence() {
+        selectedRunes = [];
+        currentSlot = 1;
+        
+        const slots = document.querySelectorAll('.sequence-slot');
+        slots.forEach(slot => {
+            slot.textContent = '?';
+            slot.classList.remove('filled');
+        });
+        
+        document.getElementById('activateButton').disabled = true;
+    }
+    
+    function giveHint() {
+        if (miniGameHints <= 0) return;
+        miniGameHints--;
+        
+        document.getElementById('hintButton').textContent = `💭 Подсказка (${miniGameHints} осталось)`;
+        
+        const hints = [
+            "Первая руна - 🔥 ОГОНЬ",
+            "Вторая руна течёт как 💧 ВОДА",
+            "Третья руна невидима как 💨 ВОЗДУХ",
+            "Последняя руна озаряет как ✨ СВЕТ",
+            "Порядок: начало с огня, затем вода..."
+        ];
+        
+        const randomHint = hints[Math.floor(Math.random() * hints.length)];
+        
+        const hintDisplay = document.createElement('div');
+        hintDisplay.style.position = 'fixed';
+        hintDisplay.style.top = '50%';
+        hintDisplay.style.left = '50%';
+        hintDisplay.style.transform = 'translate(-50%, -50%)';
+        hintDisplay.style.background = 'rgba(42, 32, 20, 0.95)';
+        hintDisplay.style.border = '5px solid #8bc34a';
+        hintDisplay.style.padding = '25px';
+        hintDisplay.style.borderRadius = '12px';
+        hintDisplay.style.color = '#ffd54f';
+        hintDisplay.style.fontSize = '14px';
+        hintDisplay.style.zIndex = '10000';
+        hintDisplay.style.textAlign = 'center';
+        hintDisplay.innerHTML = `
+            <div style="margin-bottom: 15px;">💭 ПОДСКАЗКА:</div>
+            <div>${randomHint}</div>
+            <button style="margin-top: 20px; padding: 10px 20px; background: #4a8b4a; color: white; border: none; border-radius: 8px; cursor: pointer;" onclick="this.parentElement.remove()">
+                Понятно
+            </button>
+        `;
+        
+        document.body.appendChild(hintDisplay);
+        
+        if (miniGameHints <= 0) {
+            document.getElementById('hintButton').disabled = true;
+        }
+    }
+    
+    function checkSequence() {
+        const userSequence = selectedRunes.map(rune => rune.id);
+        let correctCount = 0;
+        
+        for (let i = 0; i < 4; i++) {
+            if (userSequence[i] === correctSequence[i]) correctCount++;
+        }
+        
+        showAltarResult(correctCount);
+    }
+    
+    function showAltarResult(correctCount) {
+        document.getElementById('miniGame').classList.remove('active');
+        
+        if (correctCount === 4) {
+            document.getElementById('gameResult').classList.add('active');
+            document.getElementById('resultTitle').textContent = 'АЛТАРЬ АКТИВИРОВАН!';
+            document.getElementById('resultText').innerHTML = 'Портал открывается... Древние силы пробуждаются. Шагни внутрь, чтобы продолжить путешествие в неизвестность.<br><br><em style="color:#8bc34a; font-size:13px;">Тень ждёт вас в этом мире фиолетовых туманов. Но будьте осторожны - здесь правит Прокрастинатус, сущеное вечного промедления.</em>';
+        } else {
+            alert(`Вы угадали ${correctCount} из 4 рун.\n\nПравильный порядок:\n1. 🔥 ОГОНЬ\n2. 💧 ВОДА\n3. 💨 ВОЗДУХ\n4. ✨ СВЕТ\n\nПопробуйте ещё раз!`);
+            resetSequence();
+        }
+    }
+    
+    // ===================== ПЕРЕХОД В МИР ПРОКРАСТИНАТУСА =====================
+    
+    function startShadowTransition() {
+        document.getElementById('gameResult').classList.remove('active');
+        document.getElementById('shadowTransition').classList.add('active');
+        
+        const video = document.getElementById('transitionVideoPlayer');
+        
+        video.currentTime = 0;
+        video.play().catch(e => console.log("Ошибка воспроизведения:", e));
+        
+        video.onended = () => {
+            document.getElementById('shadowTransition').classList.remove('active');
+            startProcrastinatusWorld();
+        };
+        
+        setTimeout(() => {
+            if (document.getElementById('shadowTransition').classList.contains('active')) {
+                document.getElementById('shadowTransition').classList.remove('active');
+                startProcrastinatusWorld();
+            }
+        }, 8000);
+    }
+    
+    function startProcrastinatusWorld() {
+        console.log('Начало загрузки мира Прокрастинатуса');
+        
+        // Скрываем основной экран
+        document.getElementById('videoScreen').style.display = 'none';
+        
+        // Показываем мир Прокрастинатуса
+        document.getElementById('procrastinatusWorld').classList.add('active');
+        currentProcrastinatusScene = 1;
+        isInProcrastinatusWorld = true;
+        
+        // Меняем фон на мир Прокрастинатуса
+        setBackground('shadow-world');
+        console.log('Фон изменен на shadow-world');
+        
+        // Показываем кнопку "Далее" в мире Прокрастинатуса
+        document.getElementById('nextButton').style.display = 'block';
+        
+        showProcrastinatusScene(1);
+    }
+    
+    function showProcrastinatusScene(sceneNumber) {
+        const scenes = document.querySelectorAll('.procrastinatus-scene');
+        scenes.forEach(scene => {
+            scene.classList.remove('active');
+        });
+        
+        const scene = document.getElementById(`procrastinatusScene${sceneNumber}`);
+        if (scene) {
+            scene.classList.add('active');
+            currentProcrastinatusScene = sceneNumber;
+            
+            resetDialogueForScene(sceneNumber);
+            
+            // Если это сцена 5, инициализируем выбор действий
+            if (sceneNumber === 5 && !procrastinationChoiceMade) {
+                initProcrastinationChoiceGame();
+            }
+        }
+    }
+    
+    function resetDialogueForScene(sceneNumber) {
+        const scene = document.getElementById(`procrastinatusScene${sceneNumber}`);
+        if (!scene) return;
+        
+        const steps = scene.querySelectorAll('.dialogue-step');
+        steps.forEach(step => {
+            step.classList.remove('active');
+        });
+        
+        if (steps.length > 0) {
+            steps[0].classList.add('active');
+        }
+    }
+    
+    // ===================== УПРАВЛЕНИЕ КНОПКОЙ "ДАЛЕЕ" =====================
+    
+    function handleNextButton() {
+        if (isInProcrastinatusWorld) {
+            handleProcrastinatusNext();
+        } else {
+            handleMainGameNext();
+        }
+    }
+    
+    function handleMainGameNext() {
+        if (isTyping) {
+            stopTyping();
+            showFullText();
+            return;
+        }
+        
+        if (currentScene < 10) {
+            currentScene++;
+            showScene(currentScene);
+        }
+    }
+    
+    function handleProcrastinatusNext() {
+        const activeScene = document.querySelector('.procrastinatus-scene.active');
+        if (!activeScene) return;
+        
+        const sceneNumber = parseInt(activeScene.id.replace('procrastinatusScene', ''));
+        const activeStep = activeScene.querySelector('.dialogue-step.active');
+        
+        if (!activeStep) return;
+        
+        const steps = activeScene.querySelectorAll('.dialogue-step');
+        const currentIndex = Array.from(steps).indexOf(activeStep);
+        
+        if (currentIndex < steps.length - 1) {
+            // Переход к следующему шагу диалога
+            activeStep.classList.remove('active');
+            steps[currentIndex + 1].classList.add('active');
+            
+            // Обновляем текст кнопки, если это последний шаг перед выходом
+            if (sceneNumber === 5 && currentIndex + 1 === steps.length - 2) {
+                document.getElementById('nextButton').textContent = '🚶‍♂️ ВЫЙТИ ИЗ МИРА ТЕНИ';
+            }
+        } else {
+            // Последний шаг диалога, переходим к следующей сцене
+            if (sceneNumber === 1) {
+                showProcrastinatusScene(2);
+            } else if (sceneNumber === 2) {
+                showProcrastinatusScene(3);
+            } else if (sceneNumber === 3) {
+                showProcrastinatusScene(4);
+            } else if (sceneNumber === 4) {
+                // Сцена 4 - запуск мини-игры петли времени
+                showLoopMechanic();
+                document.getElementById('nextButton').style.display = 'none';
+            } else if (sceneNumber === 5) {
+                // Проверяем, какой вариант был выбран
+                if (procrastinationChoice) {
+                    if (procrastinationChoice.isCorrect) {
+                        // Правильный выбор (4-й вариант) - переходим к лагерю
+                        showProcrastinatusScene(6);
+                    } else {
+                        // Неправильный выбор (1-3 варианты) - показываем экран завершения
+                        showChapterCompleteScreen(false);
+                    }
+                }
+            } else if (sceneNumber === 6) {
+                // Последняя сцена (лагерь) - показываем экран завершения с успехом
+                showChapterCompleteScreen(true);
+            }
+        }
+    }
+    
+    // ===================== МИНИ-ИГРА ПЕТЛИ ВРЕМЕНИ =====================
+    
+    function showLoopMechanic() {
+        const loopMechanic = document.getElementById('loopMechanic');
+        loopMechanic.style.display = 'block';
+        loopMechanic.classList.add('active');
+        
+        const dialogueSteps = document.querySelectorAll('#procrastinatusScene4 .dialogue-step');
+        dialogueSteps.forEach(step => step.style.display = 'none');
+        
+        initLoopGame();
+    }
+    
+    function initLoopGame() {
+        const loopActionsContainer = document.getElementById('loopActionsContainer');
+        loopActionsContainer.innerHTML = '';
+        
+        loopGameData.actions.forEach(action => {
+            const button = document.createElement('button');
+            button.className = 'loop-action-btn';
+            button.setAttribute('data-action', action.id);
+            button.title = action.resultMessages[0];
+            
+            button.innerHTML = `
+                <span class="loop-action-emoji">${action.title.split(' ')[0]}</span>
+                <div class="loop-action-text">
+                    <div class="loop-action-title">${action.title}</div>
+                    <div class="loop-action-cost">Энергия: ${action.cost > 0 ? '-' + action.cost : '+' + Math.abs(action.cost)}</div>
+                </div>
+            `;
+            
+            button.addEventListener('click', () => {
+                performLoopAction(action);
+            });
+            
+            loopActionsContainer.appendChild(button);
+        });
+        
+        updateLoopUI();
+        
+        const logContainer = document.getElementById('loopGameLog');
+        if (logContainer) {
+            logContainer.innerHTML = `
+                <div class="loop-log-entry">🌟 Мы попали в петлю времени! Нужно найти выход...</div>
+                <div class="loop-log-entry loop-log-yumi">🐭 Юми: "Ник, всё повторяется! Давай подумаем..."</div>
+            `;
+        }
+        
+        const loopFinishBtn = document.getElementById('loopFinishBtn');
+        if (loopFinishBtn) {
+            loopFinishBtn.style.display = 'none';
+        }
+        
+        loopGameState.progress = 0;
+        const loopProgressFill = document.getElementById('loopProgressFill');
+        const loopProgressPercent = document.getElementById('loopProgressPercent');
+        if (loopProgressFill) loopProgressFill.style.width = '0%';
+        if (loopProgressPercent) loopProgressPercent.textContent = '0%';
+    }
+    
+    function updateLoopUI() {
+        const loopAttemptCount = document.getElementById('loopAttemptCount');
+        const loopEnergyCount = document.getElementById('loopEnergyCount');
+        const loopHintCount = document.getElementById('loopHintCount');
+        const loopProgressPercent = document.getElementById('loopProgressPercent');
+        const loopProgressFill = document.getElementById('loopProgressFill');
+        
+        if (loopAttemptCount) loopAttemptCount.textContent = loopGameState.attempt;
+        if (loopEnergyCount) loopEnergyCount.textContent = loopGameState.energy;
+        if (loopHintCount) loopHintCount.textContent = loopGameState.hints;
+        if (loopProgressPercent) loopProgressPercent.textContent = `${loopGameState.progress}%`;
+        if (loopProgressFill) loopProgressFill.style.width = `${loopGameState.progress}%`;
+        
+        if (loopGameData.scenes && loopGameState.sceneIndex < loopGameData.scenes.length) {
+            const scene = loopGameData.scenes[loopGameState.sceneIndex % loopGameData.scenes.length];
+            if (document.getElementById('loopSceneEmoji')) {
+                document.getElementById('loopSceneEmoji').textContent = scene.emoji;
+            }
+            if (document.getElementById('loopSceneText')) {
+                document.getElementById('loopSceneText').textContent = scene.text;
+            }
+        }
+        
+        updateLoopButtons();
+    }
+    
+    function updateLoopButtons() {
+        const loopGetHintBtn = document.getElementById('loopGetHintBtn');
+        const loopAnalyzeBtn = document.getElementById('loopAnalyzeBtn');
+        
+        if (loopGetHintBtn) {
+            loopGetHintBtn.disabled = loopGameState.energy < 1 || loopGameState.hints <= 0;
+        }
+        if (loopAnalyzeBtn) {
+            loopAnalyzeBtn.disabled = loopGameState.energy < 1;
+        }
+        
+        const actionButtons = document.querySelectorAll('#loopActionsContainer .loop-action-btn');
+        actionButtons.forEach(button => {
+            const actionId = button.getAttribute('data-action');
+            if (actionId) {
+                const action = loopGameData.actions.find(a => a.id === actionId);
+                if (action) {
+                    const canAfford = loopGameState.energy >= (action.cost > 0 ? action.cost : 0);
+                    button.disabled = !canAfford;
+                    button.style.opacity = canAfford ? '1' : '0.5';
+                }
+            }
+        });
+    }
+    
+    function performLoopAction(action) {
+        if (loopGameState.energy < (action.cost > 0 ? action.cost : 0)) {
+            addLoopLog("❌ Недостаточно энергии!", 'system');
+            return;
+        }
+        
+        loopGameState.energy = Math.max(0, Math.min(loopGameData.maxEnergy, 
+            loopGameState.energy - action.cost));
+        
+        loopGameState.attempt++;
+        loopGameState.usedActions.add(action.id);
+        loopGameState.lastAction = action.id;
+        
+        const isSuccessful = Math.random() < action.successRate;
+        const messageIndex = Math.floor(Math.random() * action.resultMessages.length);
+        const message = action.resultMessages[messageIndex];
+        
+        addLoopLog(`${message} ${isSuccessful ? '✅' : '❌'}`, 'action');
+        
+        let progressIncrease = isSuccessful ? 
+            (15 + Math.floor(Math.random() * 10)) : 
+            (5 + Math.floor(Math.random() * 5));
+        
+        loopGameState.progress = Math.min(100, loopGameState.progress + progressIncrease);
+        
+        if (loopGameState.usedActions.size % 3 === 0) {
+            loopGameState.sceneIndex++;
+        }
+        
+        updateLoopUI();
+        
+        checkLoopCompletion();
+    }
+    
+    function addLoopLog(text, type = 'system') {
+        const entry = document.createElement('div');
+        entry.className = `loop-log-entry ${type === 'yumi' ? 'loop-log-yumi' : type === 'action' ? 'loop-log-action' : ''}`;
+        entry.textContent = text;
+        
+        const logContainer = document.getElementById('loopGameLog');
+        if (logContainer) {
+            logContainer.appendChild(entry);
+            
+            const entries = logContainer.querySelectorAll('.loop-log-entry');
+            if (entries.length > 8) entries[0].remove();
+            
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+    }
+    
+    function checkLoopCompletion() {
+        if (loopGameState.progress >= 100) {
+            addLoopLog("🌟 Прогресс достиг 100%! Выход найден!", 'system');
+            
+            const loopFinishBtn = document.getElementById('loopFinishBtn');
+            if (loopFinishBtn) {
+                loopFinishBtn.style.display = 'inline-block';
+                loopFinishBtn.classList.add('active');
+                
+                loopFinishBtn.style.animation = 'pulse 1.5s infinite';
+            }
+        } else if (loopGameState.energy <= 0 && loopGameState.hints <= 0) {
+            setTimeout(() => {
+                addLoopLog("💀 Энергия исчерпана... Петля затягивает обратно...", 'system');
+                setTimeout(() => {
+                    if (confirm("Энергия закончилась! Начать заново?")) {
+                        resetLoopGame();
+                    }
+                }, 1500);
+            }, 1000);
+        }
+    }
+    
+    function resetLoopGame() {
+        loopGameState = {
+            attempt: 1,
+            energy: 10,
+            hints: 3,
+            progress: 0,
+            sceneIndex: 0,
+            usedActions: new Set(),
+            lastAction: null
+        };
+        
+        const loopGameLog = document.getElementById('loopGameLog');
+        if (loopGameLog) {
+            loopGameLog.innerHTML = `
+                <div class="loop-log-entry">🌟 Мы попали в петлю времени! Нужно найти выход...</div>
+                <div class="loop-log-entry loop-log-yumi">🐭 Юми: "Ник, всё повторяется! Давай подумаем..."</div>
+            `;
+        }
+        
+        const loopFinishBtn = document.getElementById('loopFinishBtn');
+        if (loopFinishBtn) {
+            loopFinishBtn.style.display = 'none';
+        }
+        updateLoopUI();
+    }
+    
+    function finishLoopGame() {
+        const loopMechanic = document.getElementById('loopMechanic');
+        if (loopMechanic) {
+            loopMechanic.style.display = 'none';
+            loopMechanic.classList.remove('active');
+        }
+        
+        // Показываем кнопку "Далее" снова
+        document.getElementById('nextButton').style.display = 'block';
+        document.getElementById('nextButton').textContent = 'Далее';
+        
+        showProcrastinatusScene(5);
+    }
+    
+    // ===================== МИНИ-ИГРА ВЫБОРА ДЕЙСТВИЙ ПРОКРАСТИНАЦИИ =====================
+    
+    function initProcrastinationChoiceGame() {
+        const actionsContainer = document.getElementById('procrastinationActions');
+        if (!actionsContainer) return;
+        
+        actionsContainer.innerHTML = '';
+        
+        procrastinationActions.forEach(action => {
+            const button = document.createElement('button');
+            button.className = 'stagnation-action-btn';
+            button.setAttribute('data-action', action.id);
+            
+            button.innerHTML = `
+                <div class="stagnation-action-emoji">${action.emoji}</div>
+                <div class="stagnation-action-text">
+                    <strong>${action.title}</strong><br>
+                    ${action.description}
+                </div>
+            `;
+            
+            button.addEventListener('click', () => {
+                selectProcrastinationAction(action);
+            });
+            
+            actionsContainer.appendChild(button);
+        });
+    }
+    
+    function selectProcrastinationAction(action) {
+        procrastinationChoiceMade = true;
+        procrastinationChoice = action;
+        
+        // Отключаем все кнопки
+        document.querySelectorAll('#procrastinationActions .stagnation-action-btn').forEach(btn => {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+        });
+        
+        // Выделяем выбранную кнопку
+        event.target.classList.add('selected');
+        
+        // Если выбран правильный вариант (4-й)
+        if (action.isCorrect) {
+            // Проигрываем видео распада
+            const raspadVideo = document.querySelector('#raspadVideoPlayer video');
+            if (raspadVideo) {
+                raspadVideo.currentTime = 0;
+                raspadVideo.play().catch(e => console.log("Ошибка воспроизведения видео:", e));
+            }
+            
+            // Показываем реакцию Прокрастинуса (паника)
+            setTimeout(() => {
+                const currentStep = document.querySelector('#choiceGameStep');
+                if (currentStep) {
+                    currentStep.classList.remove('active');
+                }
+                
+                const panicStep = document.getElementById('panicReactionStep');
+                if (panicStep) {
+                    panicStep.classList.add('active');
+                }
+            }, 500);
+        } else {
+            // Если выбран неправильный вариант (1-3)
+            setTimeout(() => {
+                const currentStep = document.querySelector('#choiceGameStep');
+                if (currentStep) {
+                    currentStep.classList.remove('active');
+                }
+                
+                const wrongStep = document.getElementById('wrongChoiceStep');
+                if (wrongStep) {
+                    wrongStep.classList.add('active');
+                }
+            }, 500);
+        }
+    }
+    
+    // ===================== ЭКРАН ЗАВЕРШЕНИЯ ГЛАВЫ =====================
+    
+    function showChapterCompleteScreen(isSuccess) {
+        // Возвращаем обычный фон
+        setBackground('default');
+        
+        // Скрываем мир Прокрастинатуса
+        document.getElementById('procrastinatusWorld').classList.remove('active');
+        
+        // Останавливаем фоновую музыку
+        backgroundMusic.pause();
+        backgroundMusic.currentTime = 0;
+        
+        // Показываем экран завершения главы с соответствующим сообщением
+        const chapterCompleteScreen = document.getElementById('chapterCompleteScreen');
+        const completionTitle = chapterCompleteScreen.querySelector('.completion-title');
+        const completionSubtitle = chapterCompleteScreen.querySelector('.completion-subtitle');
+        const completionMessage = chapterCompleteScreen.querySelector('.completion-message');
+        
+        if (isSuccess) {
+            // Успешное завершение (выбран 4-й вариант)
+            completionTitle.textContent = '✨ ГЛАВА ЗАВЕРШЕНА! ✨';
+            completionSubtitle.textContent = '"Мир Тени" пройден!';
+            completionMessage.innerHTML = `
+                Вы успешно победили Прокрастинатуса и сделали правильный выбор!<br>
+                Ник и Юми нашли заброшенный лагерь для отдыха перед новыми приключениями.<br><br>
+                <em>"Лучше сделать ошибку, чем оставаться в вечном 'между'".</em>
+            `;
+            
+            // Обновляем достижения для успешного прохождения
+            const achievements = chapterCompleteScreen.querySelectorAll('.achievement-item');
+            if (achievements.length >= 4) {
+                achievements[0].querySelector('.achievement-emoji').textContent = '🏆';
+                achievements[0].querySelector('.achievement-text').textContent = 'Победа над Прокрастинатусом';
+                achievements[1].querySelector('.achievement-emoji').textContent = '🧩';
+                achievements[1].querySelector('.achievement-text').textContent = 'Активация древнего алтаря';
+                achievements[2].querySelector('.achievement-emoji').textContent = '⏳';
+                achievements[2].querySelector('.achievement-text').textContent = 'Выход из петли времени';
+                achievements[3].querySelector('.achievement-emoji').textContent = '🏕️';
+                achievements[3].querySelector('.achievement-text').textContent = 'Обнаружение лагеря';
+            }
+        } else {
+            // Неудачное завершение (выбран 1-3 вариант)
+            completionTitle.textContent = '⚠️ ВЫ ОСТАЛИСЬ В МИРЕ ПРОКРАСТИНАТУСА! ⚠️';
+            completionSubtitle.textContent = '"Вы выбрали один из трёх неправильных вариантов"';
+            completionMessage.innerHTML = `
+                Вы решили заняться бессмысленными делами вместо того, чтобы подумать о побеге.<br>
+                Прокрастинатус доволен - вы остались в его мире навсегда.<br><br>
+                <em>"Завтра подумаешь... или послезавтра..."</em>
+            `;
+            
+            // Обновляем достижения для неудачного прохождения
+            const achievements = chapterCompleteScreen.querySelectorAll('.achievement-item');
+            if (achievements.length >= 4) {
+                achievements[0].querySelector('.achievement-emoji').textContent = '💐';
+                achievements[0].querySelector('.achievement-text').textContent = 'Собрали фиолетовые цветы';
+                achievements[1].querySelector('.achievement-emoji').textContent = '🖌️';
+                achievements[1].querySelector('.achievement-text').textContent = 'Рисовали на песке';
+                achievements[2].querySelector('.achievement-emoji').textContent = '🌳';
+                achievements[2].querySelector('.achievement-text').textContent = 'Говорили с деревьями';
+                achievements[3].querySelector('.achievement-emoji').textContent = '😴';
+                achievements[3].querySelector('.achievement-text').textContent = 'Попались в ловушку';
+            }
+        }
+        
+        // Показываем экран завершения
+        chapterCompleteScreen.classList.add('active');
+        
+        console.log(`✨ Глава завершена! Результат: ${isSuccess ? 'УСПЕХ' : 'ПОРАЖЕНИЕ'}`);
+    }
+    
+    // ===================== ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ =====================
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        initAudio();
+        
+        document.getElementById('searchButton').addEventListener('click', () => {
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('videoScreen').style.display = 'block';
+            currentVideoSrc = '';
+            showScene(0);
+        });
+        
+        // ГЛАВНАЯ КНОПКА "ДАЛЕЕ" - работает во всей игре
+        document.getElementById('nextButton').addEventListener('click', handleNextButton);
+        
+        // Остальные обработчики
+        document.getElementById('optionActivate').addEventListener('click', startMiniGame);
+        document.getElementById('optionAskMore').addEventListener('click', () => showScene(10));
+        document.getElementById('backFromQuestions').addEventListener('click', () => showScene(9));
+        document.getElementById('continueToActivation').addEventListener('click', startMiniGame);
+        document.getElementById('askMoreQuestions').addEventListener('click', resetQuestionsView);
+        
+        document.getElementById('hintButton').addEventListener('click', giveHint);
+        document.getElementById('resetButton').addEventListener('click', resetSequence);
+        document.getElementById('activateButton').addEventListener('click', checkSequence);
+        
+        document.getElementById('enterPortal').addEventListener('click', startShadowTransition);
+        
+        // Обработчики для мини-игры петли времени
+        document.getElementById('loopGetHintBtn')?.addEventListener('click', function() {
+            if (loopGameState.energy < 1 || loopGameState.hints <= 0) return;
+            
+            loopGameState.energy--;
+            loopGameState.hints--;
+            
+            let hint;
+            if (loopGameState.lastAction && Math.random() > 0.5) {
+                hint = loopGameData.yumiHints[loopGameState.lastAction] || 
+                       loopGameData.yumiHints.general[0];
+            } else {
+                const hintIndex = Math.floor(Math.random() * loopGameData.yumiHints.general.length);
+                hint = loopGameData.yumiHints.general[hintIndex];
+            }
+            
+            document.getElementById('loopCurrentHint').textContent = hint;
+            addLoopLog(hint, 'yumi');
+            
+            loopGameState.progress = Math.min(100, loopGameState.progress + 3);
+            updateLoopUI();
+            
+            setTimeout(() => {
+                const newHintIndex = Math.floor(Math.random() * loopGameData.yumiHints.general.length);
+                document.getElementById('loopCurrentHint').textContent = loopGameData.yumiHints.general[newHintIndex];
+            }, 5000);
+        });
+        
+        document.getElementById('loopAnalyzeBtn')?.addEventListener('click', function() {
+            if (loopGameState.energy < 1) return;
+            
+            loopGameState.energy--;
+            
+            const analyses = [
+                `🐭 'Я насчитала уже ${loopGameState.attempt} циклов. Петля ослабевает!'`,
+                `🐭 'Энергия на ${loopGameState.energy}/${loopGameData.maxEnergy}. Экономь силы!'`,
+                `🐭 'Прогресс ${loopGameState.progress}%. Мы близки к выходу!'`,
+                `🐭 'Использовано действий: ${loopGameState.usedActions.size}. Попробуй что-то новое!'`,
+                `🐭 'Туман реагирует на твои эмоции. Сохраняй спокойствие!'`
+            ];
+            
+            const analysis = analyses[Math.floor(Math.random() * analyses.length)];
+            document.getElementById('loopCurrentHint').textContent = analysis;
+            addLoopLog(`🔍 Анализ: ${analysis}`, 'yumi');
+            
+            loopGameState.progress = Math.min(100, loopGameState.progress + 8);
+            updateLoopUI();
+        });
+        
+        document.getElementById('loopFinishBtn')?.addEventListener('click', finishLoopGame);
+        
+        // Кнопки "Далее" внутри диалогов мира Прокрастинатуса
+        const allNextButtons = document.querySelectorAll('.dialogue-next');
+        allNextButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.stopPropagation(); // Останавливаем всплытие
+                
+                const sceneElement = this.closest('.procrastinatus-scene');
+                if (sceneElement) {
+                    const sceneNumber = parseInt(sceneElement.id.replace('procrastinatusScene', ''));
+                    const activeStep = sceneElement.querySelector('.dialogue-step.active');
+                    
+                    if (activeStep) {
+                        const steps = sceneElement.querySelectorAll('.dialogue-step');
+                        const currentIndex = Array.from(steps).indexOf(activeStep);
+                        
+                        if (currentIndex < steps.length - 1) {
+                            activeStep.classList.remove('active');
+                            steps[currentIndex + 1].classList.add('active');
+                        } else {
+                            // Переход к следующей сцене через главную кнопку
+                            document.getElementById('nextButton').click();
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Кнопка "Попробовать снова" при неправильном выборе
+        document.getElementById('tryAgainButton')?.addEventListener('click', function() {
+            procrastinationChoiceMade = false;
+            procrastinationChoice = null;
+            
+            // Сбрасываем выбор
+            const choiceStep = document.getElementById('choiceGameStep');
+            const wrongStep = document.getElementById('wrongChoiceStep');
+            
+            if (wrongStep) wrongStep.classList.remove('active');
+            if (choiceStep) choiceStep.classList.add('active');
+            
+            // Включаем кнопки выбора
+            document.querySelectorAll('#procrastinationActions .stagnation-action-btn').forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.classList.remove('selected');
+            });
+        });
+        
+        // Кнопка "Начать заново" на экране завершения
+        document.getElementById('restartChapterButton')?.addEventListener('click', function() {
+            if (confirm("Начать главу заново?")) {
+                location.reload();
+            }
+        });
+        
+        // Кнопка завершения в лагере
+        document.getElementById('finalCampButton')?.addEventListener('click', function() {
+            // Если игрок дошёл до лагеря, значит он выбрал правильный вариант
+            showChapterCompleteScreen(true);
+        });
+        
+        // Клик по тексту для пропуска печати
+        document.addEventListener('click', (e) => {
+            if (isTyping && !e.target.classList.contains('option-button') && 
+                !e.target.classList.contains('question-item')) {
+                stopTyping();
+                showFullText();
+            }
+        });
+        
+        console.log('Игра "День 4. Поиски алтаря" полностью загружена!');
+    });
+    </script>
+</body>
+</html>

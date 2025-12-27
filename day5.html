@@ -1,0 +1,2156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Новогоднее путешествие Ника - День 5</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Press Start 2P', cursive;
+        }
+        
+        body {
+            background: #0a001a;
+            color: #e0d0ff;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background-image: url('img/Fon day 5 ylica.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+        
+        body.castle-bg {
+            background-image: url('img/Fon day5 zamok.png');
+        }
+        
+        body.final-bg {
+            background-image: url('img/Fon day 5 ylica.png');
+            animation: finalGlow 3s infinite alternate;
+        }
+        
+        @keyframes finalGlow {
+            0% { background-color: rgba(10, 0, 26, 0.3); }
+            100% { background-color: rgba(154, 0, 255, 0.1); }
+        }
+        
+        .game-container {
+            background: rgba(10, 0, 26, 0.85);
+            border: 3px solid #8a2be2;
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 1000px;
+            width: 100%;
+            max-height: 95vh;
+            box-shadow: 0 0 30px rgba(154, 0, 255, 0.7);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .scene {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+        .scene.active {
+            display: flex;
+        }
+        
+        /* Заставка */
+        .title-scene {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 30px;
+            padding: 40px;
+        }
+        
+        .title-text {
+            color: #ffcc00;
+            font-size: 28px;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+            margin-bottom: 10px;
+            animation: titlePulse 2s infinite;
+        }
+        
+        @keyframes titlePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
+        }
+        
+        .subtitle {
+            color: #00ffff;
+            font-size: 16px;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        .start-btn {
+            background: linear-gradient(45deg, #4b0082, #8a2be2);
+            border: 3px solid #00ffff;
+            color: white;
+            padding: 15px 40px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .start-btn:hover {
+            background: linear-gradient(45deg, #8a2be2, #ff00ff);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
+        }
+        
+        /* УВЕЛИЧЕННЫЙ ВИДЕО-КОНТЕЙНЕР */
+        .video-container {
+            width: 100%;
+            height: 450px;
+            border: 3px solid #8a2be2;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+            flex-shrink: 0;
+        }
+        
+        .video-frame {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .dialog-box {
+            background: rgba(20, 0, 40, 0.95);
+            border: 3px solid #8a2be2;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 120px;
+            flex-shrink: 0;
+        }
+        
+        .dialog-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #f0e0ff;
+            min-height: 60px;
+        }
+        
+        .character {
+            color: #ff00ff;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .response {
+            color: #00ffff;
+            font-style: italic;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+            flex-shrink: 0;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #4b0082, #8a2be2);
+            border: 2px solid #00ffff;
+            color: white;
+            padding: 12px 25px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(45deg, #8a2be2, #ff00ff);
+            transform: scale(1.05);
+        }
+        
+        .qte-game-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .attack-theme {
+            color: #ff5555;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .qte-progress-container {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid #ff5555;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        .qte-progress-text {
+            text-align: center;
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #330000;
+            border: 1px solid #ff0000;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff9900);
+            width: 0%;
+            transition: width 0.2s;
+        }
+        
+        .qte-keys {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 15px 0;
+        }
+        
+        .qte-key {
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #550000, #220000);
+            border: 3px solid #880000;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: #ff6666;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        
+        .qte-key.active {
+            background: radial-gradient(circle, #ff0000, #990000);
+            border-color: #ff9900;
+            transform: scale(1.1);
+            color: white;
+        }
+        
+        .qte-key.pressed {
+            background: radial-gradient(circle, #00ff00, #009900);
+            border-color: #00ff00;
+            transform: scale(1.05);
+            color: white;
+        }
+        
+        .qte-timer {
+            color: #ffcc00;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .focus-scene {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+        }
+        
+        .focus-main-text {
+            color: #ffcc00;
+            text-align: center;
+            font-size: 20px;
+        }
+        
+        .focus-area {
+            width: 90%;
+            max-width: 400px;
+            height: 200px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #00ffff;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .hold-button {
+            width: 180px;
+            height: 70px;
+            background: linear-gradient(45deg, #008800, #00aa00);
+            border: 3px solid #00ff00;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+            z-index: 2;
+        }
+        
+        .hold-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 10px;
+            background: linear-gradient(90deg, #ffff00, #ffcc00);
+        }
+        
+        .hold-phrase {
+            position: absolute;
+            color: #aaffaa;
+            font-size: 12px;
+            animation: floatUp 2s ease-out forwards;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+        }
+        
+        .choice-scene {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .choice-title {
+            color: #ffcc00;
+            text-align: center;
+            font-size: 18px;
+        }
+        
+        .memories-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .memory-choice {
+            width: 120px;
+            height: 120px;
+            background: rgba(0, 100, 0, 0.7);
+            border: 2px solid #00ff00;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            padding: 10px;
+        }
+        
+        .memory-choice:hover {
+            background: rgba(0, 200, 0, 0.8);
+            transform: scale(1.05);
+        }
+        
+        .memory-choice.selected {
+            background: rgba(255, 255, 0, 0.9);
+            border-color: #ffff00;
+            transform: scale(1.08);
+        }
+        
+        .memory-emoji {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .memory-label {
+            font-size: 10px;
+            color: white;
+            text-align: center;
+        }
+        
+        .retry-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .retry-modal.active {
+            display: flex;
+        }
+        
+        .retry-box {
+            background: rgba(20, 0, 40, 0.95);
+            border: 3px solid #ff5555;
+            border-radius: 10px;
+            padding: 30px;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        .retry-title {
+            color: #ffcc00;
+            margin-bottom: 15px;
+        }
+        
+        .retry-btn {
+            background: linear-gradient(45deg, #ff0000, #ff5500);
+            border: 2px solid #ffcc00;
+            color: white;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        
+        .typing-cursor {
+            display: inline-block;
+            width: 6px;
+            height: 14px;
+            background-color: #ff00ff;
+            margin-left: 2px;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .instruction-box {
+            background: rgba(0, 50, 100, 0.9);
+            border: 3px solid #00ffff;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        
+        .instruction-text {
+            color: #aaffff;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        
+        /* Кнопка управления звуком */
+        .sound-control {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        
+        .sound-btn {
+            background: rgba(20, 0, 40, 0.8);
+            border: 2px solid #8a2be2;
+            color: #00ffff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            transition: 0.3s;
+        }
+        
+        .sound-btn:hover {
+            background: rgba(40, 0, 80, 0.9);
+            transform: scale(1.1);
+        }
+        
+        .sound-btn.muted {
+            color: #ff5555;
+            border-color: #ff5555;
+        }
+        
+        /* Микшер громкости */
+        .volume-mixer {
+            background: rgba(20, 0, 40, 0.9);
+            border: 2px solid #8a2be2;
+            border-radius: 10px;
+            padding: 15px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 200px;
+            box-shadow: 0 0 20px rgba(154, 0, 255, 0.5);
+        }
+        
+        .volume-mixer.active {
+            display: flex;
+        }
+        
+        .volume-control {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .volume-label {
+            color: #00ffff;
+            font-size: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .volume-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #330066;
+            border-radius: 4px;
+            outline: none;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #8a2be2;
+            border-radius: 50%;
+            border: 2px solid #00ffff;
+            cursor: pointer;
+        }
+        
+        .volume-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #8a2be2;
+            border-radius: 50%;
+            border: 2px solid #00ffff;
+            cursor: pointer;
+        }
+        
+        .final-message {
+            color: #ffcc00;
+            text-align: center;
+            font-size: 24px;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+            animation: pulse 2s infinite;
+            margin: 20px 0;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .home-text {
+            color: #aaffaa;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+        
+        .menu-btn {
+            background: linear-gradient(45deg, #008080, #00cccc);
+            border: 2px solid #00ffff;
+            color: white;
+            padding: 12px 25px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .menu-btn:hover {
+            background: linear-gradient(45deg, #00cccc, #00ffff);
+            transform: scale(1.05);
+        }
+        
+        /* Окошко поздравления - БОЛЬШОЕ И ПО ЦЕНТРУ */
+        .congrats-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            padding: 20px;
+        }
+        
+        .congrats-modal.active {
+            display: flex;
+        }
+        
+        .congrats-box {
+            background: linear-gradient(135deg, rgba(20, 0, 40, 0.98), rgba(10, 0, 26, 0.98));
+            border: 6px solid #ffcc00;
+            border-radius: 20px;
+            padding: 40px 35px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 85vh;
+            text-align: center;
+            box-shadow: 0 0 80px rgba(255, 204, 0, 0.7), 0 0 40px rgba(255, 0, 255, 0.5);
+            animation: congratsAppear 1s ease-out;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        @keyframes congratsAppear {
+            0% {
+                transform: scale(0.7);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .congrats-box::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(45deg, #ffcc00, #ff00ff, #00ffff, #ffcc00);
+            z-index: -1;
+            border-radius: 25px;
+            opacity: 0.3;
+            animation: borderGlow 4s linear infinite;
+        }
+        
+        @keyframes borderGlow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        .congrats-title {
+            color: #ffcc00;
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(255, 204, 0, 0.9);
+            line-height: 1.3;
+            padding-bottom: 15px;
+            border-bottom: 3px solid rgba(255, 204, 0, 0.3);
+            animation: titleGlow 3s infinite alternate;
+        }
+        
+        @keyframes titleGlow {
+            0% { text-shadow: 0 0 15px rgba(255, 204, 0, 0.7); }
+            100% { text-shadow: 0 0 25px rgba(255, 204, 0, 1), 0 0 15px rgba(255, 0, 255, 0.5); }
+        }
+        
+        .congrats-message-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 10px 15px 0;
+            margin-bottom: 20px;
+            max-height: 55vh;
+        }
+        
+        .congrats-message-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .congrats-message-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+        
+        .congrats-message-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #ffcc00, #ff9900);
+            border-radius: 4px;
+        }
+        
+        .congrats-message {
+            color: #ffcc99;
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 25px;
+            text-align: left;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            border-left: 6px solid #ffcc00;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .congrats-message ul {
+            padding-left: 30px;
+            margin: 20px 0;
+        }
+        
+        .congrats-message li {
+            margin-bottom: 12px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #aaffff;
+            position: relative;
+        }
+        
+        .congrats-message li::before {
+            content: '✨';
+            position: absolute;
+            left: -25px;
+            top: 0;
+        }
+        
+        .congrats-message br {
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .congrats-signature {
+            color: #ff00ff;
+            font-size: 24px;
+            text-align: right;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 3px solid rgba(255, 204, 0, 0.3);
+            animation: signatureGlow 3s infinite alternate;
+            text-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+        }
+        
+        @keyframes signatureGlow {
+            0% { 
+                text-shadow: 0 0 10px rgba(255, 0, 255, 0.7);
+                transform: translateX(0);
+            }
+            100% { 
+                text-shadow: 0 0 20px rgba(255, 0, 255, 1), 0 0 10px rgba(255, 204, 0, 0.5);
+                transform: translateX(-10px);
+            }
+        }
+        
+        .close-congrats-btn {
+            background: linear-gradient(45deg, #4b0082, #8a2be2);
+            border: 4px solid #ffcc00;
+            color: white;
+            padding: 18px 50px;
+            font-size: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .close-congrats-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+            z-index: -1;
+        }
+        
+        .close-congrats-btn:hover {
+            background: linear-gradient(45deg, #8a2be2, #ff00ff);
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.8);
+        }
+        
+        .close-congrats-btn:hover::before {
+            left: 100%;
+        }
+        
+        /* Адаптация для мобильных устройств */
+        @media (max-width: 900px) {
+            .congrats-box {
+                max-width: 95%;
+                padding: 30px 25px;
+                max-height: 90vh;
+            }
+            
+            .congrats-title {
+                font-size: 28px;
+                margin-bottom: 20px;
+            }
+            
+            .congrats-message {
+                font-size: 16px;
+                padding: 20px;
+                line-height: 1.7;
+            }
+            
+            .congrats-message li {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+            
+            .congrats-signature {
+                font-size: 20px;
+                margin-top: 20px;
+            }
+            
+            .close-congrats-btn {
+                padding: 15px 30px;
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .congrats-box {
+                padding: 25px 20px;
+                width: 98%;
+            }
+            
+            .congrats-title {
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+            
+            .congrats-message {
+                font-size: 14px;
+                padding: 15px;
+                line-height: 1.6;
+            }
+            
+            .congrats-message-container {
+                max-height: 60vh;
+            }
+            
+            .congrats-message li {
+                font-size: 13px;
+                margin-bottom: 8px;
+            }
+            
+            .congrats-signature {
+                font-size: 18px;
+                margin-top: 15px;
+                padding-top: 15px;
+            }
+            
+            .close-congrats-btn {
+                padding: 12px 25px;
+                font-size: 13px;
+            }
+            
+            .game-container {
+                padding: 15px;
+                max-height: 90vh;
+            }
+            
+            .video-container {
+                height: 300px;
+            }
+        }
+        
+        @media (max-height: 700px) {
+            .congrats-box {
+                max-height: 85vh;
+            }
+            
+            .congrats-message-container {
+                max-height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body id="page-body">
+    <!-- Панель управления звуком -->
+    <div class="sound-control">
+        <div class="sound-btn" id="sound-btn" onclick="toggleSoundPanel()" title="Управление звуком">♪</div>
+        <div class="volume-mixer" id="volume-mixer">
+            <div class="volume-control">
+                <div class="volume-label">
+                    <span>Эмбиент</span>
+                    <span id="ambient-volume-value">50%</span>
+                </div>
+                <input type="range" min="0" max="100" value="50" class="volume-slider" id="ambient-volume">
+            </div>
+            <div class="volume-control">
+                <div class="volume-label">
+                    <span>QTE Музыка</span>
+                    <span id="qte-volume-value">50%</span>
+                </div>
+                <input type="range" min="0" max="100" value="50" class="volume-slider" id="qte-volume">
+            </div>
+            <div class="volume-control">
+                <div class="volume-label">
+                    <span>Звуки кнопок</span>
+                    <span id="sfx-volume-value">70%</span>
+                </div>
+                <input type="range" min="0" max="100" value="70" class="volume-slider" id="sfx-volume">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Окошко поздравления - БОЛЬШОЕ И ПО ЦЕНТРУ -->
+    <div class="congrats-modal" id="congrats-modal">
+        <div class="congrats-box">
+            <div class="congrats-title">🎄 С НОВЫМ ГОДОМ! 🎄</div>
+            
+            <div class="congrats-message-container">
+                <div class="congrats-message">
+                    Дорогой Никита,<br><br>
+                    
+                    Этот год был разным, и тяжелым и иногда радостным. Как и любой путь. Но ты прошёл его — не просто выжил, а прожил.<br><br>
+                    
+                    Ты встретился лицом к лицу со своими тенями, принял свои неудачи как часть пути, и в этом — настоящая сила. Каждый маленький шаг вперёд, каждая преодолённая трудность, каждая улыбка сквозь трудности — всё это и есть жизнь.<br><br>
+                    
+                    Пусть в новом году ты:
+                    <ul>
+                        <li>Чаще будешь видеть свет там, где раньше замечал только темноту</li>
+                        <li>Помнить, что твоя ценность не зависит от успехов или неудач</li>
+                        <li>Позволишь себе быть собой - и я приму тебя любым</li>
+                        <li>Найдешь радость в простых моментах, которые делают жизнь прекрасной</li>
+                    </ul>
+                    
+                    Ты заслуживаешь всего хорошего. Ты достоин любви. Ты — это ты, и в этом твоя самая большая сила.<br><br>
+                    
+                    Пусть новый год принесёт тебе не только новые мечты, но и силы для их осуществления, не только новые горизонты, но и уверенность идти к ним. Пусть каждый день будет наполнен смыслом, теплом и маленькими чудесами.
+                </div>
+            </div>
+            
+            <div class="congrats-signature">
+                Я люблю тебя,<br>
+                твоя Юми 💖
+            </div>
+            <button class="close-congrats-btn" onclick="closeCongrats()">❤️ СПАСИБО, ЮМИ!</button>
+        </div>
+    </div>
+    
+    <div class="game-container">
+        <!-- Сцена 0: Заставка -->
+        <div class="scene active" id="scene0">
+            <div class="title-scene">
+                <div class="title-text">День 5</div>
+                <div class="subtitle">Финальные поиски Тени</div>
+                <div class="subtitle">Новогоднее путешествие Ника</div>
+                <div style="color: #ffaaaa; font-size: 12px; margin-top: 30px; line-height: 1.8; max-width: 600px;">
+                    Последняя ночь года подходит к концу.<br>
+                    Ник и Юми стоят на пороге финального испытания.<br>
+                    Тень, олицетворяющая все неудачи года, ждёт их в замке.<br>
+                    Пришло время с ней встретиться...
+                </div>
+                <button class="start-btn" onclick="startGame()">НАЧАТЬ</button>
+            </div>
+        </div>
+
+        <!-- Сцена 1 -->
+        <div class="scene" id="scene1">
+            <div class="video-container">
+                <video class="video-frame" autoplay muted loop playsinline>
+                    <source src="video/Yumi y kostra.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="dialog-box">
+                <div id="dialog-text-1" class="dialog-text"></div>
+            </div>
+            <div class="controls">
+                <button class="btn" id="next-btn-1" onclick="nextReplique(1)">Встать</button>
+            </div>
+        </div>
+
+        <!-- Сцена 2 -->
+        <div class="scene" id="scene2">
+            <div class="video-container">
+                <video class="video-frame" autoplay muted loop playsinline>
+                    <source src="video/Pyt k zamky.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="dialog-box">
+                <div id="dialog-text-2" class="dialog-text"></div>
+            </div>
+            <div class="controls">
+                <button class="btn" id="next-btn-2" onclick="nextReplique(2)">Далее</button>
+            </div>
+        </div>
+
+        <!-- Сцена 3 -->
+        <div class="scene" id="scene3">
+            <div class="video-container">
+                <video class="video-frame" autoplay muted loop playsinline>
+                    <source src="video/Pyt k zamky.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="dialog-box">
+                <div id="dialog-text-3" class="dialog-text"></div>
+            </div>
+            <div class="controls">
+                <button class="btn" id="next-btn-3" onclick="nextReplique(3)">Далее</button>
+            </div>
+        </div>
+
+        <!-- Сцена 4 -->
+        <div class="scene" id="scene4">
+            <div class="video-container">
+                <video class="video-frame" autoplay muted loop playsinline>
+                    <source src="video/Vorota otkrity.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="dialog-box">
+                <div id="dialog-text-4" class="dialog-text"></div>
+            </div>
+            <div class="controls">
+                <button class="btn" id="next-btn-4" onclick="nextReplique(4)">Далее</button>
+            </div>
+        </div>
+
+        <!-- Сцена 5 (Тень говорит "Ник") -->
+        <div class="scene" id="scene5">
+            <div class="video-container">
+                <video class="video-frame" autoplay muted loop playsinline>
+                    <source src="video/Ten na trone.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="dialog-box">
+                <div id="dialog-text-5" class="dialog-text"></div>
+            </div>
+            <div class="controls">
+                <button class="btn" id="next-btn-5" onclick="nextReplique(5)">Далее</button>
+            </div>
+        </div>
+
+        <!-- Сцена 6 -->
+        <div class="scene" id="scene6">
+            <div class="video-container">
+                <video class="video-frame" autoplay muted loop playsinline>
+                    <source src="video/Ten idet.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div class="dialog-box">
+                <div id="dialog-text-6" class="dialog-text"></div>
+            </div>
+            <div class="controls">
+                <button class="btn" id="next-btn-6" onclick="nextReplique(6)">Далее</button>
+            </div>
+        </div>
+
+        <!-- Сцена 7: Инструкция перед QTE -->
+        <div class="scene" id="scene7">
+            <div class="video-container">
+                <video class="video-frame" autoplay muted loop playsinline>
+                    <source src="video/Ten atakyet.mp4.mp4" type="video/mp4" onerror="handleVideoError(this)">
+                </video>
+            </div>
+            
+            <div class="dialog-box">
+                <div class="instruction-box">
+                    <div class="instruction-text">
+                        ⚔️ СЕЙЧАС НАЧНЁТСЯ МИНИ-ИГРА ⚔️<br><br>
+                        Быстро нажимай появляющиеся кнопки Q, T, E,<br>
+                        чтобы отбить атаки негативных мыслей.<br>
+                        У тебя есть 60 секунд!
+                    </div>
+                </div>
+                
+                <div id="dialog-text-7" class="dialog-text">
+                    <span class="character">Тень:</span> Ты так делал весь год...
+                </div>
+            </div>
+            <div class="controls">
+                <button class="btn" id="next-btn-7" onclick="startQTEGame()">НАЧАТЬ ИГРУ</button>
+            </div>
+        </div>
+
+        <!-- Сцена 8: QTE Фаза 1 -->
+        <div class="scene" id="scene8">
+            <div class="video-container">
+                <video class="video-frame" autoplay muted loop playsinline id="game-video">
+                    <source src="video/Ten atakyet.mp4.mp4" type="video/mp4" onerror="handleVideoError(this)">
+                </video>
+            </div>
+            
+            <div class="dialog-box">
+                <div class="qte-game-container">
+                    <div class="qte-phase1 active" id="qte-phase1">
+                        <div class="attack-theme">⚔️ ОТБЕЙ НЕУДАЧИ И СТРАХИ ⚔️</div>
+                        
+                        <div class="qte-progress-container">
+                            <div class="qte-progress-text">
+                                ОТБИТО АТАК: <span id="qte-score">0</span> / <span id="qte-target">20</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="qte-keys" id="qte-keys">
+                            <div class="qte-key" id="key-Q" onclick="handleQTEClick('Q')">
+                                Q
+                                <div style="font-size: 10px; margin-top: 5px;">БЫСТРО РЕАГИРУЙ</div>
+                            </div>
+                            <div class="qte-key" id="key-T" onclick="handleQTEClick('T')">
+                                T
+                                <div style="font-size: 10px; margin-top: 5px;">ПРОТИВОСТОЙ</div>
+                            </div>
+                            <div class="qte-key" id="key-E" onclick="handleQTEClick('E')">
+                                E
+                                <div style="font-size: 10px; margin-top: 5px;">ВЫДЕРЖКА</div>
+                            </div>
+                        </div>
+                        
+                        <div class="qte-timer" id="qte-timer">⏱ ОСТАЛОСЬ: 60 СЕК</div>
+                        
+                        <div id="phase1-dialog" class="dialog-text">
+                            <span class="character">Тень:</span> Каждая неудача пыталась сломить тебя...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сцена 9: QTE Фаза 2 -->
+        <div class="scene" id="scene9">
+            <div class="video-container">
+                <video class="video-frame" autoplay muted loop playsinline>
+                    <source src="video/Ten letaet vokryg.mp4" type="video/mp4" onerror="handleVideoError(this)">
+                </video>
+            </div>
+            
+            <div class="dialog-box">
+                <div class="focus-scene active" id="focus-scene">
+                    <div class="focus-main-text">СОСРЕДОТОЧЬСЯ НА ВАЖНОМ</div>
+                    
+                    <div class="focus-area">
+                        <div style="text-align: center; margin-bottom: 15px; color: #aaffaa;">
+                            Удерживай кнопку, чтобы осмыслить и отпустить
+                        </div>
+                        
+                        <div class="hold-button" id="hold-button" onmousedown="startHold()" onmouseup="stopHold()" ontouchstart="startHold()" ontouchend="stopHold()">
+                            УДЕРЖИВАЙ
+                            <div class="hold-progress" id="hold-progress"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="focus-dialog" class="dialog-text">
+                        <span class="character">Тень:</span> Не всё было твоей виной...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сцена 10: Выбор памяти -->
+        <div class="scene" id="scene10">
+            <div class="video-container">
+                <video class="video-frame" autoplay muted loop playsinline>
+                    <source src="video/Ten letaet vokryg.mp4" type="video/mp4" onerror="handleVideoError(this)">
+                </video>
+            </div>
+            
+            <div class="dialog-box">
+                <div class="choice-scene active" id="choice-scene">
+                    <div class="choice-title">🌟 ВЫБЕРИ САМОЕ ВАЖНОЕ 🌟</div>
+                    
+                    <div id="choice-dialog" class="dialog-text">
+                        <span class="character">Юми:</span> Выбери то, что хочешь сохранить...
+                    </div>
+                    
+                    <div class="memories-container" id="memories-container">
+                        <!-- Памяти будут созданы JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Сцена 11 -->
+        <div class="scene" id="scene11">
+            <div class="video-container">
+                <video class="video-frame" autoplay muted loop playsinline>
+                    <source src="video/Ten yspokoilas.mp4" type="video/mp4" onerror="handleVideoError(this)">
+                </video>
+            </div>
+            <div class="dialog-box">
+                <div id="dialog-text-11" class="dialog-text"></div>
+            </div>
+            <div class="controls">
+                <button class="btn" id="next-btn-11" onclick="nextReplique(11)">Далее</button>
+            </div>
+        </div>
+
+        <!-- Сцена 12: Тень растворяется -->
+        <div class="scene" id="scene12">
+            <div class="video-container">
+                <video class="video-frame" autoplay muted loop playsinline>
+                    <source src="video/Ten rastvoryaetsya.mp4" type="video/mp4" onerror="handleVideoError(this)">
+                </video>
+            </div>
+            <div class="dialog-box">
+                <div id="dialog-text-12" class="dialog-text"></div>
+            </div>
+            <div class="controls">
+                <button class="btn" id="next-btn-12" onclick="nextReplique(12)">Далее</button>
+            </div>
+        </div>
+
+        <!-- Сцена 13: Возвращение домой -->
+        <div class="scene" id="scene13">
+            <div class="video-container">
+                <video class="video-frame" autoplay muted loop playsinline>
+                    <source src="video/Final Tmy.mp4" type="video/mp4" onerror="handleVideoError(this)">
+                </video>
+            </div>
+            <div class="dialog-box">
+                <div id="dialog-text-13" class="dialog-text"></div>
+            </div>
+            <div class="controls">
+                <button class="btn" id="next-btn-13" onclick="nextReplique(13)">Далее</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Окошко перезапуска -->
+    <div class="retry-modal" id="retry-modal">
+        <div class="retry-box">
+            <div class="retry-title">⏱ ВРЕМЯ ВЫШЛО!</div>
+            <div style="color: #ffaaaa; margin-bottom: 20px;">
+                Попробуй еще раз!
+            </div>
+            <button class="retry-btn" onclick="retryQTE()">ПОПРОБОВАТЬ СНОВА</button>
+        </div>
+    </div>
+
+    <!-- Аудио для эмбиента -->
+    <audio id="ambient-audio" loop>
+        <source src="audio/Floating Thru Space (Ambient Music For Sleep) - An Angel's Caress [audiovk.com].mp3" type="audio/mp3">
+        <source src="audio/ambient.ogg" type="audio/ogg">
+        Ваш браузер не поддерживает аудио элемент.
+    </audio>
+
+    <!-- Аудио для QTE игры -->
+    <audio id="qte-audio" loop>
+        <!-- Замените на свой аудиофайл для QTE -->
+        <source src="audio/qte-music.mp3" type="audio/mp3">
+        <source src="audio/qte-music.ogg" type="audio/ogg">
+    </audio>
+
+    <!-- Звуки для кнопок -->
+    <audio id="btn-sound" preload="auto">
+        <source src="audio/button-click.mp3" type="audio/mp3">
+        <source src="audio/button-click.ogg" type="audio/ogg">
+    </audio>
+    
+    <audio id="qte-hit-sound" preload="auto">
+        <source src="audio/qte-hit.mp3" type="video/mp3">
+        <source src="audio/qte-hit.ogg" type="audio/ogg">
+    </audio>
+    
+    <audio id="select-sound" preload="auto">
+        <source src="audio/select.mp3" type="audio/mp3">
+        <source src="audio/select.ogg" type="audio/ogg">
+    </audio>
+
+    <script>
+        const repliques = {
+            1: [
+                {char: "Юми:", text: "Ник… ты проснулся."},
+                {char: "", text: "...", resp: "(Ник медленно открывает глаза)"},
+                {char: "Ник:", text: "Юми? Что происходит?"},
+                {char: "Юми:", text: "Мне снилось, что дальше уже нельзя просто идти."},
+                {char: "Ник:", text: "Но мы идём, верно?"},
+                {char: "Юми:", text: "Да. Мы всё равно пойдём.", resp: "(Костер окончательно гаснет)"}
+            ],
+            2: [
+                {char: "Ник:", text: "Что это там, вдалеке?"},
+                {char: "Юми:", text: "Ник… там не видно ни стен, ни стражей."},
+                {char: "Ник:", text: "Странно… будто он ждёт."},
+                {char: "Юми:", text: "Она не прячется. Она ждёт не гостя… а тебя.", resp: "(Фиолетовые молнии очерчивают силуэт)"}
+            ],
+            3: [
+                {char: "Ник:", text: "Юми, ты чувствуешь?"},
+                {char: "Юми:", text: "Да… это странно. Ни одна Тень раньше не позволяла подойти так просто.", resp: "(Земля пульсирует под ногами)"},
+                {char: "Ник:", text: "Будто она знала, что мы придём."},
+                {char: "Юми:", text: "Не мы… ты. Она ждала именно тебя."}
+            ],
+            4: [
+                {char: "Ник:", text: "Ворота открыты…"},
+                {char: "Юми:", text: "Она ждала.", resp: "(Металл ворот холодный, но не леденящий)"},
+                {char: "Ник:", text: "Я помню… как боялся закрытых дверей."},
+                {char: "Юми:", text: "А теперь они распахнуты."},
+                {char: "Ник:", text: "Теперь я не боюсь.", resp: "(И внутри — только ты сам)"}
+            ],
+            5: [
+                {char: "Тень:", text: "Ник."},
+                {char: "Ник:", text: "Ты…"},
+                {char: "Тень:", text: "Я не ставила преград. Не нужно было.", resp: "(На зеркальном полу отражаются обба)"},
+                {char: "Ник:", text: "Почему?"},
+                {char: "Тень:", text: "Ты бы всё равно дошёл. Я знала — ты придёшь в последнюю ночь года."}
+            ],
+            6: [
+                {char: "Тень:", text: "Я — всё, что не получилось за этот год.", resp: "(Трон начинает таять)"},
+                {char: "Ник:", text: "Все неудачи…"},
+                {char: "Тень:", text: "Все попытки, где ты делал максимум… но этого оказалось мало."},
+                {char: "Ник:", text: "И все моменты, где я винил себя…"},
+                {char: "Тень:", text: "Сильнее, чем нужно. Да.", resp: "(И утро, начинавшееся с этой мысли)"}
+            ],
+            7: [
+                {char: "Тень:", text: "Ты так делал весь год...", resp: "(готовься к борьбе)"}
+            ],
+            11: [
+                {char: "Тень:", text: "Я ждала…"},
+                {char: "Ник:", text: "Чего?"},
+                {char: "Тень:", text: "Чтобы ты больше не нёс это один.", resp: "(Её голос стал тише и мягче)"},
+                {char: "Ник:", text: "Но это же моя боль…"},
+                {char: "Тень:", text: "Которая была не только твоей. Ты делил её с миром, который тоже старался."}
+            ],
+            12: [
+                {char: "Юми:", text: "Тень растворяется…", resp: "(Золотой свет наполняет зал)"},
+                {char: "Ник:", text: "Она… уходит."},
+                {char: "Юми:", text: "Нет. Она становится частью тебя.", resp: "(Свет становится ярче)"},
+                {char: "Ник:", text: "Больше не как тяжесть…"},
+                {char: "Юми:", text: "А как опыт. Как путь, который ты прошёл."}
+            ],
+            13: [
+                {char: "", text: "Их телепортировало домой, в деревню Угольное Сердце.", resp: "(Вокруг знакомые стены и теплый свет)"},
+                {char: "Юми:", text: "Мы… дома."},
+                {char: "Ник:", text: "Мир Тени растворился."},
+                {char: "Юми:", text: "Потому что ты принял её. Не как врага…"},
+                {char: "Ник:", text: "А как часть себя."},
+                {char: "", text: "С НОВЫМ ГОДОМ."},
+                {char: "", text: "И СО ВСЕМ, ЧТО В НЁМ БУДЕТ."}
+            ]
+        };
+
+        let currentScene = 0;
+        let currentReplique = {};
+        let isTyping = false;
+        let shadowAppeared = false;
+        
+        let qteScore = 0;
+        let qteTarget = 20;
+        let qteTime = 60;
+        let qteInterval;
+        let attackInterval;
+        let activeKey = null;
+        
+        let holdProgress = 0;
+        let holdInterval;
+        let isHolding = false;
+        let selectedMemory = null;
+        let holdPhrases = ["Я смогу", "Это пройдёт", "Я справлюсь", "Я достоин", "Всё будет хорошо", "Я сильнее"];
+        
+        // Аудио переменные
+        let ambientAudio = document.getElementById('ambient-audio');
+        let qteAudio = document.getElementById('qte-audio');
+        let btnSound = document.getElementById('btn-sound');
+        let qteHitSound = document.getElementById('qte-hit-sound');
+        let selectSound = document.getElementById('select-sound');
+        let isSoundOn = true;
+        let ambientVolume = 0.5;
+        let qteVolume = 0.5;
+        let sfxVolume = 0.7;
+        
+        // Создание звуков для кнопок (как в первой игре)
+        let audioContext;
+        let pixelSoundEnabled = true;
+
+        function initAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (e) {
+                console.log('Web Audio API не поддерживается');
+                pixelSoundEnabled = false;
+            }
+        }
+
+        function playPixelSound(type) {
+            if (!pixelSoundEnabled || !audioContext || !isSoundOn) return;
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            let frequency = 440, duration = 0.1;
+            
+            switch(type) {
+                case 'click': frequency = 220 + Math.random() * 110; duration = 0.05; break;
+                case 'step': frequency = 150 + Math.random() * 50; duration = 0.08; break;
+                case 'success': frequency = 880; duration = 0.2; break;
+                case 'fail': frequency = 110; duration = 0.3; break;
+                case 'hover': frequency = 330; duration = 0.03; break;
+                case 'menu_click': frequency = 550; duration = 0.1; break;
+                case 'select': frequency = 660; duration = 0.15; break;
+                case 'qte_hit': frequency = 440 + Math.random() * 220; duration = 0.1; break;
+            }
+            
+            oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.1 * sfxVolume, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        const memories = [
+            {emoji: "✨", label: "Маленькие победы"},
+            {emoji: "❤️", label: "Забота о себе"},
+            {emoji: "🌟", label: "Личный рост"},
+            {emoji: "🤝", label: "Поддержка близких"}
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Инициализация звуков для кнопок
+            initAudio();
+            
+            // Настройка слайдеров громкости
+            setupVolumeControls();
+            
+            // Автовоспроизведение эмбиента будет только после клика пользователя
+            // Убираем автостарт
+            
+            // Закрытие микшера при клике вне его
+            document.addEventListener('click', (e) => {
+                const mixer = document.getElementById('volume-mixer');
+                const soundBtn = document.getElementById('sound-btn');
+                if (mixer && soundBtn && !mixer.contains(e.target) && !soundBtn.contains(e.target)) {
+                    mixer.classList.remove('active');
+                }
+            });
+            
+            // Добавляем звуки на все кнопки
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('btn') || 
+                    e.target.classList.contains('start-btn') || 
+                    e.target.classList.contains('retry-btn') ||
+                    e.target.classList.contains('menu-btn') ||
+                    e.target.classList.contains('close-congrats-btn')) {
+                    playButtonSound();
+                    playPixelSound('click');
+                    
+                    // Если аудио контекст приостановлен, запускаем его
+                    if (audioContext && audioContext.state === 'suspended') {
+                        audioContext.resume();
+                    }
+                }
+            });
+            
+            // Звук при наведении на кнопки (как в первой игре)
+            document.querySelectorAll('.btn, .start-btn, .retry-btn, .menu-btn, .qte-key, .memory-choice, .hold-button, .close-congrats-btn').forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    playPixelSound('hover');
+                });
+            });
+        });
+
+        function setupVolumeControls() {
+            const ambientSlider = document.getElementById('ambient-volume');
+            const qteSlider = document.getElementById('qte-volume');
+            const sfxSlider = document.getElementById('sfx-volume');
+            const ambientValue = document.getElementById('ambient-volume-value');
+            const qteValue = document.getElementById('qte-volume-value');
+            const sfxValue = document.getElementById('sfx-volume-value');
+            
+            // Восстановление сохранённых значений
+            const savedAmbient = localStorage.getItem('ambientVolume');
+            const savedQTE = localStorage.getItem('qteVolume');
+            const savedSFX = localStorage.getItem('sfxVolume');
+            
+            if (savedAmbient) {
+                ambientVolume = parseFloat(savedAmbient);
+                ambientSlider.value = ambientVolume * 100;
+                ambientValue.textContent = `${Math.round(ambientVolume * 100)}%`;
+            }
+            
+            if (savedQTE) {
+                qteVolume = parseFloat(savedQTE);
+                qteSlider.value = qteVolume * 100;
+                qteValue.textContent = `${Math.round(qteVolume * 100)}%`;
+            }
+            
+            if (savedSFX) {
+                sfxVolume = parseFloat(savedSFX);
+                sfxSlider.value = sfxVolume * 100;
+                sfxValue.textContent = `${Math.round(sfxVolume * 100)}%`;
+            }
+            
+            // Обработчики слайдеров
+            ambientSlider.addEventListener('input', function() {
+                ambientVolume = this.value / 100;
+                ambientValue.textContent = `${this.value}%`;
+                if (ambientAudio) {
+                    ambientAudio.volume = ambientVolume;
+                }
+                localStorage.setItem('ambientVolume', ambientVolume);
+            });
+            
+            qteSlider.addEventListener('input', function() {
+                qteVolume = this.value / 100;
+                qteValue.textContent = `${this.value}%`;
+                if (qteAudio) {
+                    qteAudio.volume = qteVolume;
+                }
+                localStorage.setItem('qteVolume', qteVolume);
+            });
+            
+            sfxSlider.addEventListener('input', function() {
+                sfxVolume = this.value / 100;
+                sfxValue.textContent = `${this.value}%`;
+                localStorage.setItem('sfxVolume', sfxVolume);
+            });
+        }
+
+        function playButtonSound() {
+            if (btnSound && isSoundOn) {
+                btnSound.volume = sfxVolume;
+                btnSound.currentTime = 0;
+                btnSound.play().catch(e => console.log("Ошибка воспроизведения звука кнопки:", e));
+            }
+        }
+
+        function playQTESound() {
+            if (qteHitSound && isSoundOn) {
+                qteHitSound.volume = sfxVolume;
+                qteHitSound.currentTime = 0;
+                qteHitSound.play().catch(e => console.log("Ошибка воспроизведения QTE звука:", e));
+            }
+            // Также играем пиксельный звук
+            playPixelSound('qte_hit');
+        }
+
+        function playSelectSound() {
+            if (selectSound && isSoundOn) {
+                selectSound.volume = sfxVolume;
+                selectSound.currentTime = 0;
+                selectSound.play().catch(e => console.log("Ошибка воспроизведения звука выбора:", e));
+            }
+            // Также играем пиксельный звук
+            playPixelSound('select');
+        }
+
+        function toggleSoundPanel() {
+            const mixer = document.getElementById('volume-mixer');
+            const soundBtn = document.getElementById('sound-btn');
+            
+            if (mixer.classList.contains('active')) {
+                mixer.classList.remove('active');
+            } else {
+                mixer.classList.add('active');
+            }
+        }
+
+        function playAmbient() {
+            if (ambientAudio && isSoundOn) {
+                ambientAudio.volume = ambientVolume;
+                ambientAudio.play().catch(e => {
+                    console.log("Ошибка воспроизведения эмбиента:", e);
+                    // Показываем кнопку для пользовательского взаимодействия
+                    document.getElementById('sound-btn').textContent = '▶️';
+                    document.getElementById('sound-btn').title = 'Нажмите для включения звука';
+                });
+            }
+        }
+
+        function playQTEMusic() {
+            if (qteAudio && isSoundOn) {
+                qteAudio.volume = qteVolume;
+                qteAudio.currentTime = 0;
+                qteAudio.play().catch(e => console.log("Ошибка воспроизведения QTE музыки:", e));
+            }
+            
+            // Приглушаем эмбиент во время QTE
+            if (ambientAudio) {
+                ambientAudio.volume = ambientVolume * 0.3;
+            }
+        }
+
+        function stopQTEMusic() {
+            if (qteAudio) {
+                qteAudio.pause();
+                qteAudio.currentTime = 0;
+            }
+            
+            // Возвращаем нормальную громкость эмбиента
+            if (ambientAudio && isSoundOn) {
+                ambientAudio.volume = ambientVolume;
+                if (ambientAudio.paused) {
+                    ambientAudio.play();
+                }
+            }
+        }
+
+        function handleVideoError(videoElement) {
+            console.error("Ошибка загрузки видео:", videoElement.src);
+            videoElement.style.display = 'none';
+            videoElement.parentElement.style.background = '#000';
+            videoElement.parentElement.innerHTML = '<div style="color: white; text-align: center; padding: 50px;">Видео не загрузилось</div>';
+        }
+
+        function setBackground(type) {
+            const body = document.getElementById('page-body');
+            if (type === 'street') {
+                body.classList.remove('castle-bg', 'final-bg');
+            } else if (type === 'castle') {
+                body.classList.remove('final-bg');
+                body.classList.add('castle-bg');
+            } else if (type === 'final') {
+                body.classList.remove('castle-bg');
+                body.classList.add('final-bg');
+            }
+        }
+
+        function typeText(element, text, callback) {
+            if (isTyping) return;
+            isTyping = true;
+            
+            element.innerHTML = '';
+            
+            let i = 0;
+            let currentHTML = '';
+            
+            function processNextChar() {
+                if (i < text.length) {
+                    const char = text.charAt(i);
+                    currentHTML += char;
+                    element.innerHTML = currentHTML + '<span class="typing-cursor"></span>';
+                    i++;
+                    setTimeout(processNextChar, 10);
+                } else {
+                    element.innerHTML = currentHTML;
+                    isTyping = false;
+                    if (callback) callback();
+                }
+            }
+            
+            processNextChar();
+        }
+
+        function showReplique(sceneNum, index) {
+            if (!repliques[sceneNum]) return;
+            if (index >= repliques[sceneNum].length) return;
+            
+            const replique = repliques[sceneNum][index];
+            const dialogBox = document.getElementById(`dialog-text-${sceneNum}`);
+            const nextBtn = document.getElementById(`next-btn-${sceneNum}`);
+            
+            if (!dialogBox) return;
+            nextBtn.style.display = 'none';
+            
+            let htmlContent = '';
+            if (replique.char) {
+                htmlContent += `<span class="character">${replique.char}</span> `;
+            }
+            htmlContent += replique.text;
+            if (replique.resp) {
+                htmlContent += `<div class="response">${replique.resp}</div>`;
+            }
+            
+            typeText(dialogBox, htmlContent, () => {
+                nextBtn.style.display = 'block';
+            });
+            
+            currentReplique[sceneNum] = index;
+            
+            if (sceneNum === 5 && index === 0 && replique.char === "Тень:" && replique.text === "Ник.") {
+                if (!shadowAppeared) {
+                    shadowAppeared = true;
+                    // Фон замка устанавливаем ТОЛЬКО один раз при первом появлении Тени
+                    setTimeout(() => {
+                        setBackground('castle');
+                    }, 500);
+                }
+            }
+        }
+
+        function startGame() {
+            playPixelSound('menu_click');
+            
+            // Запускаем аудио после первого клика пользователя
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            
+            // Запускаем эмбиент
+            if (ambientAudio && isSoundOn) {
+                ambientAudio.volume = ambientVolume;
+                ambientAudio.play().catch(e => {
+                    console.log("Ошибка запуска эмбиента:", e);
+                });
+            }
+            
+            goToScene(1);
+        }
+
+        function nextReplique(sceneNum) {
+            if (isTyping) {
+                const dialogBox = document.getElementById(`dialog-text-${sceneNum}`);
+                const replique = repliques[sceneNum][currentReplique[sceneNum] || 0];
+                
+                if (replique) {
+                    let htmlContent = '';
+                    if (replique.char) {
+                        htmlContent += `<span class="character">${replique.char}</span> `;
+                    }
+                    htmlContent += replique.text;
+                    if (replique.resp) {
+                        htmlContent += `<div class="response">${replique.resp}</div>`;
+                    }
+                    
+                    dialogBox.innerHTML = htmlContent;
+                    isTyping = false;
+                    const nextBtn = document.getElementById(`next-btn-${sceneNum}`);
+                    nextBtn.style.display = 'block';
+                }
+                return;
+            }
+            
+            const currentIndex = currentReplique[sceneNum] || 0;
+            const nextIndex = currentIndex + 1;
+            
+            if (nextIndex < repliques[sceneNum].length) {
+                showReplique(sceneNum, nextIndex);
+            } else {
+                if (sceneNum === 1) {
+                    // После сцены 1 меняем кнопку "Встать" на "Далее" для остальных сцен
+                    document.getElementById('next-btn-2').textContent = 'Далее';
+                    document.getElementById('next-btn-3').textContent = 'Далее';
+                    document.getElementById('next-btn-4').textContent = 'Далее';
+                    document.getElementById('next-btn-5').textContent = 'Далее';
+                    document.getElementById('next-btn-6').textContent = 'Далее';
+                    goToScene(2);
+                } else if (sceneNum === 6) {
+                    goToScene(7);
+                } else if (sceneNum === 10) {
+                    goToScene(11);
+                } else if (sceneNum === 13) {
+                    // Финальная сцена - показываем поздравление
+                    document.getElementById('dialog-text-13').innerHTML = `
+                        <div class="home-text">
+                            Мир Тени растворился, и их телепортировало домой,<br>
+                            в деревню Угольное Сердце. Всё хорошо.
+                        </div>
+                        <div class="final-message">С НОВЫМ ГОДОМ</div>
+                        <div class="final-message" style="font-size: 20px;">И СО ВСЕМ, ЧТО В НЁМ БУДЕТ</div>
+                    `;
+                    document.querySelector('#scene13 .controls').innerHTML = `
+                        <button class="btn" onclick="showCongrats()">❤️ ПРОЧИТАТЬ ПОЗДРАВЛЕНИЕ ОТ ЮМИ</button>
+                    `;
+                    
+                    // Устанавливаем финальный фон
+                    setBackground('final');
+                } else {
+                    goToScene(sceneNum + 1);
+                }
+            }
+        }
+
+        function showCongrats() {
+            playPixelSound('select');
+            document.getElementById('congrats-modal').classList.add('active');
+            
+            // Воспроизводим праздничный звук при открытии поздравления
+            playPixelSound('success');
+            
+            // Прокручиваем к началу сообщения
+            const congratsContainer = document.querySelector('.congrats-message-container');
+            if (congratsContainer) {
+                congratsContainer.scrollTop = 0;
+            }
+        }
+
+        function closeCongrats() {
+            playPixelSound('click');
+            document.getElementById('congrats-modal').classList.remove('active');
+            
+            // Показываем кнопки для возврата в меню
+            document.querySelector('#scene13 .controls').innerHTML = `
+                <a href="index1.html" class="menu-btn">ВЕРНУТЬСЯ В МЕНЮ</a>
+                <button class="btn" onclick="restartGame()">НАЧАТЬ ЗАНОВО</button>
+            `;
+        }
+
+        function goToScene(num) {
+            if (qteInterval) clearInterval(qteInterval);
+            if (attackInterval) clearInterval(attackInterval);
+            if (holdInterval) clearInterval(holdInterval);
+            
+            qteScore = 0;
+            qteTime = 60;
+            holdProgress = 0;
+            isHolding = false;
+            selectedMemory = null;
+            
+            document.querySelectorAll('.video-frame').forEach(video => {
+                video.pause();
+            });
+            
+            document.querySelectorAll('.scene').forEach(scene => {
+                scene.classList.remove('active');
+            });
+            
+            // ВАЖНОЕ ИСПРАВЛЕНИЕ: НЕ скрываем окно поздравления при переходе между сценами
+            // Только если это не переход к другой сцене (num не равен 0)
+            if (num !== 0 && num !== 13) {
+                document.getElementById('congrats-modal').classList.remove('active');
+            }
+            
+            currentScene = num;
+            const nextScene = document.getElementById(`scene${num}`);
+            if (!nextScene) return;
+            
+            nextScene.classList.add('active');
+            
+            const video = nextScene.querySelector('.video-frame');
+            if (video) {
+                video.currentTime = 0;
+                video.play().catch(e => console.log("Ошибка воспроизведения видео:", e));
+            }
+            
+            // Управление аудио в зависимости от сцены
+            if (num >= 8 && num <= 9) {
+                // QTE сцены - включаем боевую музыку
+                playQTEMusic();
+            } else {
+                // Обычные сцены - выключаем QTE музыку, включаем эмбиент
+                stopQTEMusic();
+                if (ambientAudio && isSoundOn && ambientAudio.paused) {
+                    playAmbient();
+                }
+                
+                // Устанавливаем правильный фон для каждой сцены
+                if (num === 13) {
+                    // Финальная сцена
+                    setBackground('final');
+                } else if (num >= 5 && num <= 12) {
+                    // Сцены с 5 по 12 - замок
+                    // Особенно важно сцены 11 и 12, которые были забыты
+                    setBackground('castle');
+                } else if (num <= 4) {
+                    // Сцены с 1 по 4 - улица
+                    setBackground('street');
+                }
+            }
+            
+            if (num !== 0 && num !== 8 && num !== 9 && num !== 10) {
+                currentReplique[num] = 0;
+                showReplique(num, 0);
+            }
+            
+            if (num === 10) {
+                setTimeout(() => {
+                    createMemories();
+                }, 500);
+            }
+            
+            document.getElementById('retry-modal').classList.remove('active');
+        }
+
+        function startQTEGame() {
+            goToScene(8);
+            startQTEPhase1();
+        }
+
+        function startQTEPhase1() {
+            qteScore = 0;
+            qteTime = 60;
+            
+            updateQTEStats();
+            updateTimer();
+            
+            qteInterval = setInterval(() => {
+                qteTime--;
+                updateTimer();
+                
+                if (qteTime <= 0) {
+                    clearInterval(qteInterval);
+                    clearInterval(attackInterval);
+                    stopQTEMusic();
+                    
+                    setTimeout(() => {
+                        document.getElementById('retry-modal').classList.add('active');
+                    }, 1000);
+                }
+            }, 1000);
+            
+            setTimeout(() => {
+                activateRandomAttack();
+            }, 500);
+            
+            attackInterval = setInterval(() => {
+                activateRandomAttack();
+            }, 1500);
+        }
+
+        function activateRandomAttack() {
+            if (activeKey) {
+                const keyElement = document.getElementById(`key-${activeKey}`);
+                if (keyElement) {
+                    keyElement.classList.remove('active');
+                }
+            }
+            
+            const keys = ['Q', 'T', 'E'];
+            activeKey = keys[Math.floor(Math.random() * keys.length)];
+            
+            const keyElement = document.getElementById(`key-${activeKey}`);
+            if (keyElement) {
+                keyElement.classList.add('active');
+                
+                setTimeout(() => {
+                    if (keyElement.classList.contains('active')) {
+                        keyElement.classList.remove('active');
+                        activeKey = null;
+                    }
+                }, 1200);
+            }
+        }
+
+        function handleQTEClick(key) {
+            const keyElement = document.getElementById(`key-${key}`);
+            if (!keyElement) return;
+            
+            if (keyElement.classList.contains('active')) {
+                keyElement.classList.remove('active');
+                keyElement.classList.add('pressed');
+                
+                qteScore++;
+                playQTESound(); // Звук при успешном нажатии
+                
+                setTimeout(() => {
+                    keyElement.classList.remove('pressed');
+                }, 200);
+                
+                updateQTEStats();
+                
+                if (qteScore >= qteTarget) {
+                    clearInterval(qteInterval);
+                    clearInterval(attackInterval);
+                    stopQTEMusic();
+                    setTimeout(() => {
+                        playPixelSound('success');
+                        goToScene(9);
+                    }, 1000);
+                }
+            }
+        }
+
+        function handleKeyPress(event) {
+            const key = event.key.toUpperCase();
+            if (key === 'Q' || key === 'T' || key === 'E') {
+                handleQTEClick(key);
+            }
+        }
+
+        function updateQTEStats() {
+            document.getElementById('qte-score').textContent = qteScore;
+            
+            const progress = (qteScore / qteTarget) * 100;
+            const fillElement = document.getElementById('progress-fill');
+            if (fillElement) {
+                fillElement.style.width = `${Math.min(100, progress)}%`;
+            }
+        }
+
+        function updateTimer() {
+            const timerElement = document.getElementById('qte-timer');
+            if (timerElement) {
+                timerElement.textContent = `⏱ ОСТАЛОСЬ: ${qteTime} СЕК`;
+            }
+        }
+
+        function retryQTE() {
+            document.getElementById('retry-modal').classList.remove('active');
+            startQTEPhase1();
+        }
+
+        function createHoldPhrase() {
+            if (!isHolding) return;
+            
+            const focusArea = document.querySelector('.focus-area');
+            if (!focusArea) return;
+            
+            const phrase = holdPhrases[Math.floor(Math.random() * holdPhrases.length)];
+            const phraseElement = document.createElement('div');
+            phraseElement.className = 'hold-phrase';
+            phraseElement.textContent = phrase;
+            
+            const x = Math.random() * (focusArea.offsetWidth - 60) + 30;
+            const y = Math.random() * (focusArea.offsetHeight - 30) + 15;
+            
+            phraseElement.style.left = `${x}px`;
+            phraseElement.style.top = `${y}px`;
+            
+            focusArea.appendChild(phraseElement);
+            
+            setTimeout(() => {
+                phraseElement.remove();
+            }, 2000);
+        }
+
+        function startHold() {
+            if (isHolding) return;
+            
+            isHolding = true;
+            const holdButton = document.getElementById('hold-button');
+            holdButton.classList.add('holding');
+            
+            holdInterval = setInterval(() => {
+                if (isHolding) {
+                    holdProgress += 1.5;
+                    if (holdProgress >= 100) {
+                        holdProgress = 100;
+                        clearInterval(holdInterval);
+                        
+                        // Показываем завершение
+                        holdButton.textContent = '✓ ОСМЫСЛЕНО!';
+                        holdButton.style.cursor = 'default';
+                        holdButton.style.background = 'linear-gradient(45deg, #00aa00, #00ff00)';
+                        
+                        // Переход к выбору памяти через 1.5 секунды
+                        setTimeout(() => {
+                            playPixelSound('success');
+                            goToScene(10);
+                        }, 1500);
+                    }
+                    
+                    const holdProgressBar = document.getElementById('hold-progress');
+                    if (holdProgressBar) {
+                        holdProgressBar.style.width = `${holdProgress}%`;
+                    }
+                    
+                    // Показываем фразы случайным образом
+                    if (Math.random() < 0.3) {
+                        createHoldPhrase();
+                    }
+                }
+            }, 50);
+        }
+
+        function stopHold() {
+            if (!isHolding) return;
+            
+            isHolding = false;
+            const holdButton = document.getElementById('hold-button');
+            holdButton.classList.remove('holding');
+            clearInterval(holdInterval);
+        }
+
+        function createMemories() {
+            const container = document.getElementById('memories-container');
+            container.innerHTML = '';
+            
+            const warningDiv = document.createElement('div');
+            warningDiv.style.color = '#ffcc00';
+            warningDiv.style.fontSize = '10px';
+            warningDiv.style.marginBottom = '10px';
+            warningDiv.style.textAlign = 'center';
+            warningDiv.textContent = 'Выбери самое важное';
+            container.parentNode.insertBefore(warningDiv, container);
+            
+            memories.forEach((memory, index) => {
+                const memoryElement = document.createElement('div');
+                memoryElement.className = 'memory-choice';
+                memoryElement.dataset.index = index;
+                memoryElement.innerHTML = `
+                    <div class="memory-emoji">${memory.emoji}</div>
+                    <div class="memory-label">${memory.label}</div>
+                `;
+                
+                memoryElement.onclick = function() {
+                    playSelectSound(); // Звук при выборе памяти
+                    playPixelSound('select'); // Пиксельный звук
+                    
+                    // Снимаем выделение с предыдущего выбора
+                    const allMemories = document.querySelectorAll('.memory-choice');
+                    allMemories.forEach(m => m.classList.remove('selected'));
+                    
+                    // Выделяем текущий
+                    this.classList.add('selected');
+                    selectedMemory = this;
+                    
+                    warningDiv.style.color = '#00ff00';
+                    warningDiv.textContent = `Выбрано: ${memory.label}`;
+                    
+                    // Переход к следующей сцене через 2 секунды
+                    setTimeout(() => {
+                        playPixelSound('menu_click');
+                        goToScene(11);
+                    }, 2000);
+                };
+                
+                container.appendChild(memoryElement);
+            });
+        }
+
+        function restartGame() {
+            currentReplique = {};
+            isTyping = false;
+            shadowAppeared = false;
+            
+            // Перезапускаем аудио
+            if (ambientAudio) {
+                ambientAudio.currentTime = 0;
+                ambientAudio.volume = ambientVolume;
+                if (isSoundOn) {
+                    ambientAudio.play();
+                }
+            }
+            
+            if (qteAudio) {
+                qteAudio.pause();
+                qteAudio.currentTime = 0;
+                qteAudio.volume = qteVolume;
+            }
+            
+            // Возвращаем кнопку "Встать" на место
+            document.getElementById('next-btn-1').textContent = 'Встать';
+            
+            setBackground('street');
+            goToScene(0); // Возвращаемся к заставке
+        }
+    </script>
+</body>
+</html>
